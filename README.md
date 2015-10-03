@@ -1,8 +1,12 @@
 # ImageProcessing
 
 Provides higher-level helper methods for image processing in Ruby using
-ImageMagick. This methods are extracted from CarrierWave and Refile, and
-can be reused in any project.
+ImageMagick.
+
+This methods were extracted from Refile, and were made generic so that they can
+be used in any project. The goal is to have a centralized place where image
+processing helper methods are maintained, instead of CarrierWave, Dragonfly and
+Refile each having their own.
 
 ## Installation
 
