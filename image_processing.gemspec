@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/janko-m/image_processing"
   spec.license       = "MIT"
 
-  spec.files         = Dir["README.md", "LICENSE.txt", "lib/**", "image_processing.gemspec"]
+  spec.files         = Dir["README.md", "LICENSE.txt", "lib/**/*", "image_processing.gemspec"]
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "minitest", "~> 5.8"
