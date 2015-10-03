@@ -19,7 +19,7 @@ module ImageProcessing
     # Changes the image encoding format to the given format
     #
     # @see http://www.imagemagick.org/script/command-line-options.php#format
-    # @param [MiniMagick::Image] img      the image to convert
+    # @param [MiniMagick::Image] image    the image to convert
     # @param [String] format              the format to convert to
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
@@ -36,7 +36,7 @@ module ImageProcessing
     # narrower than specified in either dimension but will not be larger than
     # the specified values.
     #
-    # @param [MiniMagick::Image] img      the image to convert
+    # @param [MiniMagick::Image] image    the image to convert
     # @param [#to_s] width                the maximum width
     # @param [#to_s] height               the maximum height
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
@@ -56,7 +56,7 @@ module ImageProcessing
     # specified in the smaller dimension but will not be larger than the
     # specified values.
     #
-    # @param [MiniMagick::Image] img      the image to convert
+    # @param [MiniMagick::Image] image    the image to convert
     # @param [#to_s] width                the width to fit into
     # @param [#to_s] height               the height to fit into
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
@@ -80,7 +80,7 @@ module ImageProcessing
     # By default, the center part of the image is kept, and the remainder
     # cropped off, but this can be changed via the `gravity` option.
     #
-    # @param [MiniMagick::Image] img      the image to convert
+    # @param [MiniMagick::Image] image    the image to convert
     # @param [#to_s] width                the width to fill out
     # @param [#to_s] height               the height to fill out
     # @param [String] gravity             which part of the image to focus on
@@ -111,7 +111,7 @@ module ImageProcessing
     # By default, the image will be placed in the center but this can be
     # changed via the `gravity` option.
     #
-    # @param [MiniMagick::image] img      the image to convert
+    # @param [MiniMagick::image] image    the image to convert
     # @param [#to_s] width                the width to fill out
     # @param [#to_s] height               the height to fill out
     # @param [string] background          the color to use as a background
