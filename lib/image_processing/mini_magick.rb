@@ -137,6 +137,28 @@ module ImageProcessing
     end
     nondestructive_alias :resize_and_pad, :resize_and_pad!
 
+    # Resample the image to fit within the specified resolution while retaining
+    # the original image size.
+    #
+    # The resulting image will always be the same pixel size as the source with
+    # an adjusted resolution dimensions.
+    #
+    # @param [MiniMagick::Image] img      the image to convert
+    # @param [#to_s] width                the dpi width
+    # @param [#to_s] height               the dpi height
+    # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
+    # @return [File, Tempfile]
+    # @see http://www.imagemagick.org/script/command-line-options.php#resample
+    def resample!(image, width, height)
+      _with_minimagick(image) do |img|
+        img.combine_options do |cmd|
+          yield cmd if block_given?
+          cmd.resample "#{width}x#{height}"
+        end
+      end
+    end
+    nondestructive_alias :resample, :resample!
+
     # Convert an image into a MiniMagick::Image for the duration of the block,
     # and at the end return a File object.
     def _with_minimagick(image)

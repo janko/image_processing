@@ -22,6 +22,10 @@ describe ImageProcessing::MiniMagick do
     assert_equal type, MiniMagick::Image.new(file.path).type
   end
 
+  def assert_resolution(resolution, file)
+    assert_equal resolution, MiniMagick::Image.new(file.path).resolution
+  end
+
   def fixture_image(name)
     File.open("test/fixtures/#{name}")
   end
@@ -170,6 +174,23 @@ describe ImageProcessing::MiniMagick do
 
         it "yields the command object" do
           resize_and_pad(@portrait, 400, 400, background: "red") { |cmd| @yielded = cmd }
+          assert_kind_of MiniMagick::Tool, @yielded
+        end
+      end
+
+      describe "#resample" do
+        it "downsamples high resolution images to low resolution" do
+          result = resample!(@landscape, 30, 30)
+          assert_resolution [30, 30], result
+        end
+
+        it "has a nondestructive version" do
+          result = resample(@landscape, 30, 30)
+          assert File.exist?(@landscape.path)
+        end
+
+        it "yields the command object" do
+          resample(@landscape, 30, 30) { |cmd| @yielded = cmd }
           assert_kind_of MiniMagick::Tool, @yielded
         end
       end
