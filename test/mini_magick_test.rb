@@ -151,11 +151,18 @@ describe ImageProcessing::MiniMagick do
         end
 
         it "produces correct image" do
+          @portrait = convert!(@portrait, "png")
           result = resize_and_pad!(@portrait, 400, 400, background: "red")
           assert_similar fixture_image("pad.jpg"), result
         end
 
+        it "produces correct image when enlarging" do
+          result = resize_and_pad!(@landscape, 1000, 1000, background: "green")
+          assert_similar fixture_image("pad-large.jpg"), result
+        end
+
         it "has a nondestructive version" do
+          @portrait = convert!(@portrait, "png")
           result = resize_and_pad(@portrait, 400, 400, background: "red")
           assert_similar fixture_image("pad.jpg"), result
           assert File.exist?(@portrait.path)
