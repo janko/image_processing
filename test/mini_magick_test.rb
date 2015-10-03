@@ -1,0 +1,190 @@
+require "test_helper"
+require "image_processing/mini_magick"
+require "stringio"
+
+describe ImageProcessing::MiniMagick do
+  include ImageProcessing::MiniMagick
+
+  def assert_similar(expected, actual)
+    a = Phashion::Image.new(expected.path)
+    b = Phashion::Image.new(actual.path)
+
+    distance = a.distance_from(b).abs
+
+    assert_operator distance, :<, 2
+  end
+
+  def assert_dimensions(dimensions, file)
+    assert_equal dimensions, MiniMagick::Image.new(file.path).dimensions
+  end
+
+  def assert_type(type, file)
+    assert_equal type, MiniMagick::Image.new(file.path).type
+  end
+
+  def fixture_image(name)
+    File.open("test/fixtures/#{name}")
+  end
+
+  before do
+    @portrait = _copy_to_tempfile(fixture_image("portrait.jpg"))
+    @landscape = _copy_to_tempfile(fixture_image("landscape.jpg"))
+  end
+
+  ["ImageMagick", "GraphicsMagick"].each do |cli|
+    describe "with #{cli}", cli: cli.downcase.to_sym do
+      around do |&block|
+        MiniMagick.with_cli(metadata[:cli], &block)
+      end
+
+      describe "#convert!" do
+        it "changes the image format" do
+          result = convert!(@portrait, "png")
+          assert_type "PNG", result
+        end
+
+        it "has a nondestructive version" do
+          result = convert(@portrait, "png")
+          assert_type "PNG", result
+          assert File.exist?(@portrait.path)
+        end
+
+        it "yields the command object" do
+          convert(@portrait, "png") { |cmd| @yielded = cmd }
+          assert_kind_of MiniMagick::Tool, @yielded
+        end
+      end
+
+      describe "#resize_to_limit!" do
+        it "resizes the image up to a given limit" do
+          result = resize_to_limit!(@portrait, 400, 400)
+          assert_dimensions [300, 400], result
+        end
+
+        it "does not resize the image if it is smaller than the limit" do
+          result = resize_to_limit!(@portrait, 1000, 1000)
+          assert_dimensions [600, 800], result
+        end
+
+        it "produces correct image" do
+          result = resize_to_limit!(@portrait, 400, 400)
+          assert_similar fixture_image("limit.jpg"), result
+        end
+
+        it "has a nondestructive version" do
+          result = resize_to_limit(@portrait, 400, 400)
+          assert_similar fixture_image("limit.jpg"), result
+          assert File.exist?(@portrait.path)
+        end
+
+        it "yields the command object" do
+          resize_to_limit(@portrait, 400, 400) { |cmd| @yielded = cmd }
+          assert_kind_of MiniMagick::Tool, @yielded
+        end
+      end
+
+      describe "#resize_to_fit!" do
+        it "resizes the image to fit given dimensions" do
+          result = resize_to_fit!(@portrait, 400, 400)
+          assert_dimensions [300, 400], result
+        end
+
+        it "enlarges image if it is smaller than given dimensions" do
+          result = resize_to_fit!(@portrait, 1000, 1000)
+          assert_dimensions [750, 1000], result
+        end
+
+        it "produces correct image" do
+          result = resize_to_fit!(@portrait, 400, 400)
+          assert_similar fixture_image("fit.jpg"), result
+        end
+
+        it "has a nondestructive version" do
+          result = resize_to_fit(@portrait, 400, 400)
+          assert_similar fixture_image("fit.jpg"), result
+          assert File.exist?(@portrait.path)
+        end
+
+        it "yields the command object" do
+          resize_to_fit(@portrait, 400, 400) { |cmd| @yielded = cmd }
+          assert_kind_of MiniMagick::Tool, @yielded
+        end
+      end
+
+      describe "#resize_to_fill!" do
+        it "resizes and crops the image to fill out the given dimensions" do
+          result = resize_to_fill!(@portrait, 400, 400)
+          assert_dimensions [400, 400], result
+        end
+
+        it "enlarges image and crops it if it is smaller than given dimensions" do
+          result = resize_to_fill!(@portrait, 1000, 1000)
+          assert_dimensions [1000, 1000], result
+        end
+
+        it "produces correct image" do
+          result = resize_to_fill!(@portrait, 400, 400)
+          assert_similar fixture_image("fill.jpg"), result
+        end
+
+        it "has a nondestructive version" do
+          result = resize_to_fill(@portrait, 400, 400)
+          assert_similar fixture_image("fill.jpg"), result
+          assert File.exist?(@portrait.path)
+        end
+
+        it "yields the command object" do
+          resize_to_fill(@portrait, 400, 400) { |cmd| @yielded = cmd }
+          assert_kind_of MiniMagick::Tool, @yielded
+        end
+      end
+
+      describe "#resize_and_pad!" do
+        it "resizes and fills out the remaining space to fill out the given dimensions" do
+          result = resize_and_pad!(@portrait, 400, 400, background: "red")
+          assert_dimensions [400, 400], result
+        end
+
+        it "enlarges image and fills out the remaining space to fill out the given dimensions" do
+          result = resize_and_pad!(@portrait, 1000, 1000, background: "red")
+          assert_dimensions [1000, 1000], result
+        end
+
+        it "produces correct image" do
+          result = resize_and_pad!(@portrait, 400, 400, background: "red")
+          assert_similar fixture_image("pad.jpg"), result
+        end
+
+        it "has a nondestructive version" do
+          result = resize_and_pad(@portrait, 400, 400, background: "red")
+          assert_similar fixture_image("pad.jpg"), result
+          assert File.exist?(@portrait.path)
+        end
+
+        it "yields the command object" do
+          resize_and_pad(@portrait, 400, 400, background: "red") { |cmd| @yielded = cmd }
+          assert_kind_of MiniMagick::Tool, @yielded
+        end
+      end
+    end
+  end
+
+  it "allows chaining" do
+    result = resize_to_fit(@portrait, 400, 400)
+    result = convert!(result, "png")
+
+    assert_dimensions [300, 400], result
+    assert_type "PNG", result
+  end
+
+  it "produces correct extension" do
+    result = resize_to_fit(@portrait, 400, 400)
+    assert_equal ".jpg", File.extname(result.path)
+  end
+
+  it "accepts StringIOs" do
+    portrait = StringIO.new(@portrait.read)
+    result = resize_to_fit(portrait, 400, 400)
+    assert_dimensions [300, 400], result
+  end
+end
