@@ -43,40 +43,41 @@ image = File.open("path/to/image.jpg")
 ImageProcessing::MiniMagick.resize_to_fit(image, 400, 400)
 ```
 
-The following is the list of helper methods that ImageProcessing provides:
+The following is the list of helper methods that ImageProcessing provides (each
+one has both a destructive and a nondestructive version):
 
 ```rb
 # Adjust an image so that its orientation is suitable for viewing
-auto_orient(file)  # nondestructive
-auto_orient!(file) # destructive
+auto_orient(file)
+auto_orient!(file)
 
 # Converts file to the specified format.
-convert(file, format)  # nondestructive
-convert!(file, format) # destructive
+convert(file, format)
+convert!(file, format)
 
 # Resizes image to fit the specified dimensions (shrinks if larger, enlarges if
 # smaller, but keeps the aspect ratio).
-resize_to_fit(file, width, height)  # nondestructive
-resize_to_fit!(file, width, height) # destructive
+resize_to_fit(file, width, height)
+resize_to_fit!(file, width, height)
 
 # Resizes image in limit of the specified dimensions (shrinks if larger, keeps
 # if smaller, but keeps the aspect ratio).
-resize_to_limit(file, width, height)  # nondestructive
-resize_to_limit!(file, width, height) # destructive
+resize_to_limit(file, width, height)
+resize_to_limit!(file, width, height)
 
 # Resizes image to fill the specified dimensions (shrinks if larger,
 # enlarges if smaller, crops the longer side).
-resize_to_fill(file, width, height, gravity: "Center")  # nondestructive
-resize_to_fill!(file, width, height, gravity: "Center") # destructive
+resize_to_fill(file, width, height, gravity: "Center")
+resize_to_fill!(file, width, height, gravity: "Center")
 
 # Resizes image to the specified dimensions and pads missing space (shrinks if
 # larger, enlarges if smaller, fills the shorter side with specified color).
-resize_and_pad(file, width, height, background: "transparent", gravity: "Center")  # nondestructive
-resize_and_pad!(file, width, height, background: "transparent", gravity: "Center") # destructive
+resize_and_pad(file, width, height, background: "transparent", gravity: "Center")
+resize_and_pad!(file, width, height, background: "transparent", gravity: "Center")
 
 # Resamples the image to a different resolution
-resample(file, horizontal, vertical)  # nondestructive
-resample!(file, horizontal, vertical) # destructive
+resample(file, horizontal, vertical)
+resample!(file, horizontal, vertical)
 ```
 
 If you want to do custom MiniMagick processing, each of the above optionally
