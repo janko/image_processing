@@ -46,6 +46,10 @@ ImageProcessing::MiniMagick.resize_to_fit(image, 400, 400)
 The following is the list of helper methods that ImageProcessing provides:
 
 ```rb
+# Adjust an image so that its orientation is suitable for viewing
+auto_orient(file)  # nondestructive
+auto_orient!(file) # destructive
+
 # Converts file to the specified format.
 convert(file, format)  # nondestructive
 convert!(file, format) # destructive
@@ -69,6 +73,10 @@ resize_to_fill!(file, width, height, gravity: "Center") # destructive
 # larger, enlarges if smaller, fills the shorter side with specified color).
 resize_and_pad(file, width, height, background: "transparent", gravity: "Center")  # nondestructive
 resize_and_pad!(file, width, height, background: "transparent", gravity: "Center") # destructive
+
+# Resamples the image to a different resolution
+resample(file, horizontal, vertical)  # nondestructive
+resample!(file, horizontal, vertical) # destructive
 ```
 
 ## Contributing
