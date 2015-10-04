@@ -24,7 +24,7 @@ module ImageProcessing
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
     def convert!(image, format, &block)
-      _with_minimagick(image) do |img|
+      with_minimagick(image) do |img|
         img.format(format.downcase, nil, &block)
       end
     end
@@ -37,7 +37,7 @@ module ImageProcessing
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
     def auto_orient!(image)
-      _with_minimagick(image) do |img|
+      with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
           cmd.auto_orient
@@ -58,7 +58,7 @@ module ImageProcessing
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
     def resize_to_limit!(image, width, height)
-      _with_minimagick(image) do |img|
+      with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
           cmd.resize "#{width}x#{height}>"
@@ -78,7 +78,7 @@ module ImageProcessing
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
     def resize_to_fit!(image, width, height)
-      _with_minimagick(image) do |img|
+      with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
           cmd.resize "#{width}x#{height}"
@@ -104,7 +104,7 @@ module ImageProcessing
     # @return [File, Tempfile]
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     def resize_to_fill!(image, width, height, gravity: "Center")
-      _with_minimagick(image) do |img|
+      with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
           cmd.resize "#{width}x#{height}^"
@@ -137,7 +137,7 @@ module ImageProcessing
     # @see http://www.imagemagick.org/script/color.php
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     def resize_and_pad!(image, width, height, background: "transparent", gravity: "Center")
-      _with_minimagick(image) do |img|
+      with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
           cmd.resize "#{width}x#{height}"
@@ -166,7 +166,7 @@ module ImageProcessing
     # @return [File, Tempfile]
     # @see http://www.imagemagick.org/script/command-line-options.php#resample
     def resample!(image, width, height)
-      _with_minimagick(image) do |img|
+      with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
           cmd.resample "#{width}x#{height}"
@@ -177,7 +177,7 @@ module ImageProcessing
 
     # Convert an image into a MiniMagick::Image for the duration of the block,
     # and at the end return a File object.
-    def _with_minimagick(image)
+    def with_minimagick(image)
       image = ::MiniMagick::Image.new(image.path, image)
       yield image
       image.instance_variable_get("@tempfile")
