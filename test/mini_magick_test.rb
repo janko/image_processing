@@ -59,6 +59,23 @@ describe ImageProcessing::MiniMagick do
         end
       end
 
+      describe "#auto_orient!" do
+        it "fixes the orientation of the image" do
+          result = auto_orient!(@portrait)
+          assert_equal "1", MiniMagick::Image.new(result.path).exif["Orientation"]
+        end
+
+        it "has a nondestructive version" do
+          result = auto_orient(@portrait)
+          assert File.exist?(@portrait.path)
+        end
+
+        it "yields the command object" do
+          auto_orient(@portrait) { |cmd| @yielded = cmd }
+          assert_kind_of MiniMagick::Tool, @yielded
+        end
+      end
+
       describe "#resize_to_limit!" do
         it "resizes the image up to a given limit" do
           result = resize_to_limit!(@portrait, 400, 400)

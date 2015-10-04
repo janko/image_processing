@@ -30,6 +30,22 @@ module ImageProcessing
     end
     nondestructive_alias :convert, :convert!
 
+    # Adjusts the image so that its orientation is suitable for viewing.
+    #
+    # @see http://www.imagemagick.org/script/command-line-options.php#auto-orient
+    # @param [MiniMagick::Image] image    the image to convert
+    # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
+    # @return [File, Tempfile]
+    def auto_orient!(image)
+      _with_minimagick(image) do |img|
+        img.combine_options do |cmd|
+          yield cmd if block_given?
+          cmd.auto_orient
+        end
+      end
+    end
+    nondestructive_alias :auto_orient, :auto_orient!
+
     # Resize the image to fit within the specified dimensions while retaining
     # the original aspect ratio. Will only resize the image if it is larger
     # than the specified dimensions. The resulting image may be shorter or
