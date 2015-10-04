@@ -79,6 +79,29 @@ resample(file, horizontal, vertical)  # nondestructive
 resample!(file, horizontal, vertical) # destructive
 ```
 
+If you want to do custom MiniMagick processing, each of the above optionally
+yields an instance of `MiniMagick::Tool`, so you can use it for additional
+processing:
+
+```rb
+convert(file, "png") do |cmd|
+  cmd.background("none")
+end
+```
+
+There is also a helper method for doing MiniMagick processing directly:
+
+```rb
+processed = with_minimagick(file) do |image|
+  image #=> #<MiniMagick::Image ...>
+  image.combine_options do |cmd|
+    # ...
+  end
+end
+
+processed #=> #<File ...>
+```
+
 ## Contributing
 
 ImageMagick and GraphicsMagick are both required to be installed, on Mac this is
