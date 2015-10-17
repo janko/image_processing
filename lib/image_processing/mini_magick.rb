@@ -181,7 +181,9 @@ module ImageProcessing
     def with_minimagick(image)
       image = ::MiniMagick::Image.new(image.path, image)
       yield image
-      image.instance_variable_get("@tempfile")
+      tempfile = image.instance_variable_get("@tempfile")
+      tempfile.open if tempfile.is_a?(Tempfile) # for aws-sdk
+      tempfile
     end
 
     # Creates a copy of the file and stores it into a Tempfile. Works for any
