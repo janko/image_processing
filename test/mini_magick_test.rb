@@ -232,4 +232,8 @@ describe ImageProcessing::MiniMagick do
     result = resize_to_fit(portrait, 400, 400)
     assert_dimensions [300, 400], result
   end
+
+  it "module_function's the nondestructive aliases" do
+    assert ImageProcessing::MiniMagick.respond_to?(:convert)
+  end
 end

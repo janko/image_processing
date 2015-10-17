@@ -12,6 +12,7 @@ module ImageProcessing
       define_method(name) do |image, *args, &block|
         send(original, _copy_to_tempfile(image), *args, &block)
       end
+      module_function name
     end
 
     module_function
