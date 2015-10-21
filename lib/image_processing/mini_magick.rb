@@ -2,7 +2,7 @@ require "image_processing/version"
 require "mini_magick"
 require "tempfile"
 
-if MiniMagick.version < Gem::Version.new("4.3.5")
+if !MiniMagick.respond_to?(:version) || MiniMagick.version < Gem::Version.new("4.3.5")
   raise "image_processing requires mini_magick version >= 4.3.5"
 end
 
