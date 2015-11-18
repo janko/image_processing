@@ -6,4 +6,4 @@ require "minitest/pride"
 require "minitest/hooks/default"
 require "minispec-metadata"
 
-require "phashion"
+require "phashion" unless RUBY_ENGINE == "jruby"

@@ -6,6 +6,8 @@ describe ImageProcessing::MiniMagick do
   include ImageProcessing::MiniMagick
 
   def assert_similar(expected, actual)
+    return if RUBY_ENGINE == "jruby"
+
     a = Phashion::Image.new(expected.path)
     b = Phashion::Image.new(actual.path)
 

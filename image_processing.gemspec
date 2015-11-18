@@ -1,4 +1,4 @@
-require_relative "lib/image_processing/version"
+require File.expand_path('../lib/image_processing/version', __FILE__)
 
 Gem::Specification.new do |spec|
   spec.name          = "image_processing"
@@ -18,5 +18,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest-hooks"
   spec.add_development_dependency "minispec-metadata"
   spec.add_development_dependency "mini_magick", ">= 4.3.5"
-  spec.add_development_dependency "phashion"
+  spec.add_development_dependency "phashion" unless RUBY_ENGINE == "jruby"
 end
