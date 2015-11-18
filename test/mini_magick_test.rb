@@ -27,7 +27,7 @@ describe ImageProcessing::MiniMagick do
   def assert_resolution(resolution, file)
     actual_resolution = MiniMagick::Image.new(file.path).resolution
     # Travis has old imagemagick version
-    actual_resolution = actual_resolution.values_at(0, 2) if ENV["CI"]
+    actual_resolution = actual_resolution.select(&:nonzero?) if ENV["CI"]
     assert_equal resolution, actual_resolution
   end
 
