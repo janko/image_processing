@@ -25,7 +25,10 @@ describe ImageProcessing::MiniMagick do
   end
 
   def assert_resolution(resolution, file)
-    assert_equal resolution, MiniMagick::Image.new(file.path).resolution
+    actual_resolution = MiniMagick::Image.new(file.path).resolution
+    # Travis has old imagemagick version
+    actual_resolution = actual_resolution.values_at(0, 2) if ENV["CI"]
+    assert_equal resolution, actual_resolution
   end
 
   def fixture_image(name)
@@ -44,11 +47,6 @@ describe ImageProcessing::MiniMagick do
       end
 
       describe "#convert!" do
-        before do
-          # Travis has old graphicsmagick version
-          skip if metadata[:cli] == :graphicsmagick && ENV["CI"]
-        end
-
         it "changes the image format" do
           result = convert!(@portrait, "png")
           assert_type "PNG", result
@@ -67,6 +65,11 @@ describe ImageProcessing::MiniMagick do
       end
 
       describe "#auto_orient!" do
+        before do
+          # Travis has old graphicsmagick version
+          skip if metadata[:cli] == :graphicsmagick && ENV["CI"]
+        end
+
         it "fixes the orientation of the image" do
           result = auto_orient!(@portrait)
           assert_equal "1", MiniMagick::Image.new(result.path).exif["Orientation"]
@@ -205,8 +208,6 @@ describe ImageProcessing::MiniMagick do
       describe "#resample" do
         it "downsamples high resolution images to low resolution" do
           result = resample!(@landscape, 30, 30)
-          # Travis has old imagemagick version
-          result = [result[0], result[2]] if ENV["CI"]
           assert_resolution [30, 30], result
         end
 
