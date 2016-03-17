@@ -24,9 +24,9 @@ module ImageProcessing
     # @param [String] format              the format to convert to
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
-    def convert!(image, format, &block)
+    def convert!(image, format, page = nil, &block)
       with_minimagick(image) do |img|
-        img.format(format.downcase, nil, &block)
+        img.format(format.downcase, page, &block)
       end
     end
     nondestructive_alias :convert, :convert!
