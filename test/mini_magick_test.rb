@@ -243,6 +243,11 @@ describe ImageProcessing::MiniMagick do
     assert_dimensions [300, 400], result
   end
 
+  it "rewinds the input file" do
+    resize_to_fit(@portrait, 400, 400)
+    assert_equal 0, @portrait.pos
+  end
+
   it "module_function's the nondestructive aliases" do
     assert ImageProcessing::MiniMagick.respond_to?(:convert)
   end

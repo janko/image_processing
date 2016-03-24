@@ -192,6 +192,7 @@ module ImageProcessing
       args = [File.basename(file.path, ".*"), File.extname(file.path)] if file.respond_to?(:path)
       tempfile = Tempfile.new(args || "image", binmode: true)
       IO.copy_stream(file, tempfile.path)
+      file.rewind
       tempfile
     end
   end
