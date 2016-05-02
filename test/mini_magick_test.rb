@@ -221,6 +221,33 @@ describe ImageProcessing::MiniMagick do
           assert_kind_of MiniMagick::Tool, @yielded
         end
       end
+
+      describe "#crop" do
+        it "resizes the image to the given dimensions" do
+          result = crop!(@portrait, 50, 50)
+          assert_dimensions [50, 50], result
+        end
+
+        it "crops the right area of the images" do
+          result = crop!(@portrait, 50, 50, 325, 425)
+          assert_similar fixture_image("crop.jpg"), result
+        end
+
+        it "crops the right area of the images when a gravity is given" do
+          result = crop!(@portrait, 50, 50, 30, 30, gravity: 'Center')
+          assert_similar fixture_image("crop-center.jpg"), result
+        end
+
+        it "has a nondestructive version" do
+          result = crop(@portrait, 50, 50, 325, 425)
+          assert File.exist?(@portrait.path)
+        end
+
+        it "yields the command object" do
+          crop(@portrait, 50, 50, 325, 425) { |cmd| @yielded = cmd }
+          assert_kind_of MiniMagick::Tool, @yielded
+        end
+      end
     end
   end
 

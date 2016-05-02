@@ -48,13 +48,17 @@ The following is the list of helper methods that ImageProcessing provides (each
 one has both a destructive and a nondestructive version):
 
 ```rb
-# Adjust an image so that its orientation is suitable for viewing
+# Adjust an image so that its orientation is suitable for viewing.
 auto_orient(file)
 auto_orient!(file)
 
 # Converts file to the specified format.
 convert(file, format)
 convert!(file, format)
+
+# Crop image to the defined area.
+crop(file, width, height, x_offset, y_offset, gravity: "NorthWest")
+crop!(file, width, height, x_offset, y_offset, gravity: "NorthWest")
 
 # Resizes image to fit the specified dimensions (shrinks if larger, enlarges if
 # smaller, but keeps the aspect ratio).

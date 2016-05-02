@@ -176,6 +176,27 @@ module ImageProcessing
     end
     nondestructive_alias :resample, :resample!
 
+    # Crops the image to be the defined area.
+    #
+    # @param [#to_s] width                the width of the cropped image
+    # @param [#to_s] height               the height of the cropped image
+    # @param [#to_s] x_offset             the x coordinate where to start cropping
+    # @param [#to_s] y_offset             the y coordinate where to start cropping
+    # @param [string] gravity             which part of the image to focus on
+    # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
+    # @return [File, Tempfile]
+    # @see http://www.imagemagick.org/script/command-line-options.php#crop
+    def crop!(image, width, height, x_offset = 0, y_offset = 0, gravity: "NorthWest")
+      with_minimagick(image) do |img|
+        img.combine_options do |cmd|
+          yield cmd if block_given?
+          cmd.gravity gravity
+          cmd.crop "#{width}x#{height}+#{x_offset}+#{y_offset}"
+        end
+      end
+    end
+    nondestructive_alias :crop, :crop!
+
     # Convert an image into a MiniMagick::Image for the duration of the block,
     # and at the end return a File object.
     def with_minimagick(image)
