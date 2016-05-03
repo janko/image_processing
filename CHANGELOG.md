@@ -1,4 +1,4 @@
-## HEAD
+## 0.3.0 (03-05-2016)
 
 * Add cropping functionality to `ImageProcessing::MiniMagick` (paulgoetze)
 
