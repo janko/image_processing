@@ -3,12 +3,14 @@ require File.expand_path('../lib/image_processing/version', __FILE__)
 Gem::Specification.new do |spec|
   spec.name          = "image_processing"
   spec.version       = ImageProcessing::VERSION
-  spec.authors       = ["Janko Marohnić"]
-  spec.email         = ["janko.marohnic@gmail.com"]
+
+  spec.required_ruby_version = ">= 2.0"
 
   spec.summary       = "Set of higher-level helper methods for image processing."
   spec.description   = "Set of higher-level helper methods for image processing."
   spec.homepage      = "https://github.com/janko-m/image_processing"
+  spec.authors       = ["Janko Marohnić"]
+  spec.email         = ["janko.marohnic@gmail.com"]
   spec.license       = "MIT"
 
   spec.files         = Dir["README.md", "LICENSE.txt", "lib/**/*", "image_processing.gemspec"]

@@ -3,10 +3,12 @@
 Provides higher-level helper methods for image processing in Ruby using
 ImageMagick.
 
-This methods were extracted from Refile, and were made generic so that they can
-be used in any project. The goal is to have a centralized place where image
-processing helper methods are maintained, instead of CarrierWave, Dragonfly and
-Refile each having their own.
+These methods were extracted from [refile-mini_magick], and were made generic so
+that they can be used in any project. The goal of image_processing is to have a
+centralized place where helper methods for image processing are maintained,
+instead of CarrierWave, Dragonfly and Refile each implementing their own.
+
+It's been tested with MRI 2.x, JRuby and Rubinius.
 
 ## Installation
 
@@ -126,3 +128,5 @@ $ rake test
 ## License
 
 [MIT](LICENSE.txt)
+
+[refile-mini_magick]: https://github.com/refile/refile-mini_magick
