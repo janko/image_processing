@@ -1,3 +1,7 @@
+## 0.4.0 (11-07-2016)
+
+* Add `#corrupted?` for checking whether an image is corrupted (janko-m)
+
 ## 0.3.0 (03-05-2016)
 
 * Add cropping functionality to `ImageProcessing::MiniMagick` (paulgoetze)
