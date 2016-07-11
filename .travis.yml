@@ -1,6 +1,11 @@
 language: ruby
 
-sudo: false
+sudo: required
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install imagemagick libmagickcore-dev libmagickwand-dev
+  - sudo apt-get install -qq graphicsmagick
 
 rvm:
   - "2.0"
@@ -13,11 +18,3 @@ rvm:
 script: rake test
 
 cache: bundler
-
-addons:
-  apt:
-    packages:
-      - imagemagick
-      - libmagickcore-dev
-      - libmagickwand-dev
-      - graphicsmagick
