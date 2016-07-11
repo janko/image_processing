@@ -77,6 +77,9 @@ resize_and_pad[!](file, width, height, background: "transparent", gravity: "Cent
 
 # Resamples the image to a different resolution
 resample[!](file, horizontal, vertical)
+
+# Returns true if the given image is corrupted
+currupted?(file)
 ```
 
 If you want to do custom MiniMagick processing, each of the above optionally

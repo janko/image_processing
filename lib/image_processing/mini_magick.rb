@@ -197,6 +197,21 @@ module ImageProcessing
     end
     nondestructive_alias :crop, :crop!
 
+    # Returns whether the image is corrupt.
+    #
+    # @param [File] image
+    # @return [Boolean]
+    def corrupted?(image)
+      ::MiniMagick::Tool::Identify.new do |identify|
+        identify.verbose
+        identify.regard_warnings
+        identify << image.path
+      end
+      false
+    rescue ::MiniMagick::Error
+      true
+    end
+
     # Convert an image into a MiniMagick::Image for the duration of the block,
     # and at the end return a File object.
     def with_minimagick(image)

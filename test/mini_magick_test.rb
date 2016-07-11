@@ -248,6 +248,22 @@ describe ImageProcessing::MiniMagick do
           assert_kind_of MiniMagick::Tool, @yielded
         end
       end
+
+      describe "#corrupted?" do
+        before do
+          if MiniMagick.cli == :graphicsmagick
+            skip "GraphicsMagick doesn't support -regard-warnings option on identify"
+          end
+        end
+
+        it "returns true if the image is corrupted" do
+          assert corrupted?(fixture_image("corrupted.jpg"))
+        end
+
+        it "returns false if the image is not corrupted" do
+          refute corrupted?(fixture_image("fit.jpg"))
+        end
+      end
     end
   end
 
