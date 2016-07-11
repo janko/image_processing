@@ -51,40 +51,32 @@ one has both a destructive and a nondestructive version):
 
 ```rb
 # Adjust an image so that its orientation is suitable for viewing.
-auto_orient(file)
-auto_orient!(file)
+auto_orient[!](file)
 
 # Converts file to the specified format.
-convert(file, format)
-convert!(file, format)
+convert[!](file, format)
 
 # Crop image to the defined area.
-crop(file, width, height, x_offset, y_offset, gravity: "NorthWest")
-crop!(file, width, height, x_offset, y_offset, gravity: "NorthWest")
+crop[!](file, width, height, x_offset, y_offset, gravity: "NorthWest")
 
 # Resizes image to fit the specified dimensions (shrinks if larger, enlarges if
 # smaller, but keeps the aspect ratio).
-resize_to_fit(file, width, height)
-resize_to_fit!(file, width, height)
+resize_to_fit[!](file, width, height)
 
 # Resizes image in limit of the specified dimensions (shrinks if larger, keeps
 # if smaller, but keeps the aspect ratio).
-resize_to_limit(file, width, height)
-resize_to_limit!(file, width, height)
+resize_to_limit[!](file, width, height)
 
 # Resizes image to fill the specified dimensions (shrinks if larger,
 # enlarges if smaller, crops the longer side).
-resize_to_fill(file, width, height, gravity: "Center")
-resize_to_fill!(file, width, height, gravity: "Center")
+resize_to_fill[!](file, width, height, gravity: "Center")
 
 # Resizes image to the specified dimensions and pads missing space (shrinks if
 # larger, enlarges if smaller, fills the shorter side with specified color).
-resize_and_pad(file, width, height, background: "transparent", gravity: "Center")
-resize_and_pad!(file, width, height, background: "transparent", gravity: "Center")
+resize_and_pad[!](file, width, height, background: "transparent", gravity: "Center")
 
 # Resamples the image to a different resolution
-resample(file, horizontal, vertical)
-resample!(file, horizontal, vertical)
+resample[!](file, horizontal, vertical)
 ```
 
 If you want to do custom MiniMagick processing, each of the above optionally

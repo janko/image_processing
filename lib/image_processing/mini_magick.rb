@@ -160,7 +160,7 @@ module ImageProcessing
     # The resulting image will always be the same pixel size as the source with
     # an adjusted resolution dimensions.
     #
-    # @param [MiniMagick::Image] img      the image to convert
+    # @param [MiniMagick::Image] image    the image to convert
     # @param [#to_s] width                the dpi width
     # @param [#to_s] height               the dpi height
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
