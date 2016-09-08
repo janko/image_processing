@@ -110,6 +110,7 @@ module ImageProcessing
           yield cmd if block_given?
           cmd.resize "#{width}x#{height}^"
           cmd.gravity gravity
+          cmd.background "rgba(255,255,255,0.0)" # transparent
           cmd.extent "#{width}x#{height}"
         end
       end
