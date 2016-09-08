@@ -1,3 +1,7 @@
+## 0.4.1 (08-09-2016)
+
+* Maintain transparent background of PNGs in `#resize_to_fill` (janko-m)
+
 ## 0.4.0 (11-07-2016)
 
 * Add `#corrupted?` for checking whether an image is corrupted (janko-m)
