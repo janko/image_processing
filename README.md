@@ -32,7 +32,7 @@ converted = convert(original, "png") # makes a converted copy
 converted #=> #<Tempfile:/var/folders/k7/6zx6dx6x7ys3rv3srh0nyfj00000gn/T/mini_magick20151003-23030-9e1vjz.png (closed)>
 File.exist?(original.path) #=> true
 
-converted = convert!(original, "png") # destructively converts the file
+converted = convert!(original, "png") # converts the file in-place
 converted #=> #<Tempfile:/var/folders/k7/6zx6dx6x7ys3rv3srh0nyfj00000gn/T/mini_magick20151003-23030-9e1vjz.png (closed)>
 File.exist?(original.path) #=> false
 ```
@@ -45,6 +45,8 @@ image = File.open("path/to/image.jpg")
 
 ImageProcessing::MiniMagick.resize_to_fit(image, 400, 400)
 ```
+
+### Methods
 
 The following is the list of helper methods that ImageProcessing provides (each
 one has both a destructive and a nondestructive version):
@@ -81,6 +83,16 @@ resample[!](file, horizontal, vertical)
 # Returns true if the given image is corrupted
 currupted?(file)
 ```
+
+For `#resize_to_limit[!]` and `#resize_to_fit[!]` you can don't have to specify
+both dimensions:
+
+```rb
+resize_to_limit(image, 300, nil)
+resize_to_fit(image, nil, 500)
+```
+
+### Dropping to MiniMagick
 
 If you want to do custom MiniMagick processing, each of the above optionally
 yields an instance of `MiniMagick::Tool`, so you can use it for additional
