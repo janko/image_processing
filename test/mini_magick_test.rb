@@ -112,6 +112,11 @@ describe ImageProcessing::MiniMagick do
           resize_to_limit(@portrait, 400, 400) { |cmd| @yielded = cmd }
           assert_kind_of MiniMagick::Tool, @yielded
         end
+
+        it "set's up quality as well" do
+          result = resize_to_limit(@portrait, 400, 400, quality: 50)
+          assert_similar fixture_image("limit-quality.jpg"), result
+        end
       end
 
       describe "#resize_to_fit!" do
@@ -140,6 +145,11 @@ describe ImageProcessing::MiniMagick do
           resize_to_fit(@portrait, 400, 400) { |cmd| @yielded = cmd }
           assert_kind_of MiniMagick::Tool, @yielded
         end
+
+        it "set's up quality as well" do
+          result = resize_to_fit(@portrait, 400, 400, quality: 50)
+          assert_similar fixture_image("fit-quality.jpg"), result
+        end
       end
 
       describe "#resize_to_fill!" do
@@ -167,6 +177,11 @@ describe ImageProcessing::MiniMagick do
         it "yields the command object" do
           resize_to_fill(@portrait, 400, 400) { |cmd| @yielded = cmd }
           assert_kind_of MiniMagick::Tool, @yielded
+        end
+
+        it "set's up quality as well" do
+          result = resize_to_fill(@portrait, 400, 400, quality: 50)
+          assert_similar fixture_image("fill-quality.jpg"), result
         end
       end
 
@@ -203,6 +218,11 @@ describe ImageProcessing::MiniMagick do
           resize_and_pad(@portrait, 400, 400, background: "red") { |cmd| @yielded = cmd }
           assert_kind_of MiniMagick::Tool, @yielded
         end
+
+        it "set's up quality as well" do
+          result = resize_to_fill(@portrait, 400, 400, quality: 50)
+          assert_similar fixture_image("pad-quality.jpg"), result
+        end
       end
 
       describe "#resample" do
@@ -219,6 +239,11 @@ describe ImageProcessing::MiniMagick do
         it "yields the command object" do
           resample(@landscape, 30, 30) { |cmd| @yielded = cmd }
           assert_kind_of MiniMagick::Tool, @yielded
+        end
+
+        it "set's up quality as well" do
+          result = resample(@portrait, 400, 400, quality: 50)
+          assert_similar fixture_image("resample-quality.jpg"), result
         end
       end
 
@@ -246,6 +271,11 @@ describe ImageProcessing::MiniMagick do
         it "yields the command object" do
           crop(@portrait, 50, 50, 325, 425) { |cmd| @yielded = cmd }
           assert_kind_of MiniMagick::Tool, @yielded
+        end
+
+        it "set's up quality as well" do
+          result = crop(@portrait, 400, 400, quality: 50)
+          assert_similar fixture_image("crop-quality.jpg"), result
         end
       end
 
