@@ -104,7 +104,8 @@ convert(file, "png") do |cmd|
 end
 ```
 
-There is also a helper method for doing MiniMagick processing directly:
+There is also a helper method for doing MiniMagick processing directly (though
+note that this will process the image in-place!):
 
 ```rb
 processed = with_minimagick(file) do |image|
