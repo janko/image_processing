@@ -55,8 +55,9 @@ one has both a destructive and a nondestructive version):
 # Adjust an image so that its orientation is suitable for viewing.
 auto_orient[!](file)
 
-# Converts file to the specified format.
-convert[!](file, format)
+# Converts file to the specified format, and you can specify to convert only a
+# certain page for multilayered formats.
+convert[!](file, format, page = nil)
 
 # Crop image to the defined area.
 crop[!](file, width, height, x_offset, y_offset, gravity: "NorthWest")
