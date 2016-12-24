@@ -21,4 +21,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minispec-metadata"
   spec.add_development_dependency "mini_magick", ">= 4.3.5"
   spec.add_development_dependency "phashion" unless RUBY_ENGINE == "jruby"
+  spec.add_development_dependency "pry"
 end

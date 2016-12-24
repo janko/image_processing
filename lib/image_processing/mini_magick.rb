@@ -58,11 +58,14 @@ module ImageProcessing
     # @param [#to_s] height               the maximum height
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
-    def resize_to_limit!(image, width, height)
+    def resize_to_limit!(image, width, height, quality: nil)
       with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
+
           cmd.resize "#{width}x#{height}>"
+
+          cmd.quality(quality) if quality
         end
       end
     end
@@ -78,11 +81,14 @@ module ImageProcessing
     # @param [#to_s] height               the height to fit into
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
-    def resize_to_fit!(image, width, height)
+    def resize_to_fit!(image, width, height, quality: nil)
       with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
+
           cmd.resize "#{width}x#{height}"
+
+          cmd.quality(quality) if quality
         end
       end
     end
@@ -104,7 +110,7 @@ module ImageProcessing
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
-    def resize_to_fill!(image, width, height, gravity: "Center")
+    def resize_to_fill!(image, width, height, gravity: "Center", quality: nil)
       with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
@@ -112,6 +118,8 @@ module ImageProcessing
           cmd.gravity gravity
           cmd.background "rgba(255,255,255,0.0)" # transparent
           cmd.extent "#{width}x#{height}"
+
+          cmd.quality(quality) if quality
         end
       end
     end
@@ -138,18 +146,22 @@ module ImageProcessing
     # @return [File, Tempfile]
     # @see http://www.imagemagick.org/script/color.php
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
-    def resize_and_pad!(image, width, height, background: "transparent", gravity: "Center")
+    def resize_and_pad!(image, width, height, background: "transparent", gravity: "Center", quality: nil)
       with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
+
           cmd.resize "#{width}x#{height}"
+
           if background == "transparent"
             cmd.background "rgba(255, 255, 255, 0.0)"
           else
             cmd.background background
           end
+
           cmd.gravity gravity
           cmd.extent "#{width}x#{height}"
+          cmd.quality(quality) if quality
         end
       end
     end
@@ -167,11 +179,13 @@ module ImageProcessing
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
     # @see http://www.imagemagick.org/script/command-line-options.php#resample
-    def resample!(image, width, height)
+    def resample!(image, width, height, quality: nil)
       with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
           cmd.resample "#{width}x#{height}"
+
+          cmd.quality(quality) if quality
         end
       end
     end
@@ -187,12 +201,14 @@ module ImageProcessing
     # @yield [MiniMagick::Tool::Mogrify, MiniMagick::Tool::Convert]
     # @return [File, Tempfile]
     # @see http://www.imagemagick.org/script/command-line-options.php#crop
-    def crop!(image, width, height, x_offset = 0, y_offset = 0, gravity: "NorthWest")
+    def crop!(image, width, height, x_offset = 0, y_offset = 0, gravity: "NorthWest", quality: nil)
       with_minimagick(image) do |img|
         img.combine_options do |cmd|
           yield cmd if block_given?
           cmd.gravity gravity
           cmd.crop "#{width}x#{height}+#{x_offset}+#{y_offset}"
+
+          cmd.quality(quality) if quality
         end
       end
     end
@@ -217,7 +233,9 @@ module ImageProcessing
     # and at the end return a File object.
     def with_minimagick(image)
       image = ::MiniMagick::Image.new(image.path, image)
+
       yield image
+
       tempfile = image.instance_variable_get("@tempfile")
       tempfile.open if tempfile.is_a?(Tempfile) # for aws-sdk
       tempfile
