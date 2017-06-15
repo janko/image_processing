@@ -1,3 +1,7 @@
+## 0.4.2 (2017-06-16)
+
+* Don't use path of input file as basename for output file (@janko-m)
+
 ## 0.4.1 (2016-09-08)
 
 * Maintain transparent background of PNGs in `#resize_to_fill` (janko-m)
