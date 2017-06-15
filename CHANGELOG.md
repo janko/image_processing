@@ -1,3 +1,7 @@
+## 0.4.4 (2017-06-16)
+
+* Fix last changes being incompatible with older Ruby versions, again (@janko-m)
+
 ## 0.4.3 (2017-06-16)
 
 * Fix last changes being incompatible with older Ruby versions (@janko-m)
