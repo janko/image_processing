@@ -1,3 +1,7 @@
+## 0.4.3 (2017-06-16)
+
+* Fix last changes being incompatible with older Ruby versions (@janko-m)
+
 ## 0.4.2 (2017-06-16)
 
 * Don't use path of input file as basename for output file (@janko-m)
