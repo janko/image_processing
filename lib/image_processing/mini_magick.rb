@@ -219,15 +219,15 @@ module ImageProcessing
       image = ::MiniMagick::Image.new(image.path, image)
       yield image
       tempfile = image.instance_variable_get("@tempfile")
-      tempfile.open if tempfile.is_a?(Tempfile) # for aws-sdk
+      tempfile.open if tempfile.is_a?(Tempfile)
       tempfile
     end
 
     # Creates a copy of the file and stores it into a Tempfile. Works for any
     # IO object that responds to `#read(length = nil, outbuf = nil)`.
     def _copy_to_tempfile(file)
-      args = [File.basename(file.path, ".*"), File.extname(file.path)] if file.respond_to?(:path)
-      tempfile = Tempfile.new(args || "image", binmode: true)
+      extension = File.extname(file.path) if file.respond_to?(:path)
+      tempfile = Tempfile.new(["mini_magick", extension], binmode: true)
       IO.copy_stream(file, tempfile.path)
       file.rewind
       tempfile
