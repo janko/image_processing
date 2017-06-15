@@ -227,7 +227,7 @@ module ImageProcessing
     # IO object that responds to `#read(length = nil, outbuf = nil)`.
     def _copy_to_tempfile(file)
       extension = File.extname(file.path) if file.respond_to?(:path)
-      tempfile = Tempfile.new(["mini_magick", *extension], binmode: true)
+      tempfile = Tempfile.new(["mini_magick", extension.to_s], binmode: true)
       IO.copy_stream(file, tempfile.path)
       file.rewind
       tempfile
