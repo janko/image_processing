@@ -1,3 +1,7 @@
+## 0.4.5 (2017-09-08)
+
+* Add `lib/image_processing.rb` to allow loading via `Bundler.require` (@printercu)
+
 ## 0.4.4 (2017-06-16)
 
 * Fix last changes being incompatible with older Ruby versions, again (@janko-m)
