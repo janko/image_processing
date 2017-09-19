@@ -21,3 +21,4 @@ addons:
       - libmagickcore-dev
       - libmagickwand-dev
       - graphicsmagick
+      - libvips
