@@ -20,5 +20,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest-hooks"
   spec.add_development_dependency "minispec-metadata"
   spec.add_development_dependency "mini_magick", ">= 4.3.5"
+  spec.add_development_dependency "ruby-vips", ">= 2.0.0"
   spec.add_development_dependency "phashion" unless RUBY_ENGINE == "jruby"
 end
