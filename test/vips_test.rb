@@ -114,7 +114,7 @@ describe ImageProcessing::Vips do
     end
 
     it "crops the right area of the images from the center" do
-      result = crop!(@portrait, 50, 50, 0.5, 0.5)
+      result = crop!(@portrait, 50, 50, gravity: 'Center')
       assert_similar fixture_image("crop-center-vips.jpg"), result
     end
   end

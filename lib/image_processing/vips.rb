@@ -51,16 +51,40 @@ module ImageProcessing
       end
     end
 
-    def crop!(image, width, height, x_offset=0, y_offset=0)
+    def crop!(image, width, height, gravity: "NorthWest")
       with_ruby_vips(image) do |img|
-        width   ||= img.width
-        height  ||= img.height
-        top       = x_offset.is_a?(Float)  && x_offset.between?(0,1)  ? (img.height - height) * x_offset : x_offset
-        left      = y_offset.is_a?(Float) && y_offset.between?(0,1) ? (img.width - width) * y_offset : y_offset
-        img = img.extract_area left, top, width, height
+        top, left = get_gravity_values(img, width, height, gravity)
+        img = img.crop top, left, width, height
         tmp_name = tmp_name(image.path)
         img.write_to_file(tmp_name)
         tmp_name
+      end
+    end
+
+    def get_gravity_values(image, width, height, gravity)
+      top = image.width - width
+      left = image.height - height
+      case gravity
+        when 'Center'
+          [(top / 2), (left / 2)]
+        when 'North'
+          [(top / 2), 0]
+        when 'East'
+          [top, (left / 2)]
+        when 'South'
+          [(top / 2), left]
+        when 'West'
+          [0, (left / 2)]
+        when 'NorthEast'
+          [top, 0]
+        when 'SouthEast'
+          [top,left]
+        when 'SouthWest'
+          [0, left]
+        when 'NorthWest'
+          [0, 0]
+        else
+          raise InvalidGravityValue
       end
     end
 
