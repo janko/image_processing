@@ -89,4 +89,21 @@ describe ImageProcessing::Vips do
       assert_similar fixture_image("fit.jpg"), result
     end
   end
+
+  describe "#resize_to_fill!" do
+    it "resizes and crops the image to fill out the given dimensions" do
+      result = resize_to_fill!(@portrait, 400, 400)
+      assert_dimensions [400, 400], result
+    end
+
+    it "enlarges image and crops it if it is smaller than given dimensions" do
+      result = resize_to_fill!(@portrait, 1000, 1000)
+      assert_dimensions [1000, 1000], result
+    end
+
+    it "produces correct image" do
+      result = resize_to_fill!(@portrait, 400, 400)
+      assert_similar fixture_image("fill.jpg"), result
+    end
+  end
 end

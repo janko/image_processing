@@ -40,6 +40,17 @@ module ImageProcessing
         tmp_name
       end
     end
+
+    def resize_to_fill!(image, width, height)
+      with_ruby_vips(image) do |img|
+        img = resize_image img, width, height, :max
+        img = crop_image(img, width, height)
+        tmp_name = tmp_name(image.path)
+        img.write_to_file(tmp_name)
+        tmp_name
+      end
+    end
+
     # Convert an image into a MiniMagick::Image for the duration of the block,
     # and at the end return a File object.
     def with_ruby_vips(image)
@@ -78,6 +89,26 @@ module ImageProcessing
       width_ratio = width.to_f / image.width
       height_ratio = height.to_f / image.height
       [width_ratio, height_ratio].send(min_or_max)
+    end
+
+    def crop_image(image, width, height)
+      if image.width > width
+        top = 0
+        left = (image.width - width) / 2
+      elsif image.height > height
+        left = 0
+        top = (image.height - height) / 2
+      else
+        left = 0
+        top = 0
+      end
+
+      # Floating point errors can sometimes chop off an extra pixel
+      # TODO: fix all the universe so that floating point errors never happen again
+      height = image.height if image.height < height
+      width = image.width if image.width < width
+
+      image.extract_area(left, top, width, height)
     end
   end
 end
