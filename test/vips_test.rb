@@ -18,18 +18,11 @@ describe ImageProcessing::Vips do
   end
 
   def assert_dimensions(dimensions, file)
-    assert_equal dimensions, MiniMagick::Image.new(file.path).dimensions
+    assert_equal dimensions, Vips::Image.new_from_file(file.path).size
   end
 
   def assert_type(type, file)
-    assert_equal type, MiniMagick::Image.new(file.path).type
-  end
-
-  def assert_resolution(resolution, file)
-    actual_resolution = MiniMagick::Image.new(file.path).resolution
-    # Travis has old imagemagick version
-    actual_resolution = actual_resolution.select(&:nonzero?) if ENV["CI"]
-    assert_equal resolution, actual_resolution
+    assert_equal type, File.extname(file.path)
   end
 
   def fixture_image(name)
@@ -45,14 +38,14 @@ describe ImageProcessing::Vips do
   describe "#convert!" do
     it "changes the image format" do
       result = convert!(@portrait, "png")
-      assert_type "PNG", result
+      assert_type ".png", result
     end
   end
 
   describe "#auto_orient!" do
     it "fixes the orientation of the image" do
       result = auto_orient!(@portrait)
-      assert_equal "1", MiniMagick::Image.new(result.path).exif["Orientation"]
+      assert_equal 1, Vips::Image.new_from_file(result.path).get("orientation")
     end
   end
 
