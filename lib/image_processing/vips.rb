@@ -51,6 +51,19 @@ module ImageProcessing
       end
     end
 
+    def crop!(image, width, height, x_offset=0, y_offset=0)
+      with_ruby_vips(image) do |img|
+        width   ||= img.width
+        height  ||= img.height
+        top       = x_offset.is_a?(Float)  && x_offset.between?(0,1)  ? (img.height - height) * x_offset : x_offset
+        left      = y_offset.is_a?(Float) && y_offset.between?(0,1) ? (img.width - width) * y_offset : y_offset
+        img = img.extract_area left, top, width, height
+        tmp_name = tmp_name(image.path)
+        img.write_to_file(tmp_name)
+        tmp_name
+      end
+    end
+
     # Convert an image into a MiniMagick::Image for the duration of the block,
     # and at the end return a File object.
     def with_ruby_vips(image)

@@ -106,4 +106,16 @@ describe ImageProcessing::Vips do
       assert_similar fixture_image("fill.jpg"), result
     end
   end
+
+  describe "#crop" do
+    it "resizes the image to the given dimensions" do
+      result = crop!(@portrait, 50, 50)
+      assert_dimensions [50, 50], result
+    end
+
+    it "crops the right area of the images from the center" do
+      result = crop!(@portrait, 50, 50, 0.5, 0.5)
+      assert_similar fixture_image("crop-center-vips.jpg"), result
+    end
+  end
 end
