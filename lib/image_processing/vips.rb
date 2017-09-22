@@ -16,7 +16,7 @@ module ImageProcessing
 
     def auto_orient!(image)
       with_ruby_vips(image) do |img|
-        img.autorot
+        img = img.autorot
         tmp_name = tmp_name(image.path)
         img.write_to_file(tmp_name)
         tmp_name
@@ -51,6 +51,17 @@ module ImageProcessing
       end
     end
 
+    def resize_and_pad!(image, width, height, background: "transparent", gravity: "Center")
+      with_ruby_vips(image) do |img|
+        img = resize_image img, width, height
+        top, left = get_gravity_values(img, width, height, gravity)
+        img = img.embed(top, left, width, height, {extend: :background, background: get_background(background)})
+        tmp_name = tmp_name(image.path)
+        img.write_to_file(tmp_name)
+        tmp_name
+      end
+    end
+
     def crop!(image, width, height, gravity: "NorthWest")
       with_ruby_vips(image) do |img|
         top, left = get_gravity_values(img, width, height, gravity)
@@ -58,6 +69,17 @@ module ImageProcessing
         tmp_name = tmp_name(image.path)
         img.write_to_file(tmp_name)
         tmp_name
+      end
+    end
+
+    def get_background(background)
+      case background.downcase
+      when "red"
+        [255,0,0]
+      when "green"
+        [0,255,0]
+      when "blue"
+        [0,0,255]
       end
     end
 
@@ -88,7 +110,7 @@ module ImageProcessing
       end
     end
 
-    # Convert an image into a MiniMagick::Image for the duration of the block,
+    # Convert an image into a Vips::Image for the duration of the block,
     # and at the end return a File object.
     def with_ruby_vips(image)
       image = ::Vips::Image.new_from_file image.path
