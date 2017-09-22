@@ -6,48 +6,39 @@ module ImageProcessing
   module Vips
     module_function
 
-    def convert!(image, format, page = nil, &block)
-      with_ruby_vips(image) do |img|
-        tmp_name = tmp_name(image.path, "_tmp.#{format}")
-        img.write_to_file(tmp_name)
-        tmp_name
-      end
+    def convert!(image, format, &block)
+      vips_image = ::Vips::Image.new_from_file image.path
+      tmp_name = tmp_name(image.path, "_tmp.#{format}")
+      vips_image.write_to_file(tmp_name)
+      File.new(tmp_name)
     end
 
     def auto_orient!(image)
       with_ruby_vips(image) do |img|
-        img = img.autorot
-        tmp_name = tmp_name(image.path)
-        img.write_to_file(tmp_name)
-        tmp_name
+        img.autorot
       end
     end
 
     def resize_to_limit!(image, width, height)
       with_ruby_vips(image) do |img|
-        img = resize_image(img, width, height) if width < img.width || height < img.height
-        tmp_name = tmp_name(image.path)
-        img.write_to_file(tmp_name)
-        tmp_name
+        if width < img.width || height < img.height
+          resize_image(img, width, height)
+        else
+          img
+        end
       end
     end
 
     def resize_to_fit!(image, width, height)
       with_ruby_vips(image) do |img|
-        img = resize_image(img, width, height)
-        tmp_name = tmp_name(image.path)
-        img.write_to_file(tmp_name)
-        tmp_name
+        resize_image(img, width, height)
       end
     end
 
     def resize_to_fill!(image, width, height)
       with_ruby_vips(image) do |img|
         img = resize_image img, width, height, :max
-        img = crop_image(img, width, height)
-        tmp_name = tmp_name(image.path)
-        img.write_to_file(tmp_name)
-        tmp_name
+        crop_image(img, width, height)
       end
     end
 
@@ -56,19 +47,14 @@ module ImageProcessing
         img = resize_image img, width, height
         top, left = get_gravity_values(img, width, height, gravity)
         img = img.embed(top, left, width, height, {extend: :background, background: get_background(background)})
-        tmp_name = tmp_name(image.path)
-        img.write_to_file(tmp_name)
-        tmp_name
+        img
       end
     end
 
     def crop!(image, width, height, gravity: "NorthWest")
       with_ruby_vips(image) do |img|
         top, left = get_gravity_values(img, width, height, gravity)
-        img = img.crop top, left, width, height
-        tmp_name = tmp_name(image.path)
-        img.write_to_file(tmp_name)
-        tmp_name
+        img.crop top, left, width, height
       end
     end
 
@@ -110,12 +96,13 @@ module ImageProcessing
       end
     end
 
-    # Convert an image into a Vips::Image for the duration of the block,
+    # Convert an image into a MiniMagick::Image for the duration of the block,
     # and at the end return a File object.
     def with_ruby_vips(image)
-      image = ::Vips::Image.new_from_file image.path
-      file_path = yield image
-      File.new(file_path)
+      vips_image = yield ::Vips::Image.new_from_file image.path
+      tmp_name_path = tmp_name(image.path)
+      vips_image.write_to_file(tmp_name_path)
+      File.new(tmp_name_path)
     end
 
     # Creates a copy of the file and stores it into a Tempfile. Works for any
