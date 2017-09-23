@@ -38,7 +38,7 @@ module ImageProcessing
     def resize_to_fill!(image, width, height)
       with_ruby_vips(image) do |img|
         img = resize_image img, width, height, :max
-        crop_image(img, width, height)
+        extract_area(img, width, height)
       end
     end
 
@@ -138,7 +138,7 @@ module ImageProcessing
       [width_ratio, height_ratio].send(min_or_max)
     end
 
-    def crop_image(image, width, height)
+    def extract_area(image, width, height)
       if image.width > width
         top = 0
         left = (image.width - width) / 2
@@ -150,8 +150,6 @@ module ImageProcessing
         top = 0
       end
 
-      # Floating point errors can sometimes chop off an extra pixel
-      # TODO: fix all the universe so that floating point errors never happen again
       height = image.height if image.height < height
       width = image.width if image.width < width
 
