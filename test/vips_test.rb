@@ -14,7 +14,7 @@ describe ImageProcessing::Vips do
 
     distance = a.distance_from(b).abs
 
-    assert_operator distance, :<, 2
+    assert_operator distance, :<=, 2
   end
 
   def assert_dimensions(dimensions, file)
