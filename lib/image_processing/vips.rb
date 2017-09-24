@@ -7,6 +7,11 @@ module ImageProcessing
   module Vips
     module_function
 
+    # Changes the image encoding format to the given format
+    #
+    # @param [Vips::Image] image    the image to convert
+    # @param [String] format        the format to convert to
+    # @return [File, Tempfile]
     def convert!(image, format, &block)
       vips_image = ::Vips::Image.new_from_file image.path
       tmp_name = tmp_name(image.path, "_tmp.#{format}")
@@ -14,12 +19,29 @@ module ImageProcessing
       File.new(tmp_name)
     end
 
+    # Adjusts the image so that its orientation is suitable for viewing.
+    #
+    # @see http://www.vips.ecs.soton.ac.uk/supported/7.42/doc/html/libvips/libvips-conversion.html#vips-autorot
+    # @param [Vips::Image] image    the image to convert
+    # @yield [Vips::Image]
+    # @return [File, Tempfile]
     def auto_orient!(image)
       with_ruby_vips(image) do |img|
         img.autorot
       end
     end
 
+    # Resize the image to fit within the specified dimensions while retaining
+    # the original aspect ratio. Will only resize the image if it is larger
+    # than the specified dimensions. The resulting image may be shorter or
+    # narrower than specified in either dimension but will not be larger than
+    # the specified values.
+    #
+    # @param [Vips::Image] image    the image to convert
+    # @param [#to_s] width          the maximum width
+    # @param [#to_s] height         the maximum height
+    # @yield [Vips::Image]
+    # @return [File, Tempfile]
     def resize_to_limit!(image, width, height)
       with_ruby_vips(image) do |img|
         if width < img.width || height < img.height
@@ -30,12 +52,37 @@ module ImageProcessing
       end
     end
 
+    # Resize the image to fit within the specified dimensions while retaining
+    # the original aspect ratio. The image may be shorter or narrower than
+    # specified in the smaller dimension but will not be larger than the
+    # specified values.
+    #
+    # @param [Vips::Image] image    the image to convert
+    # @param [#to_s] width                the width to fit into
+    # @param [#to_s] height               the height to fit into
+    # @yield [Vips::Image]
+    # @return [File, Tempfile]
     def resize_to_fit!(image, width, height)
       with_ruby_vips(image) do |img|
         resize_image(img, width, height)
       end
     end
 
+    # Resize the image so that it is at least as large in both dimensions as
+    # specified, then crops any excess outside the specified dimensions.
+    #
+    # The resulting image will always be exactly as large as the specified
+    # dimensions.
+    #
+    # By default, the center part of the image is kept, and the remainder
+    # cropped off, but this can be changed via the `gravity` option.
+    #
+    # @param [Vips::Image] image    the image to convert
+    # @param [#to_s] width                the width to fill out
+    # @param [#to_s] height               the height to fill out
+    # @param [String] gravity             which part of the image to focus on
+    # @yield [Vips::Tool::Mogrify]
+    # @return [File, Tempfile]
     def resize_to_fill!(image, width, height)
       with_ruby_vips(image) do |img|
         img = resize_image img, width, height, :max
@@ -43,7 +90,28 @@ module ImageProcessing
       end
     end
 
-    def resize_and_pad!(image, width, height, background: "transparent", gravity: "Center")
+    # Resize the image to fit within the specified dimensions while retaining
+    # the original aspect ratio in the same way as {#fill}. Unlike {#fill} it
+    # will, if necessary, pad the remaining area with the given color, which
+    # defaults to transparent where supported by the image format and white
+    # otherwise.
+    #
+    # The resulting image will always be exactly as large as the specified
+    # dimensions.
+    #
+    # By default, the image will be placed in the center but this can be
+    # changed via the `gravity` option.
+    #
+    # @param [Vips::image] image          the image to convert
+    # @param [#to_s] width                the width to fill out
+    # @param [#to_s] height               the height to fill out
+    # @param [string] background          the color to use as a background
+    # @param [string] gravity             which part of the image to focus on
+    # @yield [Vips::Tool::Mogrify]
+    # @return [File, Tempfile]
+    # @see http://www.imagemagick.org/script/color.php
+    # @see http://www.imagemagick.org/script/command-line-options.php#gravity
+    def resize_and_pad!(image, width, height, background: "opaque", gravity: "Center")
       with_ruby_vips(image) do |img|
         img = resize_image img, width, height
         top, left = Gravity.get(img, width, height, gravity)
@@ -52,6 +120,17 @@ module ImageProcessing
       end
     end
 
+    # Crops the image to be the defined area.
+    #
+    # @param [#to_s] width                the width of the cropped image
+    # @param [#to_s] height               the height of the cropped image
+    # @param [#to_s] x_offset             the x coordinate where to start cropping
+    # @param [#to_s] y_offset             the y coordinate where to start cropping
+    # @param [string] gravity             which part of the image to focus on
+    # @yield [Vips::Image]
+    # @return [File, Tempfile]
+    # @see http://www.imagemagick.org/script/command-line-options.php#gravity
+    # @see http://www.vips.ecs.soton.ac.uk/supported/7.42/doc/html/libvips/libvips-conversion.html#vips-crop
     def crop!(image, width, height, gravity: "NorthWest")
       with_ruby_vips(image) do |img|
         top, left = Gravity.get(img, width, height, gravity)
