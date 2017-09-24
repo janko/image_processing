@@ -1,7 +1,5 @@
 require "test_helper"
-require "mini_magick"
 require "image_processing/vips"
-require "stringio"
 
 describe ImageProcessing::Vips do
   include ImageProcessing::Vips
@@ -102,7 +100,7 @@ describe ImageProcessing::Vips do
 
   describe "#resize_and_pad!" do
     it "resizes and fills out the remaining space to fill out the given dimensions" do
-      result = resize_and_pad!(@portrait, 400, 400, background: "red")
+      result = resize_and_pad!(@portrait, 400, 400)
       assert_dimensions [400, 400], result
     end
 
