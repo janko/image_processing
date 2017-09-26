@@ -23,10 +23,6 @@ describe ImageProcessing::Vips do
     assert_equal type, File.extname(file.path)
   end
 
-  def fixture_image(name)
-    File.open("test/fixtures/#{name}")
-  end
-
   before do
     @portrait = _copy_to_tempfile(fixture_image("portrait.jpg"))
     @landscape = _copy_to_tempfile(fixture_image("landscape.jpg"))
