@@ -3,6 +3,10 @@ require_relative "vips/color"
 require_relative "vips/gravity"
 require "tempfile"
 
+if Gem::Version.new(Vips::VERSION) < Gem::Version.new("2.0.0")
+  raise "image_processing requires ruby-vips version >= 2.0.0"
+end
+
 module ImageProcessing
   module Vips
     module_function
