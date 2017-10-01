@@ -1,6 +1,16 @@
 language: ruby
 
-sudo: required
+sudo: false
+
+env:
+  global:
+    - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
+    - VIPS_VERSION_MAJOR=8
+    - VIPS_VERSION_MINOR=5
+    - VIPS_VERSION_MICRO=7
+    - PATH=$HOME/vips/bin:$PATH
+    - LD_LIBRARY_PATH=$HOME/vips/lib:$LD_LIBRARY_PATH
+    - PKG_CONFIG_PATH=$HOME/vips/lib/pkgconfig:$PKG_CONFIG_PATH
 
 rvm:
   - "2.0"
@@ -12,15 +22,14 @@ rvm:
 
 script: rake test
 
-cache: bundler
-cache: apt
+cache:
+  bundler: true
+  directories:
+    - $HOME/vips
 
 before_install:
-  - echo "Installing libvips..."
-  - sudo add-apt-repository -y ppa:lovell/precise-backport-vips
-  - sudo apt-get update
-  - sudo apt-get install -y libvips-dev
-  - echo "Completed libvips installation."
+  - uname -a
+  - bash install-vips.sh --without-python
 
 addons:
   apt:
@@ -29,3 +38,23 @@ addons:
       - libmagickcore-dev
       - libmagickwand-dev
       - graphicsmagick
+      - libexpat1-dev
+      - gettext
+      - liblcms2-dev
+      - libmagickwand-dev
+      - libopenexr-dev
+      - libcfitsio3-dev
+      - libgif-dev
+      - libgs-dev
+      - libgsf-1-dev
+      - libmatio-dev
+      - libopenslide-dev
+      - liborc-0.4-dev
+      - libpango1.0-dev
+      - libpoppler-glib-dev
+      - librsvg2-dev
+      - libwebp-dev
+        # missing on trusty, unfortunately
+        # - libwebpmux2
+      - libfftw3-dev
+      - libglib2.0-dev
