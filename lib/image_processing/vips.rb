@@ -11,14 +11,6 @@ module ImageProcessing
   module Vips
     module_function
 
-    def self.nondestructive_alias(name, original)
-      define_method(name) do |image, *args, **options, &block|
-        keyword_arguments = options.merge(destructive: false)
-        send(original, image, *args, **keyword_arguments, &block)
-      end
-      module_function name
-    end
-
     # Changes the image encoding format to the given format
     # Libvips convert the file automatically based on the name
     # since we want the user to have a destructive and a non destructive method
@@ -26,34 +18,38 @@ module ImageProcessing
     #
     # @param [Vips::Image] image    the image to convert
     # @param [String] format        the format to convert to
+    # @param [File] destination     the end destination where the image will be safe
     # @return [File, Tempfile]
-    def convert!(image, format, &block)
+    def convert(image, format, destination: nil, &block)
       vips_image = ::Vips::Image.new_from_file image.path
-      new_name = tmp_name(image.path, ".#{format}")
-      vips_image.write_to_file(new_name)
-      File.delete(image.path)
-      File.new(new_name)
+      destination_image = destination || _tempfile(".#{format}")
+      vips_image.write_to_file(destination_image.path)
+      destination_image
     end
 
-    def convert(image, format, &block)
-      vips_image = ::Vips::Image.new_from_file image.path
-      tmp_name = tmp_name(image.path, "_tmp.#{format}")
-      vips_image.write_to_file(tmp_name)
-      File.new(tmp_name)
+    def convert!(image, format, &block)
+      destination_path = Pathname(image.path).sub_ext(".#{format}").to_s
+      convert(image, format, destination: File.new(destination_path), &block).tap do
+        image.close
+        File.delete(image.path)
+      end
     end
 
     # Adjusts the image so that its orientation is suitable for viewing.
     #
     # @see http://www.vips.ecs.soton.ac.uk/supported/7.42/doc/html/libvips/libvips-conversion.html#vips-autorot
     # @param [Vips::Image] image    the image to convert
-    # @yield [Vips::Image]
+    # @param [File] destination     the end destination where the image will be safe
     # @return [File, Tempfile]
-    def auto_orient!(image, destructive: true)
-      with_ruby_vips(image, destructive) do |img|
-        img.autorot
+    def auto_orient(image, destination: nil, &block)
+      with_ruby_vips(image, destination) do |vips_image|
+        vips_image.autorot
       end
     end
-    nondestructive_alias :auto_orient, :auto_orient!
+
+    def auto_orient!(image, &block)
+      auto_orient(image, destination: image, &block)
+    end
 
     # Resize the image to fit within the specified dimensions while retaining
     # the original aspect ratio. Will only resize the image if it is larger
@@ -64,18 +60,21 @@ module ImageProcessing
     # @param [Vips::Image] image    the image to convert
     # @param [#to_s] width          the maximum width
     # @param [#to_s] height         the maximum height
-    # @yield [Vips::Image]
+    # @param [File] destination     the end destination where the image will be safe
     # @return [File, Tempfile]
-    def resize_to_limit!(image, width, height, destructive: true)
-      with_ruby_vips(image, destructive) do |img|
-        if width < img.width || height < img.height
-          resize_image(img, width, height)
+    def resize_to_limit(image, width, height, destination: nil, &block)
+      with_ruby_vips(image, destination) do |vips_image|
+        if width < vips_image.width || height < vips_image.height
+          resize_image(vips_image, width, height)
         else
-          img
+          vips_image
         end
       end
     end
-    nondestructive_alias :resize_to_limit, :resize_to_limit!
+
+    def resize_to_limit!(image, width, height, &block)
+      resize_to_limit(image, width, height, destination: image, &block)
+    end
 
     # Resize the image to fit within the specified dimensions while retaining
     # the original aspect ratio. The image may be shorter or narrower than
@@ -85,14 +84,17 @@ module ImageProcessing
     # @param [Vips::Image] image    the image to convert
     # @param [#to_s] width                the width to fit into
     # @param [#to_s] height               the height to fit into
-    # @yield [Vips::Image]
+    # @param [File] destination     the end destination where the image will be safe
     # @return [File, Tempfile]
-    def resize_to_fit!(image, width, height, destructive: true)
-      with_ruby_vips(image, destructive) do |img|
-        resize_image(img, width, height)
+    def resize_to_fit(image, width, height, destination: nil, &block)
+      with_ruby_vips(image, destination) do |vips_image|
+        resize_image(vips_image, width, height)
       end
     end
-    nondestructive_alias :resize_to_fit, :resize_to_fit!
+
+    def resize_to_fit!(image, width, height, &block)
+      resize_to_fit(image, width, height, destination: image, &block)
+    end
 
     # Resize the image so that it is at least as large in both dimensions as
     # specified, then crops any excess outside the specified dimensions.
@@ -106,16 +108,18 @@ module ImageProcessing
     # @param [Vips::Image] image    the image to convert
     # @param [#to_s] width                the width to fill out
     # @param [#to_s] height               the height to fill out
-    # @param [String] gravity             which part of the image to focus on
-    # @yield [Vips::Tool::Mogrify]
+    # @param [File] destination     the end destination where the image will be safe
     # @return [File, Tempfile]
-    def resize_to_fill!(image, width, height, destructive: true)
-      with_ruby_vips(image, destructive) do |img|
-        img = resize_image img, width, height, :max
-        extract_area(img, width, height)
+    def resize_to_fill(image, width, height, destination: nil, &block)
+      with_ruby_vips(image, destination) do |vips_image|
+        vips_image = resize_image vips_image, width, height, :max
+        extract_area(vips_image, width, height)
       end
     end
-    nondestructive_alias :resize_to_fill, :resize_to_fill!
+
+    def resize_to_fill!(image, width, height, &block)
+      resize_to_fill(image, width, height, destination: image, &block)
+    end
 
     # Resize the image to fit within the specified dimensions while retaining
     # the original aspect ratio in the same way as {#fill}. Unlike {#fill} it
@@ -132,21 +136,24 @@ module ImageProcessing
     # @param [Vips::image] image          the image to convert
     # @param [#to_s] width                the width to fill out
     # @param [#to_s] height               the height to fill out
-    # @param [string] background          the color to use as a background
-    # @param [string] gravity             which part of the image to focus on
-    # @yield [Vips::Tool::Mogrify]
+    # @param [String] background          the color to use as a background
+    # @param [String] gravity             which part of the image to focus on
+    # @param [File] destination     the end destination where the image will be safe
     # @return [File, Tempfile]
     # @see http://www.imagemagick.org/script/color.php
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
-    def resize_and_pad!(image, width, height, background: "opaque", gravity: "Center", destructive: true)
-      with_ruby_vips(image, destructive) do |img|
-        img = resize_image img, width, height
-        top, left = Gravity.get(img, width, height, gravity)
-        img = img.embed(top, left, width, height, {extend: :background, background: Color.get(background)})
-        img
+    def resize_and_pad(image, width, height, background: 'opaque', gravity: 'Center', destination: nil, &block)
+      with_ruby_vips(image, destination) do |vips_image|
+        vips_image = resize_image vips_image, width, height
+        top, left = Gravity.get(vips_image, width, height, gravity)
+        vips_image = vips_image.embed(top, left, width, height, {extend: :background, background: Color.get(background)})
+        vips_image
       end
     end
-    nondestructive_alias :resize_and_pad, :resize_and_pad!
+
+    def resize_and_pad!(image, width, height, background: "opaque", gravity: "Center", &block)
+      resize_and_pad(image, width, height, background: background, gravity: gravity, destination: image, &block)
+    end
 
     # Crops the image to be the defined area.
     #
@@ -154,30 +161,32 @@ module ImageProcessing
     # @param [#to_s] height               the height of the cropped image
     # @param [#to_s] x_offset             the x coordinate where to start cropping
     # @param [#to_s] y_offset             the y coordinate where to start cropping
-    # @param [string] gravity             which part of the image to focus on
+    # @param [String] gravity             which part of the image to focus on
+    # @param [File] destination     the end destination where the image will be safe
     # @yield [Vips::Image]
     # @return [File, Tempfile]
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     # @see http://www.vips.ecs.soton.ac.uk/supported/7.42/doc/html/libvips/libvips-conversion.html#vips-crop
-    def crop!(image, width, height, gravity: "NorthWest", destructive: true)
-      with_ruby_vips(image, destructive) do |img|
-        top, left = Gravity.get(img, width, height, gravity)
-        img.crop top, left, width, height
+    def crop(image, width, height, gravity: 'NorthWest', destination: nil, &block)
+      with_ruby_vips(image, destination) do |vips_image|
+        top, left = Gravity.get(vips_image, width, height, gravity)
+        vips_image.crop top, left, width, height
       end
     end
-    nondestructive_alias :crop, :crop!
+
+    def crop!(image, width, height, gravity: "NorthWest", &block)
+      crop(image, width, height, gravity: gravity, destination: image, &block)
+    end
 
     # Convert an image into a Vips::Image for the duration of the block,
     # and at the end return a File object.
-    def with_ruby_vips(image, destructive)
-      vips_image = yield ::Vips::Image.new_from_file image.path
-      path_to_write = if destructive
-                        image.path
-                      else
-                        tmp_name(image.path)
-                      end
-      vips_image.write_to_file(path_to_write)
-      File.new(path_to_write)
+    def with_ruby_vips(image, destination)
+      extension = File.extname(image.path) if image.respond_to?(:path)
+      vips_image = ::Vips::Image.new_from_file image.path
+      vips_image = yield(vips_image)
+      destination ||= _tempfile(extension)
+      vips_image.write_to_file(destination.path)
+      destination
     end
 
     # Creates a copy of the file and stores it into a Tempfile. Works for any
@@ -190,9 +199,8 @@ module ImageProcessing
       tempfile
     end
 
-    def tmp_name(path, ext='_tmp\1')
-      ext_regex = /(\.[[:alnum:]]+)$/
-      path.sub(ext_regex, ext)
+    def _tempfile(extension)
+      Tempfile.new(["image_processing-vips", extension.to_s], binmode: true)
     end
 
     def resize_image(image, width, height, min_or_max = :min)
