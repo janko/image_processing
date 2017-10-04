@@ -3,8 +3,13 @@ language: ruby
 sudo: required
 
 before_install:
-  - sudo apt-get update
-  - sudo apt-get install imagemagick libmagickcore-dev libmagickwand-dev
+  - wget http://www.imagemagick.org/download/ImageMagick.tar.gz
+  - tar -xvf ImageMagick.tar.gz
+  - cd ImageMagick-7.*
+  - ./configure
+  - make
+  - sudo make install
+  - sudo ldconfig /usr/local/lib
   - sudo apt-get install -qq graphicsmagick
 
 rvm:
