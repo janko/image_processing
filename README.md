@@ -8,7 +8,7 @@ that they can be used in any project. The goal of image_processing is to have a
 centralized place where helper methods for image processing are maintained,
 instead of CarrierWave, Dragonfly and Refile each implementing their own.
 
-It's been tested with MRI 2.x and JRuby.
+It's been tested with MRI 2.2+ and JRuby.
 
 ## Installation
 

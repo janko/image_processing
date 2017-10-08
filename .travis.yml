@@ -1,23 +1,23 @@
 language: ruby
 
-sudo: false
+sudo: required
+
+before_install:
+  - wget http://www.imagemagick.org/download/ImageMagick.tar.gz
+  - tar -xvf ImageMagick.tar.gz
+  - cd ImageMagick-7.*
+  - ./configure
+  - make
+  - sudo make install
+  - sudo ldconfig /usr/local/lib
+  - sudo apt-get install -qq graphicsmagick
 
 rvm:
-  - "2.0"
-  - "2.1.10"
-  - "2.2.7"
-  - "2.3.4"
-  - "2.4.1"
-  - "jruby-9.0.4.0"
+  - "2.2"
+  - "2.3"
+  - "2.4"
+  - "jruby-9.1.9.0"
 
 script: rake test
 
 cache: bundler
-
-addons:
-  apt:
-    packages:
-      - imagemagick
-      - libmagickcore-dev
-      - libmagickwand-dev
-      - graphicsmagick
