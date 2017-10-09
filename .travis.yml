@@ -1,35 +1,6 @@
 language: ruby
 
-sudo: false
-
-env:
-  global:
-    - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-    - VIPS_VERSION_MAJOR=8
-    - VIPS_VERSION_MINOR=5
-    - VIPS_VERSION_MICRO=7
-    - PATH=$HOME/vips/bin:$PATH
-    - LD_LIBRARY_PATH=$HOME/vips/lib:$LD_LIBRARY_PATH
-    - PKG_CONFIG_PATH=$HOME/vips/lib/pkgconfig:$PKG_CONFIG_PATH
-
-rvm:
-  - "2.0"
-  - "2.1.10"
-  - "2.2.7"
-  - "2.3.4"
-  - "2.4.1"
-  - "jruby-9.0.4.0"
-
-script: rake test
-
-cache:
-  bundler: true
-  directories:
-    - $HOME/vips
-
-before_install:
-  - uname -a
-  - bash install-vips.sh --without-python
+sudo: required
 
 addons:
   apt:
@@ -58,3 +29,38 @@ addons:
         # - libwebpmux2
       - libfftw3-dev
       - libglib2.0-dev
+
+before_install:
+  - wget http://www.imagemagick.org/download/ImageMagick.tar.gz
+  - tar -xvf ImageMagick.tar.gz
+  - cd ImageMagick-7.*
+  - ./configure
+  - make
+  - sudo make install
+  - sudo ldconfig /usr/local/lib
+  - sudo apt-get install -qq graphicsmagick
+  - uname -a
+  - bash install-vips.sh --without-python
+
+env:
+  global:
+    - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
+    - VIPS_VERSION_MAJOR=8
+    - VIPS_VERSION_MINOR=5
+    - VIPS_VERSION_MICRO=7
+    - PATH=$HOME/vips/bin:$PATH
+    - LD_LIBRARY_PATH=$HOME/vips/lib:$LD_LIBRARY_PATH
+    - PKG_CONFIG_PATH=$HOME/vips/lib/pkgconfig:$PKG_CONFIG_PATH
+
+cache:
+  bundler: true
+  directories:
+    - $HOME/vips
+
+rvm:
+  - "2.2"
+  - "2.3"
+  - "2.4"
+  - "jruby-9.1.9.0"
+
+script: rake test
