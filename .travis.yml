@@ -31,6 +31,8 @@ addons:
       - libglib2.0-dev
 
 before_install:
+  - uname -a
+  - bash install-vips.sh --without-python
   - wget http://www.imagemagick.org/download/ImageMagick.tar.gz
   - tar -xvf ImageMagick.tar.gz
   - cd ImageMagick-7.*
@@ -39,8 +41,6 @@ before_install:
   - sudo make install
   - sudo ldconfig /usr/local/lib
   - sudo apt-get install -qq graphicsmagick
-  - uname -a
-  - bash install-vips.sh --without-python
 
 env:
   global:
