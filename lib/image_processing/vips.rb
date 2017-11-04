@@ -1,6 +1,7 @@
 require "vips"
 require_relative "vips/color"
 require_relative "vips/gravity"
+require_relative "vips/utils"
 require "tempfile"
 
 if Gem::Version.new(Vips::VERSION) < Gem::Version.new("2.0.0")
@@ -62,7 +63,7 @@ module ImageProcessing
     def resize_to_limit(file, width, height, destination_path: nil, &block)
       with_ruby_vips(file, destination_path) do |vips_image|
         if width < vips_image.width || height < vips_image.height
-          resize_image(vips_image, width, height)
+          Utils.resize_image(vips_image, width, height)
         else
           vips_image
         end
@@ -85,7 +86,7 @@ module ImageProcessing
     # @return [File, Tempfile]
     def resize_to_fit(file, width, height, destination_path: nil, &block)
       with_ruby_vips(file, destination_path) do |vips_image|
-        resize_image(vips_image, width, height)
+        Utils.resize_image(vips_image, width, height)
       end
     end
 
@@ -109,8 +110,8 @@ module ImageProcessing
     # @return [File, Tempfile]
     def resize_to_fill(file, width, height, destination_path: nil, &block)
       with_ruby_vips(file, destination_path) do |vips_image|
-        vips_image = resize_image vips_image, width, height, :max
-        extract_area(vips_image, width, height)
+        vips_image = Utils.resize_image vips_image, width, height, :max
+        Utils.extract_area(vips_image, width, height)
       end
     end
 
@@ -141,7 +142,7 @@ module ImageProcessing
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     def resize_and_pad(file, width, height, background: 'opaque', gravity: 'Center', destination_path: nil, &block)
       with_ruby_vips(file, destination_path) do |vips_image|
-        vips_image = resize_image vips_image, width, height
+        vips_image = Utils.resize_image vips_image, width, height
         top, left = Gravity.get(vips_image, width, height, gravity)
         vips_image = vips_image.embed(top, left, width, height, {extend: :background, background: Color.get(background)})
         vips_image
@@ -181,56 +182,9 @@ module ImageProcessing
       file_extension = extension || File.extname(file.path)
       vips_image = ::Vips::Image.new_from_file file.path
       vips_image = yield(vips_image) if block_given?
-      destination_file = _destination_file(destination_path, file_extension)
+      destination_file = Utils.destination_file(destination_path, file_extension)
       vips_image.write_to_file(destination_file.path)
       destination_file
-    end
-
-    def _destination_file(path, extension)
-      if path && File.file?(path)
-        File.new(path)
-      else
-        _tempfile(extension)
-      end
-    end
-
-    def _tempfile(extension)
-      Tempfile.new(["image_processing-vips", extension.to_s], binmode: true)
-    end
-
-    def resize_image(image, width, height, min_or_max = :min)
-      ratio = get_ratio image, width, height, min_or_max
-      return image if ratio == 1
-      image = if ratio > 1
-                image.resize(ratio, kernel: :nearest)
-              else
-                image.resize(ratio, kernel: :cubic)
-              end
-      image
-    end
-
-    def get_ratio(image, width,height, min_or_max = :min)
-      width_ratio = width.to_f / image.width
-      height_ratio = height.to_f / image.height
-      [width_ratio, height_ratio].send(min_or_max)
-    end
-
-    def extract_area(image, width, height)
-      if image.width > width
-        top = 0
-        left = (image.width - width) / 2
-      elsif image.height > height
-        left = 0
-        top = (image.height - height) / 2
-      else
-        left = 0
-        top = 0
-      end
-
-      height = image.height if image.height < height
-      width = image.width if image.width < width
-
-      image.extract_area(left, top, width, height)
     end
   end
 end
