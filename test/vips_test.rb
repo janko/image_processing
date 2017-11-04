@@ -1,5 +1,6 @@
 require "test_helper"
 require "image_processing/vips"
+require "mini_magick"
 
 describe ImageProcessing::Vips do
   include ImageProcessing::Vips
@@ -20,7 +21,7 @@ describe ImageProcessing::Vips do
   end
 
   def assert_type(type, file)
-    assert_equal type, File.extname(file.path)
+    assert_equal type, MiniMagick::Image.new(file.path).type
   end
 
   before do
@@ -32,7 +33,8 @@ describe ImageProcessing::Vips do
   describe "#convert" do
     it "changes the image format" do
       result = convert(@portrait, "png")
-      assert_type ".png", result
+      assert_type "PNG", result
+      assert File.exist?(@portrait.path)
     end
   end
 
