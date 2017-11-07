@@ -1,7 +1,7 @@
 require "vips"
-require_relative "vips/color"
-require_relative "vips/gravity"
-require_relative "vips/utils"
+require "image_processing/vips/color"
+require "image_processing/vips/gravity"
+require "image_processing/vips/utils"
 require "tempfile"
 
 if Gem::Version.new(Vips::VERSION) < Gem::Version.new("2.0.0")
