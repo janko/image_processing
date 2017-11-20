@@ -178,7 +178,7 @@ module ImageProcessing
 
     # Convert an image into a Vips::Image for the duration of the block,
     # and at the end return a File object.
-    def with_ruby_vips(file, destination_path, extension: nil)
+    def with_ruby_vips(file, destination_path = nil, extension: nil)
       file_extension = extension || File.extname(file.path)
       vips_image = ::Vips::Image.new_from_file file.path
       vips_image = yield(vips_image) if block_given?
