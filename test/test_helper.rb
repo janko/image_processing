@@ -21,6 +21,6 @@ class MiniTest::Test
     tempfile = Tempfile.new(["test", extension.to_s], binmode: true)
     IO.copy_stream(file, tempfile.path)
     file.rewind
-    tempfile
+    tempfile.tap(&:open)
   end
 end

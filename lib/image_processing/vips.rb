@@ -46,7 +46,10 @@ module ImageProcessing
     end
 
     def auto_orient!(file, &block)
-      auto_orient(file, destination_path: file.path, &block)
+      auto_orient(file, &block).tap do
+        file.close
+        File.delete(file.path)
+      end
     end
 
     # Resize the image to fit within the specified dimensions while retaining
@@ -71,7 +74,10 @@ module ImageProcessing
     end
 
     def resize_to_limit!(file, width, height, &block)
-      resize_to_limit(file, width, height, destination_path: file.path, &block)
+      resize_to_limit(file, width, height, &block).tap do
+        file.close
+        File.delete(file.path)
+      end
     end
 
     # Resize the image to fit within the specified dimensions while retaining
@@ -91,7 +97,10 @@ module ImageProcessing
     end
 
     def resize_to_fit!(file, width, height, &block)
-      resize_to_fit(file, width, height, destination_path: file.path, &block)
+      resize_to_fit(file, width, height, &block).tap do
+        file.close
+        File.delete(file.path)
+      end
     end
 
     # Resize the image so that it is at least as large in both dimensions as
@@ -116,7 +125,10 @@ module ImageProcessing
     end
 
     def resize_to_fill!(file, width, height, &block)
-      resize_to_fill(file, width, height, destination_path: file.path, &block)
+      resize_to_fill(file, width, height, &block).tap do
+        file.close
+        File.delete(file.path)
+      end
     end
 
     # Resize the image to fit within the specified dimensions while retaining
@@ -150,7 +162,10 @@ module ImageProcessing
     end
 
     def resize_and_pad!(file, width, height, background: "opaque", gravity: "Center", &block)
-      resize_and_pad(file, width, height, background: background, gravity: gravity, destination_path: file.path, &block)
+      resize_and_pad(file, width, height, background: background, gravity: gravity, &block).tap do
+        file.close
+        File.delete(file.path)
+      end
     end
 
     # Crops the image to be the defined area.
@@ -173,7 +188,10 @@ module ImageProcessing
     end
 
     def crop!(file, width, height, gravity: "NorthWest", &block)
-      crop(file, width, height, gravity: gravity, destination_path: file.path, &block)
+      crop(file, width, height, gravity: gravity, &block).tap do
+        file.close
+        File.delete(file.path)
+      end
     end
 
     # Convert an image into a Vips::Image for the duration of the block,
