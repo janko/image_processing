@@ -82,7 +82,7 @@ resize_and_pad[!](file, width, height, background: "transparent", gravity: "Cent
 resample[!](file, horizontal, vertical)
 
 # Returns true if the given image is corrupted
-currupted?(file)
+corrupted?(file)
 ```
 
 For `#resize_to_limit[!]` and `#resize_to_fit[!]` you can don't have to specify
