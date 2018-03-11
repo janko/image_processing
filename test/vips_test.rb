@@ -50,6 +50,13 @@ describe ImageProcessing::Vips do
       assert_similar expected, actual
     end
 
+    it "accepts a block" do
+      rotated = fixture_image("rotated.jpg")
+      actual = auto_orient(rotated, &:invert)
+      expected = with_vips(auto_orient(rotated), &:invert)
+      assert_similar expected, actual
+    end
+
     it "doesn't modify the input file" do
       auto_orient(@portrait)
       assert_equal fixture_image("portrait.jpg").read, @portrait.read
@@ -77,6 +84,12 @@ describe ImageProcessing::Vips do
     it "produces correct image" do
       result = resize_to_limit(@portrait, 400, 400)
       assert_similar fixture_image("limit.jpg"), result
+    end
+
+    it "accepts a block" do
+      actual   = resize_to_limit(@portrait, 400, 400, &:invert)
+      expected = with_vips(resize_to_limit(@portrait, 400, 400), &:invert)
+      assert_similar expected, actual
     end
 
     it "doesn't modify the input file" do
@@ -108,6 +121,12 @@ describe ImageProcessing::Vips do
       assert_similar fixture_image("fit.jpg"), result
     end
 
+    it "accepts a block" do
+      actual   = resize_to_fit(@portrait, 400, 400, &:invert)
+      expected = with_vips(resize_to_fit(@portrait, 400, 400), &:invert)
+      assert_similar expected, actual
+    end
+
     it "doesn't modify the input file" do
       resize_to_fit(@portrait, 400, 400)
       assert_equal fixture_image("portrait.jpg").read, @portrait.read
@@ -135,6 +154,12 @@ describe ImageProcessing::Vips do
     it "produces correct image" do
       result = resize_to_fill(@portrait, 400, 400)
       assert_similar fixture_image("fill.jpg"), result
+    end
+
+    it "accepts a block" do
+      actual   = resize_to_fill(@portrait, 400, 400, &:invert)
+      expected = with_vips(resize_to_fill(@portrait, 400, 400), &:invert)
+      assert_similar expected, actual
     end
 
     it "doesn't modify the input file" do
@@ -172,6 +197,12 @@ describe ImageProcessing::Vips do
       assert_similar fixture_image("pad-large.jpg"), result
     end
 
+    it "accepts a block" do
+      actual   = resize_and_pad(@portrait, 400, 400, &:invert)
+      expected = with_vips(resize_and_pad(@portrait, 400, 400), &:invert)
+      assert_similar expected, actual
+    end
+
     it "doesn't modify the input file" do
       resize_and_pad(@portrait, 400, 400)
       assert_equal fixture_image("portrait.jpg").read, @portrait.read
@@ -187,6 +218,12 @@ describe ImageProcessing::Vips do
     it "crops the right area of the images from the center" do
       result = crop(@portrait, 50, 50, gravity: 'Center')
       assert_similar fixture_image("crop-center-vips.jpg"), result
+    end
+
+    it "accepts a block" do
+      actual   = crop(@portrait, 50, 50, &:invert)
+      expected = with_vips(crop(@portrait, 50, 50), &:invert)
+      assert_similar expected, actual
     end
 
     it "doesn't modify the input file" do
