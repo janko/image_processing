@@ -155,9 +155,16 @@ module ImageProcessing
       end
     end
 
-    # Convert an image into a Vips::Image for the duration of the block,
-    # and at the end return a File object.
-    def with_vips(file, extension: nil, &block)
+    # Converts an image into a Vips::Image for the duration of the block,
+    # and returns the processed file.
+    #
+    # @param [#path, #read] file        file to be processed
+    # @param [String] extension         extension of the result file
+    # @param [Hash] options             options for Vips::Image.new_from_file
+    # @yield [Vips::Image]
+    # @return [Tempfile]
+    # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#new_from_file-class_method
+    def with_vips(file, extension: nil, **options, &block)
       unless file.respond_to?(:path)
         return Utils.copy_to_tempfile(file) { |tempfile|
           with_vips(tempfile, extension: extension, &block)
