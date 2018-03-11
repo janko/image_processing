@@ -254,5 +254,11 @@ describe ImageProcessing::Vips do
       corrupted = fixture_image("corrupted.jpg")
       assert_raises(Vips::Error) { with_vips(corrupted, &:autorot) }
     end
+
+    it "accepts reading options" do
+      dimensions = Vips::Image.new_from_file(@portrait.path).size
+      resized = with_vips(@portrait, shrink: 2)
+      assert_dimensions dimensions.map { |n| n / 2 }, resized
+    end
   end
 end
