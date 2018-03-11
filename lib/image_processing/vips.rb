@@ -29,7 +29,7 @@ module ImageProcessing
     #
     # @param [File, Tempfile] file     the image to convert
     # @return [File, Tempfile]
-    # @see http://www.vips.ecs.soton.ac.uk/supported/7.42/doc/html/libvips/libvips-conversion.html#vips-autorot
+    # @see http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
     def auto_orient(file, &block)
       with_vips(file) do |vips_image|
         vips_image.autorot
@@ -133,7 +133,7 @@ module ImageProcessing
     # @param [String] gravity           which part of the image to focus on
     # @return [File, Tempfile]
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
-    # @see http://www.vips.ecs.soton.ac.uk/supported/7.42/doc/html/libvips/libvips-conversion.html#vips-crop
+    # @see http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-crop
     def crop(file, width, height, gravity: 'NorthWest', &block)
       with_vips(file) do |vips_image|
         top, left = Gravity.get(vips_image, width, height, gravity)
