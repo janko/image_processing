@@ -246,6 +246,13 @@ describe ImageProcessing::Vips do
       rotated = fixture_image("rotated.jpg")
       result = with_vips(StringIO.new(rotated.read), &:autorot)
       assert_type "PNG", result
+
+      image = Vips::Image.new_from_file(fixture_path("corrupted.jpg"), fail: true)
+    end
+
+    it "fails with corrupted files" do
+      corrupted = fixture_image("corrupted.jpg")
+      assert_raises(Vips::Error) { with_vips(corrupted, &:autorot) }
     end
   end
 end

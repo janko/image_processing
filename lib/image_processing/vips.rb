@@ -164,7 +164,7 @@ module ImageProcessing
         }
       end
 
-      vips_image = ::Vips::Image.new_from_file file.path
+      vips_image = ::Vips::Image.new_from_file(file.path, fail: true)
       vips_image = yield(vips_image) if block_given?
 
       extension ||= File.extname(file.path)
