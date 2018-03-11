@@ -37,18 +37,6 @@ module ImageProcessing
 
         image.extract_area(left, top, width, height)
       end
-
-      def destination_file(path, extension)
-        if path && File.file?(path)
-          File.new(path)
-        else
-          tempfile(extension)
-        end
-      end
-
-      def tempfile(extension)
-        Tempfile.new(["image_processing-vips", extension.to_s], binmode: true)
-      end
     end
   end
 end
