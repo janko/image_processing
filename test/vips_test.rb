@@ -74,13 +74,6 @@ describe ImageProcessing::Vips do
       assert_dimensions [600, 800], result
     end
 
-    it "auto rotates the image" do
-      rotated = fixture_image("rotated.jpg")
-      actual = resize_to_limit(rotated, 400, 400)
-      expected = resize_to_limit(auto_orient(rotated), 400, 400)
-      assert_similar expected, actual
-    end
-
     it "produces correct image" do
       result = resize_to_limit(@portrait, 400, 400)
       assert_similar fixture_image("limit.jpg"), result
@@ -107,13 +100,6 @@ describe ImageProcessing::Vips do
     it "enlarges image if it is smaller than given dimensions" do
       result = resize_to_fit(@portrait, 1000, 1000)
       assert_dimensions [750, 1000], result
-    end
-
-    it "auto rotates the image" do
-      rotated = fixture_image("rotated.jpg")
-      actual = resize_to_fit(rotated, 400, 400)
-      expected = resize_to_fit(auto_orient(rotated), 400, 400)
-      assert_similar expected, actual
     end
 
     it "produces correct image" do
@@ -144,13 +130,6 @@ describe ImageProcessing::Vips do
       assert_dimensions [1000, 1000], result
     end
 
-    it "auto rotates the image" do
-      rotated = fixture_image("rotated.jpg")
-      actual = resize_to_fill(rotated, 400, 400)
-      expected = resize_to_fill(auto_orient(rotated), 400, 400)
-      assert_similar expected, actual
-    end
-
     it "produces correct image" do
       result = resize_to_fill(@portrait, 400, 400)
       assert_similar fixture_image("fill.jpg"), result
@@ -177,13 +156,6 @@ describe ImageProcessing::Vips do
     it "enlarges image and fills out the remaining space to fill out the given dimensions" do
       result = resize_and_pad(@portrait, 1000, 1000, background: "red")
       assert_dimensions [1000, 1000], result
-    end
-
-    it "auto rotates the image" do
-      rotated = fixture_image("rotated.jpg")
-      actual = resize_and_pad(rotated, 400, 400)
-      expected = resize_and_pad(auto_orient(rotated), 400, 400)
-      assert_similar expected, actual
     end
 
     it "produces correct image" do
@@ -253,6 +225,13 @@ describe ImageProcessing::Vips do
     it "fails with corrupted files" do
       corrupted = fixture_image("corrupted.jpg")
       assert_raises(Vips::Error) { with_vips(corrupted, &:autorot) }
+    end
+
+    it "automatically rotates files" do
+      rotated = fixture_image("rotated.jpg")
+      actual = with_vips(rotated, &:invert)
+      expected = with_vips(auto_orient(rotated), &:invert)
+      assert_similar expected, actual
     end
 
     it "accepts reading options" do

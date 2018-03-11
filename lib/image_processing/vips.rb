@@ -53,10 +53,10 @@ module ImageProcessing
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
-    def resize_to_limit(file, width, height, auto_rotate: true, **options, &block)
+    def resize_to_limit(file, width, height, **options, &block)
       with_vips(file) do |vips_image|
         vips_image = yield(vips_image) if block_given?
-        vips_image.thumbnail_image(width, height: height, size: :down, auto_rotate: auto_rotate, **options)
+        vips_image.thumbnail_image(width, height: height, size: :down, **options)
       end
     end
 
@@ -72,10 +72,10 @@ module ImageProcessing
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
-    def resize_to_fit(file, width, height, auto_rotate: true, **options, &block)
+    def resize_to_fit(file, width, height, **options, &block)
       with_vips(file) do |vips_image|
         vips_image = yield(vips_image) if block_given?
-        vips_image.thumbnail_image(width, height: height, auto_rotate: auto_rotate, **options)
+        vips_image.thumbnail_image(width, height: height, **options)
       end
     end
 
@@ -95,10 +95,10 @@ module ImageProcessing
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
-    def resize_to_fill(file, width, height, crop: :centre, auto_rotate: true, **options, &block)
+    def resize_to_fill(file, width, height, crop: :centre, **options, &block)
       with_vips(file) do |vips_image|
         vips_image = yield(vips_image) if block_given?
-        vips_image.thumbnail_image(width, height: height, crop: crop, auto_rotate: auto_rotate, **options)
+        vips_image.thumbnail_image(width, height: height, crop: crop, **options)
       end
     end
 
@@ -125,10 +125,10 @@ module ImageProcessing
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     # @see http://www.imagemagick.org/script/color.php
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
-    def resize_and_pad(file, width, height, background: 'opaque', gravity: 'Center', auto_rotate: true, **options, &block)
+    def resize_and_pad(file, width, height, background: 'opaque', gravity: 'Center', **options, &block)
       with_vips(file) do |vips_image|
         vips_image = yield(vips_image) if block_given?
-        vips_image = vips_image.thumbnail_image(width, height: height, auto_rotate: auto_rotate, **options)
+        vips_image = vips_image.thumbnail_image(width, height: height, **options)
         top, left = Gravity.get(vips_image, width, height, gravity)
         vips_image = vips_image.embed(top, left, width, height, extend: :background, background: Color.get(background))
         vips_image
@@ -172,6 +172,7 @@ module ImageProcessing
       end
 
       vips_image = ::Vips::Image.new_from_file(file.path, fail: true, **options)
+      vips_image = vips_image.autorot
       vips_image = yield(vips_image) if block_given?
 
       extension ||= File.extname(file.path)
