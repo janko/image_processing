@@ -2,7 +2,6 @@ require "vips"
 
 require "image_processing/vips/color"
 require "image_processing/vips/gravity"
-require "image_processing/vips/utils"
 
 require "tempfile"
 
@@ -46,14 +45,12 @@ module ImageProcessing
     # @param [File, Tempfile] file     the image to convert
     # @param [#to_s] width             the maximum width
     # @param [#to_s] height            the maximum height
+    # @param [options]                 options for Vips::Image#thumbnail_image
     # @return [File, Tempfile]
-    def resize_to_limit(file, width, height, &block)
+    # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
+    def resize_to_limit(file, width, height, auto_rotate: true, **options, &block)
       with_ruby_vips(file) do |vips_image|
-        if width < vips_image.width || height < vips_image.height
-          Utils.resize_image(vips_image, width, height)
-        else
-          vips_image
-        end
+        vips_image.thumbnail_image(width, height: height, size: :down, auto_rotate: auto_rotate, **options)
       end
     end
 
@@ -65,10 +62,12 @@ module ImageProcessing
     # @param [File, Tempfile] file     the image to convert
     # @param [#to_s] width             the width to fit into
     # @param [#to_s] height            the height to fit into
+    # @param [options]                 options for Vips::Image#thumbnail_image
     # @return [File, Tempfile]
-    def resize_to_fit(file, width, height, &block)
+    # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
+    def resize_to_fit(file, width, height, auto_rotate: true, **options, &block)
       with_ruby_vips(file) do |vips_image|
-        Utils.resize_image(vips_image, width, height)
+        vips_image.thumbnail_image(width, height: height, auto_rotate: auto_rotate, **options)
       end
     end
 
@@ -84,11 +83,12 @@ module ImageProcessing
     # @param [File, Tempfile] file     the image to convert
     # @param [#to_s] width             the width to fill out
     # @param [#to_s] height            the height to fill out
+    # @param [options]                 options for Vips::Image#thumbnail_image
     # @return [File, Tempfile]
-    def resize_to_fill(file, width, height, &block)
+    # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
+    def resize_to_fill(file, width, height, crop: :centre, auto_rotate: true, **options, &block)
       with_ruby_vips(file) do |vips_image|
-        vips_image = Utils.resize_image vips_image, width, height, :max
-        Utils.extract_area(vips_image, width, height)
+        vips_image.thumbnail_image(width, height: height, crop: crop, auto_rotate: auto_rotate, **options)
       end
     end
 
@@ -109,14 +109,16 @@ module ImageProcessing
     # @param [#to_s] height             the height to fill out
     # @param [String] background        the color to use as a background
     # @param [String] gravity           which part of the image to focus on
+    # @param [options]                  options for Vips::Image#thumbnail_image
     # @return [File, Tempfile]
+    # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     # @see http://www.imagemagick.org/script/color.php
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
-    def resize_and_pad(file, width, height, background: 'opaque', gravity: 'Center', &block)
+    def resize_and_pad(file, width, height, background: 'opaque', gravity: 'Center', auto_rotate: true, **options, &block)
       with_ruby_vips(file) do |vips_image|
-        vips_image = Utils.resize_image vips_image, width, height
+        vips_image = vips_image.thumbnail_image(width, height: height, auto_rotate: auto_rotate, **options)
         top, left = Gravity.get(vips_image, width, height, gravity)
-        vips_image = vips_image.embed(top, left, width, height, {extend: :background, background: Color.get(background)})
+        vips_image = vips_image.embed(top, left, width, height, extend: :background, background: Color.get(background))
         vips_image
       end
     end

@@ -33,6 +33,7 @@ describe ImageProcessing::Vips do
     it "changes the image format" do
       result = convert(@portrait, "png")
       assert_type "PNG", result
+      assert_equal ".png", File.extname(result.path)
     end
 
     it "doesn't modify the input file" do
@@ -43,9 +44,10 @@ describe ImageProcessing::Vips do
 
   describe "#auto_orient" do
     it "fixes the orientation of the image" do
-      result = auto_orient(@portrait)
-      assert_equal 1, Vips::Image.new_from_file(result.path).get("orientation")
-      assert File.exist?(@portrait.path)
+      rotated = fixture_image("rotated.jpg")
+      actual = auto_orient(rotated)
+      expected = with_ruby_vips(rotated, &:rot90)
+      assert_similar expected, actual
     end
 
     it "doesn't modify the input file" do
@@ -63,6 +65,13 @@ describe ImageProcessing::Vips do
     it "does not resize the image if it is smaller than the limit" do
       result = resize_to_limit(@portrait, 1000, 1000)
       assert_dimensions [600, 800], result
+    end
+
+    it "auto rotates the image" do
+      rotated = fixture_image("rotated.jpg")
+      actual = resize_to_limit(rotated, 400, 400)
+      expected = resize_to_limit(auto_orient(rotated), 400, 400)
+      assert_similar expected, actual
     end
 
     it "produces correct image" do
@@ -87,6 +96,13 @@ describe ImageProcessing::Vips do
       assert_dimensions [750, 1000], result
     end
 
+    it "auto rotates the image" do
+      rotated = fixture_image("rotated.jpg")
+      actual = resize_to_fit(rotated, 400, 400)
+      expected = resize_to_fit(auto_orient(rotated), 400, 400)
+      assert_similar expected, actual
+    end
+
     it "produces correct image" do
       result = resize_to_fit(@portrait, 400, 400)
       assert_similar fixture_image("fit.jpg"), result
@@ -109,6 +125,13 @@ describe ImageProcessing::Vips do
       assert_dimensions [1000, 1000], result
     end
 
+    it "auto rotates the image" do
+      rotated = fixture_image("rotated.jpg")
+      actual = resize_to_fill(rotated, 400, 400)
+      expected = resize_to_fill(auto_orient(rotated), 400, 400)
+      assert_similar expected, actual
+    end
+
     it "produces correct image" do
       result = resize_to_fill(@portrait, 400, 400)
       assert_similar fixture_image("fill.jpg"), result
@@ -129,6 +152,13 @@ describe ImageProcessing::Vips do
     it "enlarges image and fills out the remaining space to fill out the given dimensions" do
       result = resize_and_pad(@portrait, 1000, 1000, background: "red")
       assert_dimensions [1000, 1000], result
+    end
+
+    it "auto rotates the image" do
+      rotated = fixture_image("rotated.jpg")
+      actual = resize_and_pad(rotated, 400, 400)
+      expected = resize_and_pad(auto_orient(rotated), 400, 400)
+      assert_similar expected, actual
     end
 
     it "produces correct image" do
