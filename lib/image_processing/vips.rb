@@ -22,7 +22,7 @@ module ImageProcessing
     # @param [String] format           the format to convert to
     # @return [File, Tempfile]
     def convert(file, format, &block)
-      with_ruby_vips(file, extension: ".#{format}")
+      with_vips(file, extension: ".#{format}")
     end
 
     # Adjusts the image so that its orientation is suitable for viewing.
@@ -31,7 +31,7 @@ module ImageProcessing
     # @return [File, Tempfile]
     # @see http://www.vips.ecs.soton.ac.uk/supported/7.42/doc/html/libvips/libvips-conversion.html#vips-autorot
     def auto_orient(file, &block)
-      with_ruby_vips(file) do |vips_image|
+      with_vips(file) do |vips_image|
         vips_image.autorot
       end
     end
@@ -49,7 +49,7 @@ module ImageProcessing
     # @return [File, Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     def resize_to_limit(file, width, height, auto_rotate: true, **options, &block)
-      with_ruby_vips(file) do |vips_image|
+      with_vips(file) do |vips_image|
         vips_image.thumbnail_image(width, height: height, size: :down, auto_rotate: auto_rotate, **options)
       end
     end
@@ -66,7 +66,7 @@ module ImageProcessing
     # @return [File, Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     def resize_to_fit(file, width, height, auto_rotate: true, **options, &block)
-      with_ruby_vips(file) do |vips_image|
+      with_vips(file) do |vips_image|
         vips_image.thumbnail_image(width, height: height, auto_rotate: auto_rotate, **options)
       end
     end
@@ -87,7 +87,7 @@ module ImageProcessing
     # @return [File, Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     def resize_to_fill(file, width, height, crop: :centre, auto_rotate: true, **options, &block)
-      with_ruby_vips(file) do |vips_image|
+      with_vips(file) do |vips_image|
         vips_image.thumbnail_image(width, height: height, crop: crop, auto_rotate: auto_rotate, **options)
       end
     end
@@ -115,7 +115,7 @@ module ImageProcessing
     # @see http://www.imagemagick.org/script/color.php
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     def resize_and_pad(file, width, height, background: 'opaque', gravity: 'Center', auto_rotate: true, **options, &block)
-      with_ruby_vips(file) do |vips_image|
+      with_vips(file) do |vips_image|
         vips_image = vips_image.thumbnail_image(width, height: height, auto_rotate: auto_rotate, **options)
         top, left = Gravity.get(vips_image, width, height, gravity)
         vips_image = vips_image.embed(top, left, width, height, extend: :background, background: Color.get(background))
@@ -135,7 +135,7 @@ module ImageProcessing
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     # @see http://www.vips.ecs.soton.ac.uk/supported/7.42/doc/html/libvips/libvips-conversion.html#vips-crop
     def crop(file, width, height, gravity: 'NorthWest', &block)
-      with_ruby_vips(file) do |vips_image|
+      with_vips(file) do |vips_image|
         top, left = Gravity.get(vips_image, width, height, gravity)
         vips_image.crop top, left, width, height
       end
@@ -143,7 +143,7 @@ module ImageProcessing
 
     # Convert an image into a Vips::Image for the duration of the block,
     # and at the end return a File object.
-    def with_ruby_vips(file, extension: nil)
+    def with_vips(file, extension: nil)
       extension ||= File.extname(file.path)
       vips_image = ::Vips::Image.new_from_file file.path
       vips_image = yield(vips_image) if block_given?

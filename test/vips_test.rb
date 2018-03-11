@@ -46,7 +46,7 @@ describe ImageProcessing::Vips do
     it "fixes the orientation of the image" do
       rotated = fixture_image("rotated.jpg")
       actual = auto_orient(rotated)
-      expected = with_ruby_vips(rotated, &:rot90)
+      expected = with_vips(rotated, &:rot90)
       assert_similar expected, actual
     end
 
