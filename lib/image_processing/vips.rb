@@ -2,6 +2,7 @@ require "vips"
 
 require "image_processing/vips/color"
 require "image_processing/vips/gravity"
+require "image_processing/utils"
 
 require "tempfile"
 
@@ -18,17 +19,17 @@ module ImageProcessing
     # since we want the user to have a destructive and a non destructive method
     # using the destructive method will cause the original file to be deleted
     #
-    # @param [File, Tempfile] file     the image to convert
+    # @param [#read] file              the image to convert
     # @param [String] format           the format to convert to
-    # @return [File, Tempfile]
+    # @return [Tempfile]
     def convert(file, format, &block)
-      with_vips(file, extension: ".#{format}")
+      with_vips(file, extension: ".#{format}", &block)
     end
 
     # Adjusts the image so that its orientation is suitable for viewing.
     #
-    # @param [File, Tempfile] file     the image to convert
-    # @return [File, Tempfile]
+    # @param [#read] file              the image to convert
+    # @return [Tempfile]
     # @see http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
     def auto_orient(file, &block)
       with_vips(file) do |vips_image|
@@ -42,11 +43,11 @@ module ImageProcessing
     # narrower than specified in either dimension but will not be larger than
     # the specified values.
     #
-    # @param [File, Tempfile] file     the image to convert
+    # @param [#read] file              the image to convert
     # @param [#to_s] width             the maximum width
     # @param [#to_s] height            the maximum height
     # @param [options]                 options for Vips::Image#thumbnail_image
-    # @return [File, Tempfile]
+    # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     def resize_to_limit(file, width, height, auto_rotate: true, **options, &block)
       with_vips(file) do |vips_image|
@@ -59,11 +60,11 @@ module ImageProcessing
     # specified in the smaller dimension but will not be larger than the
     # specified values.
     #
-    # @param [File, Tempfile] file     the image to convert
+    # @param [#read] file              the image to convert
     # @param [#to_s] width             the width to fit into
     # @param [#to_s] height            the height to fit into
     # @param [options]                 options for Vips::Image#thumbnail_image
-    # @return [File, Tempfile]
+    # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     def resize_to_fit(file, width, height, auto_rotate: true, **options, &block)
       with_vips(file) do |vips_image|
@@ -80,11 +81,11 @@ module ImageProcessing
     # By default, the center part of the image is kept, and the remainder
     # cropped off, but this can be changed via the `gravity` option.
     #
-    # @param [File, Tempfile] file     the image to convert
+    # @param [#read] file              the image to convert
     # @param [#to_s] width             the width to fill out
     # @param [#to_s] height            the height to fill out
     # @param [options]                 options for Vips::Image#thumbnail_image
-    # @return [File, Tempfile]
+    # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     def resize_to_fill(file, width, height, crop: :centre, auto_rotate: true, **options, &block)
       with_vips(file) do |vips_image|
@@ -104,13 +105,13 @@ module ImageProcessing
     # By default, the image will be placed in the center but this can be
     # changed via the `gravity` option.
     #
-    # @param [File, Tempfile] file      the image to convert
+    # @param [#read] file               the image to convert
     # @param [#to_s] width              the width to fill out
     # @param [#to_s] height             the height to fill out
     # @param [String] background        the color to use as a background
     # @param [String] gravity           which part of the image to focus on
     # @param [options]                  options for Vips::Image#thumbnail_image
-    # @return [File, Tempfile]
+    # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     # @see http://www.imagemagick.org/script/color.php
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
@@ -125,13 +126,13 @@ module ImageProcessing
 
     # Crops the image to be the defined area.
     #
-    # @param [File, Tempfile] file      the image to convert
+    # @param [#read] file               the image to convert
     # @param [#to_s] width              the width of the cropped image
     # @param [#to_s] height             the height of the cropped image
     # @param [#to_s] x_offset           the x coordinate where to start cropping
     # @param [#to_s] y_offset           the y coordinate where to start cropping
     # @param [String] gravity           which part of the image to focus on
-    # @return [File, Tempfile]
+    # @return [Tempfile]
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     # @see http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-crop
     def crop(file, width, height, gravity: 'NorthWest', &block)
@@ -143,13 +144,24 @@ module ImageProcessing
 
     # Convert an image into a Vips::Image for the duration of the block,
     # and at the end return a File object.
-    def with_vips(file, extension: nil)
-      extension ||= File.extname(file.path)
+    def with_vips(file, extension: nil, &block)
+      unless file.respond_to?(:path)
+        return Utils.copy_to_tempfile(file) { |tempfile|
+          with_vips(tempfile, extension: extension, &block)
+        }
+      end
+
       vips_image = ::Vips::Image.new_from_file file.path
       vips_image = yield(vips_image) if block_given?
-      processed_file = Tempfile.new(["image_processing-vips", extension], binmode: true)
-      vips_image.write_to_file(processed_file.path)
-      processed_file.tap(&:open)
+
+      extension ||= File.extname(file.path)
+      extension   = ".png" if extension.empty? # save in PNG format by default
+      result = Tempfile.new(["image_processing-vips", extension], binmode: true)
+
+      vips_image.write_to_file(result.path)
+      result.open # refresh content
+
+      result
     end
   end
 end

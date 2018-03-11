@@ -194,4 +194,21 @@ describe ImageProcessing::Vips do
       assert_equal fixture_image("portrait.jpg").read, @portrait.read
     end
   end
+
+  describe "#with_vips" do
+    it "accepts any object that responds to #read" do
+      rotated = fixture_image("rotated.jpg")
+      io = StringIO.new(rotated.read)
+      actual = with_vips(io, &:autorot)
+      expected = with_vips(rotated, &:autorot)
+      assert_similar expected, actual
+      assert_equal 0, io.pos
+    end
+
+    it "saves in PNG format when extension is not known" do
+      rotated = fixture_image("rotated.jpg")
+      result = with_vips(StringIO.new(rotated.read), &:autorot)
+      assert_type "PNG", result
+    end
+  end
 end
