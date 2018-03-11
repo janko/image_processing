@@ -42,27 +42,6 @@ describe ImageProcessing::Vips do
     end
   end
 
-  describe "#auto_orient" do
-    it "fixes the orientation of the image" do
-      rotated = fixture_image("rotated.jpg")
-      actual = auto_orient(rotated)
-      expected = with_vips(rotated, &:rot90)
-      assert_similar expected, actual
-    end
-
-    it "accepts a block" do
-      rotated = fixture_image("rotated.jpg")
-      actual = auto_orient(rotated, &:invert)
-      expected = with_vips(auto_orient(rotated), &:invert)
-      assert_similar expected, actual
-    end
-
-    it "doesn't modify the input file" do
-      auto_orient(@portrait)
-      assert_equal fixture_image("portrait.jpg").read, @portrait.read
-    end
-  end
-
   describe "#resize_to_limit" do
     it "resizes the image up to a given limit" do
       result = resize_to_limit(@portrait, 400, 400)
@@ -229,9 +208,9 @@ describe ImageProcessing::Vips do
 
     it "automatically rotates files" do
       rotated = fixture_image("rotated.jpg")
-      actual = with_vips(rotated, &:invert)
-      expected = with_vips(auto_orient(rotated), &:invert)
-      assert_similar expected, actual
+      result = with_vips(rotated, &:invert)
+      dimensions = Vips::Image.new_from_file(rotated.path).size
+      assert_dimensions dimensions.reverse, result
     end
 
     it "accepts reading options" do

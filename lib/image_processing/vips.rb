@@ -27,19 +27,6 @@ module ImageProcessing
       with_vips(file, extension: ".#{format}", &block)
     end
 
-    # Adjusts the image so that its orientation is suitable for viewing.
-    #
-    # @param [#path, #read] file       the image to convert
-    # @yield [Vips::Image]
-    # @return [Tempfile]
-    # @see http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
-    def auto_orient(file, &block)
-      with_vips(file) do |vips_image|
-        vips_image = yield(vips_image) if block_given?
-        vips_image.autorot
-      end
-    end
-
     # Resize the image to fit within the specified dimensions while retaining
     # the original aspect ratio. Will only resize the image if it is larger
     # than the specified dimensions. The resulting image may be shorter or
