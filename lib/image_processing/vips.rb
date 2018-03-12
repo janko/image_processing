@@ -21,8 +21,8 @@ module ImageProcessing
     # the specified values.
     #
     # @param [#path, #read] file       the image to convert
-    # @param [#to_s] width             the maximum width
-    # @param [#to_s] height            the maximum height
+    # @param [Integer] width           the maximum width
+    # @param [Integer] height          the maximum height
     # @param [String] format           file format of the output file
     # @param [Hash] options            options for Vips::Image#thumbnail_image
     # @yield [Vips::Image]
@@ -41,8 +41,8 @@ module ImageProcessing
     # specified values.
     #
     # @param [#path, #read] file       the image to convert
-    # @param [#to_s] width             the width to fit into
-    # @param [#to_s] height            the height to fit into
+    # @param [Integer] width           the width to fit into
+    # @param [Integer] height          the height to fit into
     # @param [String] format           file format of the output file
     # @param [Hash] options            options for Vips::Image#thumbnail_image
     # @yield [Vips::Image]
@@ -65,8 +65,8 @@ module ImageProcessing
     # cropped off, but this can be changed via the `gravity` option.
     #
     # @param [#path, #read] file       the image to convert
-    # @param [#to_s] width             the width to fill out
-    # @param [#to_s] height            the height to fill out
+    # @param [Integer] width           the width to fill out
+    # @param [Integer] height          the height to fill out
     # @param [String] format           file format of the output file
     # @param [Hash] options            options for Vips::Image#thumbnail_image
     # @yield [Vips::Image]
@@ -92,8 +92,8 @@ module ImageProcessing
     # changed via the `gravity` option.
     #
     # @param [#path, #read] file       the image to convert
-    # @param [#to_s] width             the width to fill out
-    # @param [#to_s] height            the height to fill out
+    # @param [Integer] width           the width to fill out
+    # @param [Integer] height          the height to fill out
     # @param [String] background       the color to use as a background
     # @param [String] gravity          which part of the image to focus on
     # @param [String] format           file format of the output file
@@ -116,10 +116,10 @@ module ImageProcessing
     # Crops the image to be the defined area.
     #
     # @param [#path, #read] file       the image to convert
-    # @param [#to_s] width             the width of the cropped image
-    # @param [#to_s] height            the height of the cropped image
-    # @param [#to_s] x_offset          the x coordinate where to start cropping
-    # @param [#to_s] y_offset          the y coordinate where to start cropping
+    # @param [Integer] width           the width of the cropped image
+    # @param [Integer] height          the height of the cropped image
+    # @param [Integer] x_offset        the x coordinate where to start cropping
+    # @param [Integer] y_offset        the y coordinate where to start cropping
     # @param [String] format           file format of the output file
     # @yield [Vips::Image]
     # @return [Tempfile]
