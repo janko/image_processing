@@ -29,19 +29,6 @@ describe ImageProcessing::Vips do
     @landscape = copy_to_tempfile(fixture_path("landscape.jpg"))
   end
 
-  describe "#convert" do
-    it "changes the image format" do
-      result = convert(@portrait, "png")
-      assert_type "PNG", result
-      assert_equal ".png", File.extname(result.path)
-    end
-
-    it "doesn't modify the input file" do
-      convert(@portrait, "png")
-      assert File.exist?(@portrait.path)
-    end
-  end
-
   describe "#resize_to_limit" do
     it "resizes the image up to a given limit" do
       result = resize_to_limit(@portrait, 400, 400)
@@ -62,6 +49,11 @@ describe ImageProcessing::Vips do
       actual   = resize_to_limit(@portrait, 400, 400, &:invert)
       expected = with_vips(resize_to_limit(@portrait, 400, 400), &:invert)
       assert_similar expected, actual
+    end
+
+    it "accepts format" do
+      result = resize_to_limit(@portrait, 400, 400, format: "png")
+      assert_type "PNG", result
     end
 
     it "doesn't modify the input file" do
@@ -92,6 +84,11 @@ describe ImageProcessing::Vips do
       assert_similar expected, actual
     end
 
+    it "accepts format" do
+      result = resize_to_fit(@portrait, 400, 400, format: "png")
+      assert_type "PNG", result
+    end
+
     it "doesn't modify the input file" do
       resize_to_fit(@portrait, 400, 400)
       assert_equal fixture_image("portrait.jpg").read, @portrait.read
@@ -120,6 +117,11 @@ describe ImageProcessing::Vips do
       assert_similar expected, actual
     end
 
+    it "accepts format" do
+      result = resize_to_fill(@portrait, 400, 400, format: "png")
+      assert_type "PNG", result
+    end
+
     it "doesn't modify the input file" do
       resize_to_fill(@portrait, 400, 400)
       assert_equal fixture_image("portrait.jpg").read, @portrait.read
@@ -138,7 +140,7 @@ describe ImageProcessing::Vips do
     end
 
     it "produces correct image" do
-      @portrait = convert(@portrait, "png")
+      @portrait = with_vips(@portrait, format: "png")
       result = resize_and_pad(@portrait, 400, 400, background: "red")
       assert_similar fixture_image("pad.jpg"), result
     end
@@ -152,6 +154,11 @@ describe ImageProcessing::Vips do
       actual   = resize_and_pad(@portrait, 400, 400, &:invert)
       expected = with_vips(resize_and_pad(@portrait, 400, 400), &:invert)
       assert_similar expected, actual
+    end
+
+    it "accepts format" do
+      result = resize_and_pad(@portrait, 400, 400, format: "png")
+      assert_type "PNG", result
     end
 
     it "doesn't modify the input file" do
@@ -175,6 +182,11 @@ describe ImageProcessing::Vips do
       actual   = crop(@portrait, 50, 50, &:invert)
       expected = with_vips(crop(@portrait, 50, 50), &:invert)
       assert_similar expected, actual
+    end
+
+    it "accepts format" do
+      result = crop(@portrait, 50, 50, format: "png")
+      assert_type "PNG", result
     end
 
     it "doesn't modify the input file" do
