@@ -59,15 +59,15 @@ describe ImageProcessing::Vips do
       assert_similar expected, actual
     end
 
-    it "accepts format" do
+    it "accepts thumbnail options" do
+      result = resize_to_limit(@portrait, 400, 400, thumbnail: { crop: :centre })
+      assert_dimensions [400, 400], result
+    end
+
+    it "accepts vips options" do
       result = resize_to_limit(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
       assert_equal ".png", File.extname(result.path)
-    end
-
-    it "accepts additional thumbnail options" do
-      result = resize_to_limit(@portrait, 400, 400, crop: :centre)
-      assert_dimensions [400, 400], result
     end
 
     it "doesn't modify the input file" do
@@ -106,15 +106,15 @@ describe ImageProcessing::Vips do
       assert_similar expected, actual
     end
 
-    it "accepts format" do
+    it "accepts thumbnail options" do
+      result = resize_to_fit(@portrait, 400, 400, thumbnail: { crop: :centre })
+      assert_dimensions [400, 400], result
+    end
+
+    it "accepts vips options" do
       result = resize_to_fit(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
       assert_equal ".png", File.extname(result.path)
-    end
-
-    it "accepts additional thumbnail options" do
-      result = resize_to_fit(@portrait, 400, 400, crop: :centre)
-      assert_dimensions [400, 400], result
     end
 
     it "doesn't modify the input file" do
@@ -145,16 +145,16 @@ describe ImageProcessing::Vips do
       assert_similar expected, actual
     end
 
-    it "accepts format" do
+    it "accepts thumbnail options" do
+      attention = resize_to_fill(@portrait, 400, 400, thumbnail: { crop: :attention })
+      centre    = resize_to_fill(@portrait, 400, 400, thumbnail: { crop: :centre })
+      refute_equal centre.read, attention.read
+    end
+
+    it "accepts vips options" do
       result = resize_to_fill(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
       assert_equal ".png", File.extname(result.path)
-    end
-
-    it "accepts additional thumbnail options" do
-      attention = resize_to_fill(@portrait, 400, 400, crop: :attention)
-      centre    = resize_to_fill(@portrait, 400, 400, crop: :centre)
-      refute_equal centre.read, attention.read
     end
 
     it "doesn't modify the input file" do
@@ -191,16 +191,16 @@ describe ImageProcessing::Vips do
       assert_similar expected, actual
     end
 
-    it "accepts format" do
+    it "accepts thumbnail options" do
+      crop = resize_and_pad(@portrait, 400, 400, thumbnail: { crop: :centre })
+      pad = resize_and_pad(@portrait, 400, 400)
+      refute_equal pad.read, crop.read
+    end
+
+    it "accepts vips options" do
       result = resize_and_pad(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
       assert_equal ".png", File.extname(result.path)
-    end
-
-    it "accepts additional thumbnail options" do
-      crop = resize_and_pad(@portrait, 400, 400, crop: :centre)
-      pad = resize_and_pad(@portrait, 400, 400)
-      refute_equal pad.read, crop.read
     end
 
     it "doesn't modify the input file" do
@@ -226,7 +226,7 @@ describe ImageProcessing::Vips do
       assert_similar expected, actual
     end
 
-    it "accepts format" do
+    it "accepts vips options" do
       result = crop(@portrait, 50, 50, format: "png")
       assert_type "PNG", result
       assert_equal ".png", File.extname(result.path)
@@ -247,6 +247,13 @@ describe ImageProcessing::Vips do
       assert_equal 0, io.pos
     end
 
+    it "automatically rotates files" do
+      rotated = fixture_image("rotated.jpg")
+      result = vips(rotated, &:invert)
+      dimensions = Vips::Image.new_from_file(rotated.path).size
+      assert_dimensions dimensions.reverse, result
+    end
+
     it "accepts format" do
       result = vips(@portrait, format: "png")
       assert_type "PNG", result
@@ -260,22 +267,22 @@ describe ImageProcessing::Vips do
       assert_equal ".jpg", File.extname(result.path)
     end
 
+    it "accepts load options" do
+      dimensions = Vips::Image.new_from_file(@portrait.path).size
+      result = vips(@portrait, loader: { shrink: 2 })
+      assert_dimensions dimensions.map { |n| n / 2 }, result
+    end
+
+    it "accepts save options" do
+      dimensions = Vips::Image.new_from_file(@portrait.path).size
+      result = vips(@portrait, saver: { strip: true })
+      result_image = Vips::Image.new_from_file(result.path)
+      refute_includes result_image.get_fields, "exif-data"
+    end
+
     it "fails with corrupted files" do
       corrupted = fixture_image("corrupted.jpg")
       assert_raises(Vips::Error) { vips(corrupted, &:autorot) }
-    end
-
-    it "automatically rotates files" do
-      rotated = fixture_image("rotated.jpg")
-      result = vips(rotated, &:invert)
-      dimensions = Vips::Image.new_from_file(rotated.path).size
-      assert_dimensions dimensions.reverse, result
-    end
-
-    it "accepts reading options" do
-      dimensions = Vips::Image.new_from_file(@portrait.path).size
-      resized = vips(@portrait, shrink: 2)
-      assert_dimensions dimensions.map { |n| n / 2 }, resized
     end
   end
 end

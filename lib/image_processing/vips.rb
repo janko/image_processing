@@ -23,16 +23,16 @@ module ImageProcessing
     # @param [#path, #read] file       the image to convert
     # @param [Integer] width           the maximum width
     # @param [Integer] height          the maximum height
-    # @param [String] format           file format of the output file
-    # @param [Hash] options            options for Vips::Image#thumbnail_image
+    # @param [Hash] thumbnail          options for Vips::Image#thumbnail_image
+    # @param [Hash] options            options for #vips
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
-    def resize_to_limit(file, width, height, format: nil, **options, &block)
-      vips(file, format: format) do |vips_image|
+    def resize_to_limit(file, width, height, thumbnail: {}, **options, &block)
+      vips(file, **options) do |vips_image|
         vips_image = yield(vips_image) if block_given?
         width, height = Utils.infer_dimensions([width, height], vips_image.size)
-        vips_image.thumbnail_image(width, height: height, size: :down, **options)
+        vips_image.thumbnail_image(width, height: height, size: :down, **thumbnail)
       end
     end
 
@@ -44,16 +44,16 @@ module ImageProcessing
     # @param [#path, #read] file       the image to convert
     # @param [Integer] width           the width to fit into
     # @param [Integer] height          the height to fit into
-    # @param [String] format           file format of the output file
-    # @param [Hash] options            options for Vips::Image#thumbnail_image
+    # @param [Hash] thumbnail          options for Vips::Image#thumbnail_image
+    # @param [Hash] options            options for #vips
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
-    def resize_to_fit(file, width, height, format: nil, **options, &block)
-      vips(file, format: format) do |vips_image|
+    def resize_to_fit(file, width, height, thumbnail: {}, **options, &block)
+      vips(file, **options) do |vips_image|
         vips_image = yield(vips_image) if block_given?
         width, height = Utils.infer_dimensions([width, height], vips_image.size)
-        vips_image.thumbnail_image(width, height: height, **options)
+        vips_image.thumbnail_image(width, height: height, **thumbnail)
       end
     end
 
@@ -69,15 +69,15 @@ module ImageProcessing
     # @param [#path, #read] file       the image to convert
     # @param [Integer] width           the width to fill out
     # @param [Integer] height          the height to fill out
-    # @param [String] format           file format of the output file
-    # @param [Hash] options            options for Vips::Image#thumbnail_image
+    # @param [Hash] thumbnail          options for Vips::Image#thumbnail_image
+    # @param [Hash] options            options for #vips
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
-    def resize_to_fill(file, width, height, format: nil, **options, &block)
-      vips(file, format: format) do |vips_image|
+    def resize_to_fill(file, width, height, thumbnail: {}, **options, &block)
+      vips(file, **options) do |vips_image|
         vips_image = yield(vips_image) if block_given?
-        vips_image.thumbnail_image(width, height: height, crop: :centre, **options)
+        vips_image.thumbnail_image(width, height: height, crop: :centre, **thumbnail)
       end
     end
 
@@ -98,17 +98,17 @@ module ImageProcessing
     # @param [Integer] height          the height to fill out
     # @param [String] background       the color to use as a background
     # @param [String] gravity          which part of the image to focus on
-    # @param [String] format           file format of the output file
-    # @param [Hash] options            options for Vips::Image#thumbnail_image
+    # @param [Hash] thumbnail          options for Vips::Image#thumbnail_image
+    # @param [Hash] options            options for #vips
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     # @see http://www.imagemagick.org/script/color.php
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
-    def resize_and_pad(file, width, height, background: "opaque", gravity: "Center", format: nil, **options, &block)
-      vips(file, format: format) do |vips_image|
+    def resize_and_pad(file, width, height, background: "opaque", gravity: "Center", thumbnail: {}, **options, &block)
+      vips(file, **options) do |vips_image|
         vips_image = yield(vips_image) if block_given?
-        vips_image = vips_image.thumbnail_image(width, height: height, **options)
+        vips_image = vips_image.thumbnail_image(width, height: height, **thumbnail)
         left, top = Gravity.get_coords(vips_image, width, height, gravity)
         vips_image = vips_image.embed(left, top, width, height, extend: :background, background: Color.get(background))
         vips_image
@@ -122,13 +122,12 @@ module ImageProcessing
     # @param [Integer] height          the height of the cropped image
     # @param [Integer] x_offset        the x coordinate where to start cropping
     # @param [Integer] y_offset        the y coordinate where to start cropping
-    # @param [String] format           file format of the output file
+    # @param [Hash] options            options for #vips
     # @yield [Vips::Image]
     # @return [Tempfile]
-    # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     # @see http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-crop
-    def crop(file, width, height, x_offset = 0, y_offset = 0, format: nil, &block)
-      vips(file, format: format) do |vips_image|
+    def crop(file, width, height, x_offset = 0, y_offset = 0, **options, &block)
+      vips(file, **options) do |vips_image|
         vips_image = yield(vips_image) if block_given?
         vips_image.crop x_offset, y_offset, width, height
       end
@@ -139,25 +138,27 @@ module ImageProcessing
     #
     # @param [#path, #read] file        file to be processed
     # @param [String] format            file format of the output file
-    # @param [Hash] options             options for Vips::Image.new_from_file
+    # @param [Hash] loader              options for Vips::Image.new_from_file
+    # @param [Hash] saver               options for Vips::Image#write_to_file
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#new_from_file-class_method
-    def vips(file, format: nil, **options, &block)
+    # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#write_to_file-instance_method
+    def vips(file, format: nil, loader: {}, saver: {}, &block)
       unless file.respond_to?(:path)
         return Utils.copy_to_tempfile(file) { |tempfile|
-          vips(tempfile, format: format, **options, &block)
+          vips(tempfile, format: format, loader: loader, saver: saver, &block)
         }
       end
 
-      vips_image = ::Vips::Image.new_from_file(file.path, fail: true, **options)
+      vips_image = ::Vips::Image.new_from_file(file.path, fail: true, **loader)
       vips_image = vips_image.autorot
       vips_image = yield(vips_image) if block_given?
 
       format ||= File.extname(file.path)[1..-1] || "jpg"
       result = Tempfile.new(["image_processing-vips", ".#{format}"], binmode: true)
 
-      vips_image.write_to_file(result.path)
+      vips_image.write_to_file(result.path, **saver)
       result.open # refresh content
 
       result
