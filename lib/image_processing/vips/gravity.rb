@@ -1,27 +1,39 @@
 module ImageProcessing
   module Vips
-    module Gravity
-      class InvalidGravityValue < StandardError; end
+    class Gravity
+      Error = Class.new(StandardError)
 
-      module_function
+      COORDS = {
+        "Center"    => -> (left, top) { [left / 2, top / 2] },
+        "North"     => -> (left, top) { [left / 2, 0      ] },
+        "NorthEast" => -> (left, top) { [left,     0      ] },
+        "East"      => -> (left, top) { [left,     top / 2] },
+        "SouthEast" => -> (left, top) { [left,     top    ] },
+        "South"     => -> (left, top) { [left / 2, top    ] },
+        "SouthWest" => -> (left, top) { [0,        top    ] },
+        "West"      => -> (left, top) { [0,        top / 2] },
+        "NorthWest" => -> (left, top) { [0,        0      ] },
+      }
 
-      def get(image, width, height, gravity)
-        top = image.width - width
-        left = image.height - height
-        values = case gravity
-                  when "Center"    then [(top / 2), (left / 2)]
-                  when "North"     then [(top / 2), 0]
-                  when "East"      then [top, (left / 2)]
-                  when "South"     then [(top / 2), left]
-                  when "West"      then [0, (left / 2)]
-                  when "NorthEast" then [top, 0]
-                  when "SouthEast" then [top,left]
-                  when "SouthWest" then [0, left]
-                  when "NorthWest" then [0, 0]
-                  else
-                    raise InvalidGravityValue
-                  end
-        values.map(&:abs)
+      def self.get_coords(image, width, height, gravity)
+        new(gravity).get_coords(image, width, height)
+      end
+
+      attr_reader :gravity
+
+      def initialize(gravity)
+        raise Error, "invalid gravity value: #{gravity.inspect}" unless COORDS.key?(gravity)
+
+        @gravity = gravity
+      end
+
+      def get_coords(image, width, height)
+        raise Error, "image is larger than specified dimensions" unless image.width <= width && image.height <= height
+
+        left = width  - image.width
+        top  = height - image.height
+
+        COORDS.fetch(gravity).call(left, top)
       end
     end
   end

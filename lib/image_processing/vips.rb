@@ -107,8 +107,8 @@ module ImageProcessing
       vips(file, format: format) do |vips_image|
         vips_image = yield(vips_image) if block_given?
         vips_image = vips_image.thumbnail_image(width, height: height, **options)
-        top, left = Gravity.get(vips_image, width, height, gravity)
-        vips_image = vips_image.embed(top, left, width, height, extend: :background, background: Color.get(background))
+        left, top = Gravity.get_coords(vips_image, width, height, gravity)
+        vips_image = vips_image.embed(left, top, width, height, extend: :background, background: Color.get(background))
         vips_image
       end
     end
