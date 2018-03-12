@@ -31,6 +31,7 @@ module ImageProcessing
     def resize_to_limit(file, width, height, format: nil, **options, &block)
       vips(file, format: format) do |vips_image|
         vips_image = yield(vips_image) if block_given?
+        width, height = Utils.infer_dimensions([width, height], vips_image.size)
         vips_image.thumbnail_image(width, height: height, size: :down, **options)
       end
     end
@@ -51,6 +52,7 @@ module ImageProcessing
     def resize_to_fit(file, width, height, format: nil, **options, &block)
       vips(file, format: format) do |vips_image|
         vips_image = yield(vips_image) if block_given?
+        width, height = Utils.infer_dimensions([width, height], vips_image.size)
         vips_image.thumbnail_image(width, height: height, **options)
       end
     end

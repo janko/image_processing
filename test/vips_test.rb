@@ -40,6 +40,14 @@ describe ImageProcessing::Vips do
       assert_dimensions [600, 800], result
     end
 
+    it "doesn't require both dimensions" do
+      result = resize_to_limit(@portrait, 300, nil)
+      assert_dimensions [300, 400], result
+
+      result = resize_to_limit(@portrait, nil, 1000)
+      assert_dimensions [600, 800], result
+    end
+
     it "produces correct image" do
       result = resize_to_limit(@portrait, 400, 400)
       assert_similar fixture_image("limit.jpg"), result
@@ -76,6 +84,14 @@ describe ImageProcessing::Vips do
 
     it "enlarges image if it is smaller than given dimensions" do
       result = resize_to_fit(@portrait, 1000, 1000)
+      assert_dimensions [750, 1000], result
+    end
+
+    it "doesn't require both dimensions" do
+      result = resize_to_fit(@portrait, 300, nil)
+      assert_dimensions [300, 400], result
+
+      result = resize_to_fit(@portrait, nil, 1000)
       assert_dimensions [750, 1000], result
     end
 
