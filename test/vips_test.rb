@@ -54,6 +54,7 @@ describe ImageProcessing::Vips do
     it "accepts format" do
       result = resize_to_limit(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
+      assert_equal ".png", File.extname(result.path)
     end
 
     it "doesn't modify the input file" do
@@ -87,6 +88,7 @@ describe ImageProcessing::Vips do
     it "accepts format" do
       result = resize_to_fit(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
+      assert_equal ".png", File.extname(result.path)
     end
 
     it "doesn't modify the input file" do
@@ -120,6 +122,7 @@ describe ImageProcessing::Vips do
     it "accepts format" do
       result = resize_to_fill(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
+      assert_equal ".png", File.extname(result.path)
     end
 
     it "doesn't modify the input file" do
@@ -159,6 +162,7 @@ describe ImageProcessing::Vips do
     it "accepts format" do
       result = resize_and_pad(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
+      assert_equal ".png", File.extname(result.path)
     end
 
     it "doesn't modify the input file" do
@@ -187,6 +191,7 @@ describe ImageProcessing::Vips do
     it "accepts format" do
       result = crop(@portrait, 50, 50, format: "png")
       assert_type "PNG", result
+      assert_equal ".png", File.extname(result.path)
     end
 
     it "doesn't modify the input file" do
@@ -203,6 +208,12 @@ describe ImageProcessing::Vips do
       expected = vips(rotated, &:autorot)
       assert_similar expected, actual
       assert_equal 0, io.pos
+    end
+
+    it "accepts format" do
+      result = vips(@portrait, format: "png")
+      assert_type "PNG", result
+      assert_equal ".png", File.extname(result.path)
     end
 
     it "saves in PNG format when extension is not known" do
