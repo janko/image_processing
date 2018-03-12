@@ -47,7 +47,7 @@ describe ImageProcessing::Vips do
 
     it "accepts a block" do
       actual   = resize_to_limit(@portrait, 400, 400, &:invert)
-      expected = with_vips(resize_to_limit(@portrait, 400, 400), &:invert)
+      expected = vips(resize_to_limit(@portrait, 400, 400), &:invert)
       assert_similar expected, actual
     end
 
@@ -80,7 +80,7 @@ describe ImageProcessing::Vips do
 
     it "accepts a block" do
       actual   = resize_to_fit(@portrait, 400, 400, &:invert)
-      expected = with_vips(resize_to_fit(@portrait, 400, 400), &:invert)
+      expected = vips(resize_to_fit(@portrait, 400, 400), &:invert)
       assert_similar expected, actual
     end
 
@@ -113,7 +113,7 @@ describe ImageProcessing::Vips do
 
     it "accepts a block" do
       actual   = resize_to_fill(@portrait, 400, 400, &:invert)
-      expected = with_vips(resize_to_fill(@portrait, 400, 400), &:invert)
+      expected = vips(resize_to_fill(@portrait, 400, 400), &:invert)
       assert_similar expected, actual
     end
 
@@ -140,7 +140,7 @@ describe ImageProcessing::Vips do
     end
 
     it "produces correct image" do
-      @portrait = with_vips(@portrait, format: "png")
+      @portrait = vips(@portrait, format: "png")
       result = resize_and_pad(@portrait, 400, 400, background: "red")
       assert_similar fixture_image("pad.jpg"), result
     end
@@ -152,7 +152,7 @@ describe ImageProcessing::Vips do
 
     it "accepts a block" do
       actual   = resize_and_pad(@portrait, 400, 400, &:invert)
-      expected = with_vips(resize_and_pad(@portrait, 400, 400), &:invert)
+      expected = vips(resize_and_pad(@portrait, 400, 400), &:invert)
       assert_similar expected, actual
     end
 
@@ -180,7 +180,7 @@ describe ImageProcessing::Vips do
 
     it "accepts a block" do
       actual   = crop(@portrait, 50, 50, &:invert)
-      expected = with_vips(crop(@portrait, 50, 50), &:invert)
+      expected = vips(crop(@portrait, 50, 50), &:invert)
       assert_similar expected, actual
     end
 
@@ -195,19 +195,19 @@ describe ImageProcessing::Vips do
     end
   end
 
-  describe "#with_vips" do
+  describe "#vips" do
     it "accepts any object that responds to #read" do
       rotated = fixture_image("rotated.jpg")
       io = StringIO.new(rotated.read)
-      actual = with_vips(io, &:autorot)
-      expected = with_vips(rotated, &:autorot)
+      actual = vips(io, &:autorot)
+      expected = vips(rotated, &:autorot)
       assert_similar expected, actual
       assert_equal 0, io.pos
     end
 
     it "saves in PNG format when extension is not known" do
       rotated = fixture_image("rotated.jpg")
-      result = with_vips(StringIO.new(rotated.read), &:autorot)
+      result = vips(StringIO.new(rotated.read), &:autorot)
       assert_type "PNG", result
 
       image = Vips::Image.new_from_file(fixture_path("corrupted.jpg"), fail: true)
@@ -215,19 +215,19 @@ describe ImageProcessing::Vips do
 
     it "fails with corrupted files" do
       corrupted = fixture_image("corrupted.jpg")
-      assert_raises(Vips::Error) { with_vips(corrupted, &:autorot) }
+      assert_raises(Vips::Error) { vips(corrupted, &:autorot) }
     end
 
     it "automatically rotates files" do
       rotated = fixture_image("rotated.jpg")
-      result = with_vips(rotated, &:invert)
+      result = vips(rotated, &:invert)
       dimensions = Vips::Image.new_from_file(rotated.path).size
       assert_dimensions dimensions.reverse, result
     end
 
     it "accepts reading options" do
       dimensions = Vips::Image.new_from_file(@portrait.path).size
-      resized = with_vips(@portrait, shrink: 2)
+      resized = vips(@portrait, shrink: 2)
       assert_dimensions dimensions.map { |n| n / 2 }, resized
     end
   end

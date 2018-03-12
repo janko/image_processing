@@ -29,7 +29,7 @@ module ImageProcessing
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     def resize_to_limit(file, width, height, format: nil, **options, &block)
-      with_vips(file, format: format) do |vips_image|
+      vips(file, format: format) do |vips_image|
         vips_image = yield(vips_image) if block_given?
         vips_image.thumbnail_image(width, height: height, size: :down, **options)
       end
@@ -49,7 +49,7 @@ module ImageProcessing
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     def resize_to_fit(file, width, height, format: nil, **options, &block)
-      with_vips(file, format: format) do |vips_image|
+      vips(file, format: format) do |vips_image|
         vips_image = yield(vips_image) if block_given?
         vips_image.thumbnail_image(width, height: height, **options)
       end
@@ -73,7 +73,7 @@ module ImageProcessing
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
     def resize_to_fill(file, width, height, crop: :centre, format: nil, **options, &block)
-      with_vips(file, format: format) do |vips_image|
+      vips(file, format: format) do |vips_image|
         vips_image = yield(vips_image) if block_given?
         vips_image.thumbnail_image(width, height: height, crop: crop, **options)
       end
@@ -104,7 +104,7 @@ module ImageProcessing
     # @see http://www.imagemagick.org/script/color.php
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     def resize_and_pad(file, width, height, background: 'opaque', gravity: 'Center', format: nil, **options, &block)
-      with_vips(file, format: format) do |vips_image|
+      vips(file, format: format) do |vips_image|
         vips_image = yield(vips_image) if block_given?
         vips_image = vips_image.thumbnail_image(width, height: height, **options)
         top, left = Gravity.get(vips_image, width, height, gravity)
@@ -127,7 +127,7 @@ module ImageProcessing
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     # @see http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-crop
     def crop(file, width, height, gravity: 'NorthWest', format: nil, &block)
-      with_vips(file, format: format) do |vips_image|
+      vips(file, format: format) do |vips_image|
         vips_image = yield(vips_image) if block_given?
         top, left = Gravity.get(vips_image, width, height, gravity)
         vips_image.crop top, left, width, height
@@ -143,10 +143,10 @@ module ImageProcessing
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#new_from_file-class_method
-    def with_vips(file, format: nil, **options, &block)
+    def vips(file, format: nil, **options, &block)
       unless file.respond_to?(:path)
         return Utils.copy_to_tempfile(file) { |tempfile|
-          with_vips(tempfile, format: format, **options, &block)
+          vips(tempfile, format: format, **options, &block)
         }
       end
 
