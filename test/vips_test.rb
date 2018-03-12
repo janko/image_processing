@@ -173,9 +173,9 @@ describe ImageProcessing::Vips do
       assert_dimensions [50, 50], result
     end
 
-    it "crops the right area of the images from the center" do
-      result = crop(@portrait, 50, 50, gravity: 'Center')
-      assert_similar fixture_image("crop-center-vips.jpg"), result
+    it "crops the right area of the images" do
+      result = crop(@portrait, 50, 50, 325, 425)
+      assert_similar fixture_image("crop.jpg"), result
     end
 
     it "accepts a block" do

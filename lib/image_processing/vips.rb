@@ -120,17 +120,15 @@ module ImageProcessing
     # @param [#to_s] height            the height of the cropped image
     # @param [#to_s] x_offset          the x coordinate where to start cropping
     # @param [#to_s] y_offset          the y coordinate where to start cropping
-    # @param [String] gravity          which part of the image to focus on
     # @param [String] format           file format of the output file
     # @yield [Vips::Image]
     # @return [Tempfile]
     # @see http://www.imagemagick.org/script/command-line-options.php#gravity
     # @see http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-crop
-    def crop(file, width, height, gravity: 'NorthWest', format: nil, &block)
+    def crop(file, width, height, x_offset = 0, y_offset = 0, format: nil, &block)
       vips(file, format: format) do |vips_image|
         vips_image = yield(vips_image) if block_given?
-        top, left = Gravity.get(vips_image, width, height, gravity)
-        vips_image.crop top, left, width, height
+        vips_image.crop x_offset, y_offset, width, height
       end
     end
 
