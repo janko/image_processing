@@ -240,10 +240,9 @@ describe ImageProcessing::Vips do
 
   describe "#vips" do
     it "accepts any object that responds to #read" do
-      rotated = fixture_image("rotated.jpg")
-      io = StringIO.new(rotated.read)
-      actual = vips(io, &:autorot)
-      expected = vips(rotated, &:autorot)
+      io = StringIO.new(@portrait.read)
+      actual = vips(io, &:invert)
+      expected = vips(@portrait, &:invert)
       assert_similar expected, actual
       assert_equal 0, io.pos
     end
