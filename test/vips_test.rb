@@ -216,12 +216,11 @@ describe ImageProcessing::Vips do
       assert_equal ".png", File.extname(result.path)
     end
 
-    it "saves in PNG format when extension is not known" do
-      rotated = fixture_image("rotated.jpg")
-      result = vips(StringIO.new(rotated.read), &:autorot)
-      assert_type "PNG", result
-
-      image = Vips::Image.new_from_file(fixture_path("corrupted.jpg"), fail: true)
+    it "saves in JPEG format when extension is not known" do
+      png = vips(@portrait, format: "png")
+      result = vips(StringIO.new(png.read))
+      assert_type "JPEG", result
+      assert_equal ".jpg", File.extname(result.path)
     end
 
     it "fails with corrupted files" do

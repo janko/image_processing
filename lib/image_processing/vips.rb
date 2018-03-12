@@ -152,7 +152,7 @@ module ImageProcessing
       vips_image = vips_image.autorot
       vips_image = yield(vips_image) if block_given?
 
-      format ||= File.extname(file.path)[1..-1] || "png"
+      format ||= File.extname(file.path)[1..-1] || "jpg"
       result = Tempfile.new(["image_processing-vips", ".#{format}"], binmode: true)
 
       vips_image.write_to_file(result.path)
