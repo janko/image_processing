@@ -57,6 +57,11 @@ describe ImageProcessing::Vips do
       assert_equal ".png", File.extname(result.path)
     end
 
+    it "accepts additional thumbnail options" do
+      result = resize_to_limit(@portrait, 400, 400, crop: :centre)
+      assert_dimensions [400, 400], result
+    end
+
     it "doesn't modify the input file" do
       resize_to_limit(@portrait, 400, 400)
       assert_equal fixture_image("portrait.jpg").read, @portrait.read
@@ -91,6 +96,11 @@ describe ImageProcessing::Vips do
       assert_equal ".png", File.extname(result.path)
     end
 
+    it "accepts additional thumbnail options" do
+      result = resize_to_fit(@portrait, 400, 400, crop: :centre)
+      assert_dimensions [400, 400], result
+    end
+
     it "doesn't modify the input file" do
       resize_to_fit(@portrait, 400, 400)
       assert_equal fixture_image("portrait.jpg").read, @portrait.read
@@ -123,6 +133,12 @@ describe ImageProcessing::Vips do
       result = resize_to_fill(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
       assert_equal ".png", File.extname(result.path)
+    end
+
+    it "accepts additional thumbnail options" do
+      attention = resize_to_fill(@portrait, 400, 400, crop: :attention)
+      centre    = resize_to_fill(@portrait, 400, 400, crop: :centre)
+      refute_equal centre.read, attention.read
     end
 
     it "doesn't modify the input file" do
@@ -163,6 +179,12 @@ describe ImageProcessing::Vips do
       result = resize_and_pad(@portrait, 400, 400, format: "png")
       assert_type "PNG", result
       assert_equal ".png", File.extname(result.path)
+    end
+
+    it "accepts additional thumbnail options" do
+      crop = resize_and_pad(@portrait, 400, 400, crop: :centre)
+      pad = resize_and_pad(@portrait, 400, 400)
+      refute_equal pad.read, crop.read
     end
 
     it "doesn't modify the input file" do
