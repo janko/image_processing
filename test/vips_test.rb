@@ -25,8 +25,8 @@ describe ImageProcessing::Vips do
   end
 
   before do
-    @portrait  = copy_to_tempfile(fixture_path("portrait.jpg"))
-    @landscape = copy_to_tempfile(fixture_path("landscape.jpg"))
+    @portrait  = fixture_image("portrait.jpg")
+    @landscape = fixture_image("landscape.jpg")
   end
 
   describe "#resize_to_limit" do
