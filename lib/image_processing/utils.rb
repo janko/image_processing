@@ -12,7 +12,11 @@ module ImageProcessing
       io.rewind
       tempfile.open # refresh content
 
-      yield tempfile if block_given?
+      if block_given?
+        yield tempfile
+      else
+        tempfile
+      end
     ensure
       tempfile.close! if tempfile && block_given?
     end
