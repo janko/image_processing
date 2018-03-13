@@ -22,7 +22,7 @@ module ImageProcessing
       attr_reader :gravity
 
       def initialize(gravity)
-        raise Error, "invalid gravity value: #{gravity.inspect}" unless COORDS.key?(gravity)
+        raise Error, "invalid gravity value: #{gravity.inspect} (valid: #{COORDS.keys.join(", ")})" unless COORDS.key?(gravity)
 
         @gravity = gravity
       end
