@@ -115,24 +115,6 @@ module ImageProcessing
       end
     end
 
-    # Crops the image to be the defined area.
-    #
-    # @param [#path, #read] file       the image to convert
-    # @param [Integer] width           the width of the cropped image
-    # @param [Integer] height          the height of the cropped image
-    # @param [Integer] x_offset        the x coordinate where to start cropping
-    # @param [Integer] y_offset        the y coordinate where to start cropping
-    # @param [Hash] options            options for #vips
-    # @yield [Vips::Image]
-    # @return [Tempfile]
-    # @see http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-crop
-    def crop(file, width, height, x_offset = 0, y_offset = 0, **options, &block)
-      vips(file, **options) do |vips_image|
-        vips_image = yield(vips_image) if block_given?
-        vips_image.crop x_offset, y_offset, width, height
-      end
-    end
-
     # Converts an image into a Vips::Image for the duration of the block,
     # and returns the processed file.
     #
