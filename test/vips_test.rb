@@ -209,35 +209,6 @@ describe ImageProcessing::Vips do
     end
   end
 
-  describe "#crop" do
-    it "resizes the image to the given dimensions" do
-      result = crop(@portrait, 50, 50)
-      assert_dimensions [50, 50], result
-    end
-
-    it "crops the right area of the images" do
-      result = crop(@portrait, 50, 50, 325, 425)
-      assert_similar fixture_image("crop.jpg"), result
-    end
-
-    it "accepts a block" do
-      actual   = crop(@portrait, 50, 50, &:invert)
-      expected = vips(crop(@portrait, 50, 50), &:invert)
-      assert_similar expected, actual
-    end
-
-    it "accepts vips options" do
-      result = crop(@portrait, 50, 50, format: "png")
-      assert_type "PNG", result
-      assert_equal ".png", File.extname(result.path)
-    end
-
-    it "doesn't modify the input file" do
-      crop(@portrait, 50, 50)
-      assert_equal fixture_image("portrait.jpg").read, @portrait.read
-    end
-  end
-
   describe "#vips" do
     it "accepts any object that responds to #read" do
       io = StringIO.new(@portrait.read)
