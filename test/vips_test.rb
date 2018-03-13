@@ -247,42 +247,71 @@ describe ImageProcessing::Vips do
       assert_equal 0, io.pos
     end
 
-    it "automatically rotates files" do
-      rotated = fixture_image("rotated.jpg")
-      result = vips(rotated, &:invert)
-      dimensions = Vips::Image.new_from_file(rotated.path).size
-      assert_dimensions dimensions.reverse, result
-    end
-
     it "accepts format" do
       result = vips(@portrait, format: "png")
       assert_type "PNG", result
       assert_equal ".png", File.extname(result.path)
     end
 
-    it "saves in JPEG format when extension is not known" do
-      png = vips(@portrait, format: "png")
-      result = vips(StringIO.new(png.read))
-      assert_type "JPEG", result
-      assert_equal ".jpg", File.extname(result.path)
-    end
-
-    it "accepts load options" do
+    it "accepts loader options" do
       dimensions = Vips::Image.new_from_file(@portrait.path).size
       result = vips(@portrait, loader: { shrink: 2 })
       assert_dimensions dimensions.map { |n| n / 2 }, result
     end
 
-    it "accepts save options" do
+    it "accepts saveer options" do
       dimensions = Vips::Image.new_from_file(@portrait.path).size
       result = vips(@portrait, saver: { strip: true })
       result_image = Vips::Image.new_from_file(result.path)
       refute_includes result_image.get_fields, "exif-data"
     end
+  end
+
+  describe "#vips_load" do
+    it "automatically rotates files" do
+      rotated = fixture_image("rotated.jpg")
+      result = vips_save(vips_load(rotated))
+      dimensions = Vips::Image.new_from_file(rotated.path).size
+      assert_dimensions dimensions.reverse, result
+    end
+
+    it "accepts loader options" do
+      original_dimensions = Vips::Image.new_from_file(@portrait.path).size
+      vips_image = vips_load(@portrait, shrink: 2)
+      assert_equal original_dimensions.map{|n| n/2}, vips_image.size
+    end
 
     it "fails with corrupted files" do
       corrupted = fixture_image("corrupted.jpg")
-      assert_raises(Vips::Error) { vips(corrupted, &:autorot) }
+      assert_raises(Vips::Error) { vips_save(vips_load(corrupted)) }
+    end
+  end
+
+  describe "#vips_save" do
+    it "returns a Tempfile" do
+      vips_image = vips_load(@portrait)
+      tempfile = vips_save(vips_image)
+      assert_instance_of Tempfile, tempfile
+      assert tempfile.binmode?
+    end
+
+    it "saves in JPEG format by default" do
+      png = vips(@portrait, format: "png")
+      result = vips_save(vips_load(png))
+      assert_type "JPEG", result
+      assert_equal ".jpg", File.extname(result.path)
+    end
+
+    it "accepts format" do
+      result = vips_save(vips_load(@portrait), format: "png")
+      assert_type "PNG", result
+      assert_equal ".png", File.extname(result.path)
+    end
+
+    it "accepts saver options" do
+      result = vips_save(vips_load(@portrait), strip: true)
+      result_image = Vips::Image.new_from_file(result.path)
+      refute_includes result_image.get_fields, "exif-data"
     end
   end
 end

@@ -119,7 +119,7 @@ module ImageProcessing
     # and returns the processed file.
     #
     # @param [#path, #read] file        file to be processed
-    # @param [String] format            file format of the output file
+    # @param [String] format            format of the output file
     # @param [Hash] loader              options for Vips::Image.new_from_file
     # @param [Hash] saver               options for Vips::Image#write_to_file
     # @yield [Vips::Image]
@@ -133,14 +133,36 @@ module ImageProcessing
         }
       end
 
-      vips_image = ::Vips::Image.new_from_file(file.path, fail: true, **loader)
-      vips_image = vips_image.autorot
+      vips_image = vips_load(file, **loader)
       vips_image = yield(vips_image) if block_given?
 
-      format ||= File.extname(file.path)[1..-1] || "jpg"
-      result = Tempfile.new(["image_processing-vips", ".#{format}"], binmode: true)
+      format ||= File.extname(file.path)[1..-1]
+      vips_save(vips_image, format: format, **saver)
+    end
 
-      vips_image.write_to_file(result.path, **saver)
+    # Loads the image from file path and applies autorotation.
+    #
+    # @param [#path] file               file to load
+    # @param [Hash] options             options for Vips::Image.new_from_file
+    # @return [Vips::Image]
+    # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#new_from_file-class_method
+    def vips_load(file, **options)
+      vips_image = ::Vips::Image.new_from_file(file.path, fail: true, **options)
+      vips_image.autorot
+    end
+
+    # Writes the image into a temporary file and returns it.
+    #
+    # @param [Vips::Image] vips_image   image to save to disk
+    # @param [format]                   format of the output file
+    # @param [Hash] options             options for Vips::Image#write_to_file
+    # @return [Tempfile]
+    # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#write_to_file-instance_method
+    def vips_save(vips_image, format: nil, **options)
+      format ||= "jpg"
+      result   = Tempfile.new(["image_processing-vips", ".#{format}"], binmode: true)
+
+      vips_image.write_to_file(result.path, **options)
       result.open # refresh content
 
       result
