@@ -136,7 +136,6 @@ module ImageProcessing
       vips_image = vips_load(file, **loader)
       vips_image = yield(vips_image) if block_given?
 
-      format ||= File.extname(file.path)[1..-1]
       vips_save(vips_image, format: format, **saver)
     end
 
@@ -148,6 +147,7 @@ module ImageProcessing
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#new_from_file-class_method
     def vips_load(file, **options)
       vips_image = ::Vips::Image.new_from_file(file.path, fail: true, **options)
+      vips_image.set_type(::Vips::BLOB_TYPE, "original-path", file.path)
       vips_image.autorot
     end
 
@@ -159,13 +159,25 @@ module ImageProcessing
     # @return [Tempfile]
     # @see http://www.rubydoc.info/gems/ruby-vips/Vips/Image#write_to_file-instance_method
     def vips_save(vips_image, format: nil, **options)
-      format ||= "jpg"
+      format ||= vips_determine_format(vips_image)
       result   = Tempfile.new(["image_processing-vips", ".#{format}"], binmode: true)
 
       vips_image.write_to_file(result.path, **options)
       result.open # refresh content
 
       result
+    end
+
+    # Determines what output format a Vips::Image should have.
+    #
+    # @param [Vips::Image] vips_image   image to determine format for
+    # @return [String]
+    def vips_determine_format(vips_image)
+      original_path = vips_image.get("original-path")
+      format = File.extname(original_path)[1..-1]
+      format || "jpg"
+    rescue ::Vips::Error # "original-path" metadata not found
+      "jpg"
     end
   end
 end

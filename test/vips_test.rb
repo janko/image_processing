@@ -266,9 +266,24 @@ describe ImageProcessing::Vips do
       assert tempfile.binmode?
     end
 
-    it "saves in JPEG format by default" do
+    it "retains the original extension" do
       png = vips(@portrait, format: "png")
       result = vips_save(vips_load(png))
+      assert_type "PNG", result
+      assert_equal ".png", File.extname(result.path)
+    end
+
+    it "saves in JPEG format when original didn't have extension" do
+      png = vips(@portrait, format: "png")
+      png_no_extension = copy_to_tempfile(png)
+      result = vips_save(vips_load(png_no_extension))
+      assert_type "JPEG", result
+      assert_equal ".jpg", File.extname(result.path)
+    end
+
+    it "saves in JPEG format when original extension is unknown" do
+      png = vips(@portrait, format: "png")
+      result = vips_save(Vips::Image.new_from_file(png.path))
       assert_type "JPEG", result
       assert_equal ".jpg", File.extname(result.path)
     end
