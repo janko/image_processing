@@ -1,13 +1,10 @@
+gem "ruby-vips", "~> 2.0"
 require "vips"
 
 require "image_processing/vips/color"
 require "image_processing/utils"
 
 require "tempfile"
-
-if Gem::Version.new(Vips::VERSION) < Gem::Version.new("2.0.0")
-  raise "image_processing requires ruby-vips version >= 2.0.0"
-end
 
 module ImageProcessing
   module Vips
