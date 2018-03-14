@@ -6,6 +6,8 @@ require "image_processing/utils"
 
 require "tempfile"
 
+fail "image_processing/vips requires libvips 8.6+" unless Vips.at_least_libvips?(8, 6)
+
 module ImageProcessing
   module Vips
     module_function
