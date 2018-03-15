@@ -2,9 +2,7 @@ require "test_helper"
 require "image_processing/vips"
 require "mini_magick"
 
-describe ImageProcessing::Vips do
-  include ImageProcessing::Vips
-
+describe "ImageProcessing::Vips" do
   def assert_similar(expected, actual)
     return if RUBY_ENGINE == "jruby"
 
@@ -29,275 +27,291 @@ describe ImageProcessing::Vips do
     @landscape = fixture_image("landscape.jpg")
   end
 
-  describe "#resize_to_limit" do
-    it "resizes the image up to a given limit" do
-      result = resize_to_limit(@portrait, 400, 400)
+  describe "Chainable" do
+    it "accepts source" do
+      pipeline = ImageProcessing::Vips.source(@portrait)
+      assert_equal @portrait, pipeline.default_options[:source]
+    end
+
+    it "accepts format" do
+      pipeline = ImageProcessing::Vips.convert("png")
+      assert_equal "png", pipeline.default_options[:format]
+    end
+
+    it "accepts loader options" do
+      pipeline = ImageProcessing::Vips.loader(shrink: 2)
+      assert_equal Hash[shrink: 2], pipeline.default_options[:loader]
+
+      pipeline = pipeline.loader(autorotate: true)
+      assert_equal Hash[shrink: 2, autorotate: true], pipeline.default_options[:loader]
+    end
+
+    it "accepts saver options" do
+      pipeline = ImageProcessing::Vips.saver(strip: true)
+      assert_equal Hash[strip: true], pipeline.default_options[:saver]
+
+      pipeline = pipeline.saver(Q: 100)
+      assert_equal Hash[strip: true, Q: 100], pipeline.default_options[:saver]
+    end
+
+    it "accepts operations" do
+      pipeline = ImageProcessing::Vips.shrink(2, 2)
+      assert_equal [[:shrink, [2, 2]]], pipeline.default_options[:operations]
+
+      pipeline = pipeline.invert
+      assert_equal [[:shrink, [2, 2]], [:invert, []]], pipeline.default_options[:operations]
+    end
+
+    it "merges different options" do
+      pipeline = ImageProcessing::Vips
+        .resize_to_fill(400, 400)
+        .convert("png")
+
+      assert_equal [[:resize_to_fill, [400, 400]]], pipeline.default_options[:operations]
+      assert_equal "png", pipeline.default_options[:format]
+    end
+
+    it "doesn't mutate the receiver" do
+      pipeline_jpg = ImageProcessing::Vips.convert("jpg")
+      pipeline_png = pipeline_jpg.convert("png")
+
+      assert_equal "jpg", pipeline_jpg.default_options[:format]
+      assert_equal "png", pipeline_png.default_options[:format]
+    end
+
+    it "executes processing on #call with source" do
+      result = ImageProcessing::Vips.convert("png").call(@portrait)
+      assert_instance_of Tempfile, result
+      assert_type "PNG", result
+    end
+
+    it "executes processing on #call without source" do
+      result = ImageProcessing::Vips.source(@portrait).convert("png").call
+      assert_instance_of Tempfile, result
+      assert_type "PNG", result
+    end
+
+    it "executes processing on bang operation method" do
+      result = ImageProcessing::Vips.source(@portrait).convert!("png")
+      assert_instance_of Tempfile, result
+      assert_type "PNG", result
+
+      result = ImageProcessing::Vips.source(@portrait).shrink!(2, 2)
+      assert_instance_of Tempfile, result
+      assert_dimensions [300, 400], result
+
+      result = ImageProcessing::Vips.source(@portrait).resize_to_fill!(400, 400)
+      assert_instance_of Tempfile, result
+      assert_dimensions [400, 400], result
+    end
+
+    it "returns the tempfile in binary mode" do
+      tempfile = ImageProcessing::Vips.convert("png").call(@portrait)
+      assert tempfile.binmode?
+    end
+  end
+
+  describe "Processor" do
+    it "converts to specified format" do
+      result = ImageProcessing::Vips.convert("png").call(@portrait)
+      assert_equal ".png", File.extname(result.path)
+      assert_type "PNG", result
+    end
+
+    it "maintains the original format" do
+      png = ImageProcessing::Vips.convert("png").call(@portrait)
+      result = ImageProcessing::Vips.call(png)
+      assert_equal ".png", File.extname(result.path)
+      assert_type "PNG", result
+    end
+
+    it "saves as JPEG when original format is unknown" do
+      png = ImageProcessing::Vips.convert("png").call(@portrait)
+      result = ImageProcessing::Vips.call(copy_to_tempfile(png))
+      assert_equal ".jpg", File.extname(result.path)
+      assert_type "JPEG", result
+    end
+
+    it "accepts a Vips::Image as source" do
+      vips_image = Vips::Image.new_from_file(@portrait.path)
+      result = ImageProcessing::Vips.convert("png").call(vips_image)
+      assert_equal ".png", File.extname(result.path)
+      assert_type "PNG", result
+    end
+
+    it "applies loader options" do
+      result = ImageProcessing::Vips.loader(shrink: 2).call(@portrait)
       assert_dimensions [300, 400], result
     end
 
-    it "does not resize the image if it is smaller than the limit" do
-      result = resize_to_limit(@portrait, 1000, 1000)
+    it "applies saver options" do
+      result = ImageProcessing::Vips.saver(strip: true).call(@portrait)
+      result_image = Vips::Image.new_from_file(result.path)
+      refute_includes result_image.get_fields, "exif-data"
+    end
+
+    it "applies a sequence of operations" do
+      result1 = ImageProcessing::Vips
+        .invert
+        .shrink(2, 2)
+        .call(@portrait)
+
+      result2 = ImageProcessing::Vips.invert.call(@portrait)
+      result2 = ImageProcessing::Vips.shrink(2, 2).call(result2)
+
+      assert_similar result1, result2
+    end
+
+    it "fails for corrupted files" do
+      corrupted = fixture_image("corrupted.jpg")
+      pipeline = ImageProcessing::Vips.source(corrupted).shrink(2, 2)
+      assert_raises(Vips::Error) { pipeline.call }
+    end
+
+    it "allows overriding failing for corrupted files" do
+      corrupted = fixture_image("corrupted.jpg")
+      pipeline = ImageProcessing::Vips.source(corrupted).shrink(2, 2)
+      pipeline.loader(fail: false).call
+    end
+
+    it "raises exception when source isn't valid" do
+      assert_raises(ImageProcessing::Vips::Error) do
+        ImageProcessing::Vips.source(StringIO.new).call
+      end
+    end
+
+    it "raises exception when source was not provided" do
+      assert_raises(ImageProcessing::Vips::Error) do
+        ImageProcessing::Vips.call
+      end
+    end
+  end
+
+  describe "#resize_to_limit" do
+    before do
+      @pipeline = ImageProcessing::Vips.source(@portrait)
+    end
+
+    it "srinks image to fit the specified dimensions" do
+      result = @pipeline.resize_to_limit!(400, 400)
+      assert_dimensions [300, 400], result
+    end
+
+    it "doesn't enlarge image if it's smaller than specified dimensions" do
+      result = @pipeline.resize_to_limit!(1000, 1000)
       assert_dimensions [600, 800], result
     end
 
     it "doesn't require both dimensions" do
-      result = resize_to_limit(@portrait, 300, nil)
+      result = @pipeline.resize_to_limit!(300, nil)
       assert_dimensions [300, 400], result
 
-      result = resize_to_limit(@portrait, nil, 1000)
+      result = @pipeline.resize_to_limit!(nil, 1000)
       assert_dimensions [600, 800], result
     end
 
     it "produces correct image" do
-      result = resize_to_limit(@portrait, 400, 400)
+      result = @pipeline.resize_to_limit!(400, 400)
       assert_similar fixture_image("limit.jpg"), result
     end
 
-    it "accepts a block" do
-      actual   = resize_to_limit(@portrait, 400, 400, &:invert)
-      expected = vips(resize_to_limit(@portrait, 400, 400), &:invert)
-      assert_similar expected, actual
-    end
-
     it "accepts thumbnail options" do
-      result = resize_to_limit(@portrait, 400, 400, thumbnail: { crop: :centre })
+      result = @pipeline.resize_to_limit!(400, 400, crop: :centre)
       assert_dimensions [400, 400], result
-    end
-
-    it "accepts vips options" do
-      result = resize_to_limit(@portrait, 400, 400, format: "png")
-      assert_type "PNG", result
-      assert_equal ".png", File.extname(result.path)
-    end
-
-    it "doesn't modify the input file" do
-      resize_to_limit(@portrait, 400, 400)
-      assert_equal fixture_image("portrait.jpg").read, @portrait.read
     end
   end
 
   describe "#resize_to_fit" do
-    it "resizes the image to fit given dimensions" do
-      result = resize_to_fit(@portrait, 400, 400)
+    before do
+      @pipeline = ImageProcessing::Vips.source(@portrait)
+    end
+
+    it "shrinks image to fit specified dimensions" do
+      result = @pipeline.resize_to_fit!(400, 400)
       assert_dimensions [300, 400], result
     end
 
-    it "enlarges image if it is smaller than given dimensions" do
-      result = resize_to_fit(@portrait, 1000, 1000)
+    it "enlarges image if it's smaller than given dimensions" do
+      result = @pipeline.resize_to_fit!(1000, 1000)
       assert_dimensions [750, 1000], result
     end
 
     it "doesn't require both dimensions" do
-      result = resize_to_fit(@portrait, 300, nil)
+      result = @pipeline.resize_to_fit!(300, nil)
       assert_dimensions [300, 400], result
 
-      result = resize_to_fit(@portrait, nil, 1000)
+      result = @pipeline.resize_to_fit!(nil, 1000)
       assert_dimensions [750, 1000], result
     end
 
     it "produces correct image" do
-      result = resize_to_fit(@portrait, 400, 400)
+      result = @pipeline.resize_to_fit!(400, 400)
       assert_similar fixture_image("fit.jpg"), result
     end
 
-    it "accepts a block" do
-      actual   = resize_to_fit(@portrait, 400, 400, &:invert)
-      expected = vips(resize_to_fit(@portrait, 400, 400), &:invert)
-      assert_similar expected, actual
-    end
-
     it "accepts thumbnail options" do
-      result = resize_to_fit(@portrait, 400, 400, thumbnail: { crop: :centre })
+      result = @pipeline.resize_to_fit!(400, 400, crop: :centre)
       assert_dimensions [400, 400], result
-    end
-
-    it "accepts vips options" do
-      result = resize_to_fit(@portrait, 400, 400, format: "png")
-      assert_type "PNG", result
-      assert_equal ".png", File.extname(result.path)
-    end
-
-    it "doesn't modify the input file" do
-      resize_to_fit(@portrait, 400, 400)
-      assert_equal fixture_image("portrait.jpg").read, @portrait.read
     end
   end
 
   describe "#resize_to_fill" do
+    before do
+      @pipeline = ImageProcessing::Vips.source(@portrait)
+    end
+
     it "resizes and crops the image to fill out the given dimensions" do
-      result = resize_to_fill(@portrait, 400, 400)
+      result = @pipeline.resize_to_fill!(400, 400)
       assert_dimensions [400, 400], result
     end
 
-    it "enlarges image and crops it if it is smaller than given dimensions" do
-      result = resize_to_fill(@portrait, 1000, 1000)
+    it "enlarges image and crops it if it's smaller than given dimensions" do
+      result = @pipeline.resize_to_fill!(1000, 1000)
       assert_dimensions [1000, 1000], result
     end
 
     it "produces correct image" do
-      result = resize_to_fill(@portrait, 400, 400)
+      result = @pipeline.resize_to_fill!(400, 400)
       assert_similar fixture_image("fill.jpg"), result
     end
 
-    it "accepts a block" do
-      actual   = resize_to_fill(@portrait, 400, 400, &:invert)
-      expected = vips(resize_to_fill(@portrait, 400, 400), &:invert)
-      assert_similar expected, actual
-    end
-
     it "accepts thumbnail options" do
-      attention = resize_to_fill(@portrait, 400, 400, thumbnail: { crop: :attention })
-      centre    = resize_to_fill(@portrait, 400, 400, thumbnail: { crop: :centre })
+      attention = @pipeline.resize_to_fill!(400, 400, crop: :attention)
+      centre    = @pipeline.resize_to_fill!(400, 400, crop: :centre)
       refute_equal centre.read, attention.read
-    end
-
-    it "accepts vips options" do
-      result = resize_to_fill(@portrait, 400, 400, format: "png")
-      assert_type "PNG", result
-      assert_equal ".png", File.extname(result.path)
-    end
-
-    it "doesn't modify the input file" do
-      resize_to_fill(@portrait, 400, 400)
-      assert_equal fixture_image("portrait.jpg").read, @portrait.read
     end
   end
 
   describe "#resize_and_pad" do
+    before do
+      @pipeline = ImageProcessing::Vips.source(@portrait)
+    end
+
     it "resizes and fills out the remaining space to fill out the given dimensions" do
-      result = resize_and_pad(@portrait, 400, 400)
+      result = @pipeline.resize_and_pad!(400, 400)
       assert_dimensions [400, 400], result
     end
 
     it "enlarges image and fills out the remaining space to fill out the given dimensions" do
-      result = resize_and_pad(@portrait, 1000, 1000, background: "red")
+      result = @pipeline.resize_and_pad!(1000, 1000, background: "red")
       assert_dimensions [1000, 1000], result
     end
 
     it "produces correct image" do
-      @portrait = vips(@portrait, format: "png")
-      result = resize_and_pad(@portrait, 400, 400, background: "red")
+      result = @pipeline.resize_and_pad!(400, 400, background: "red")
       assert_similar fixture_image("pad.jpg"), result
     end
 
     it "produces correct image when enlarging" do
-      result = resize_and_pad(@landscape, 1000, 1000, background: "green")
+      @pipeline = ImageProcessing::Vips.source(@landscape)
+      result = @pipeline.resize_and_pad!(1000, 1000, background: "green")
       assert_similar fixture_image("pad-large.jpg"), result
     end
 
-    it "accepts a block" do
-      actual   = resize_and_pad(@portrait, 400, 400, &:invert)
-      expected = vips(resize_and_pad(@portrait, 400, 400), &:invert)
-      assert_similar expected, actual
-    end
-
     it "accepts thumbnail options" do
-      crop = resize_and_pad(@portrait, 400, 400, thumbnail: { crop: :centre })
-      pad = resize_and_pad(@portrait, 400, 400)
+      crop = @pipeline.resize_and_pad!(400, 400, crop: :centre)
+      pad = @pipeline.resize_and_pad!(400, 400)
       refute_equal pad.read, crop.read
-    end
-
-    it "accepts vips options" do
-      result = resize_and_pad(@portrait, 400, 400, format: "png")
-      assert_type "PNG", result
-      assert_equal ".png", File.extname(result.path)
-    end
-
-    it "doesn't modify the input file" do
-      resize_and_pad(@portrait, 400, 400)
-      assert_equal fixture_image("portrait.jpg").read, @portrait.read
-    end
-  end
-
-  describe "#vips" do
-    it "accepts any object that responds to #read" do
-      io = StringIO.new(@portrait.read)
-      actual = vips(io, &:invert)
-      expected = vips(@portrait, &:invert)
-      assert_similar expected, actual
-      assert_equal 0, io.pos
-    end
-
-    it "accepts format" do
-      result = vips(@portrait, format: "png")
-      assert_type "PNG", result
-      assert_equal ".png", File.extname(result.path)
-    end
-
-    it "accepts loader options" do
-      dimensions = Vips::Image.new_from_file(@portrait.path).size
-      result = vips(@portrait, loader: { shrink: 2 })
-      assert_dimensions dimensions.map { |n| n / 2 }, result
-    end
-
-    it "accepts saveer options" do
-      dimensions = Vips::Image.new_from_file(@portrait.path).size
-      result = vips(@portrait, saver: { strip: true })
-      result_image = Vips::Image.new_from_file(result.path)
-      refute_includes result_image.get_fields, "exif-data"
-    end
-  end
-
-  describe "#vips_load" do
-    it "automatically rotates files" do
-      rotated = fixture_image("rotated.jpg")
-      result = vips_save(vips_load(rotated))
-      dimensions = Vips::Image.new_from_file(rotated.path).size
-      assert_dimensions dimensions.reverse, result
-    end
-
-    it "accepts loader options" do
-      original_dimensions = Vips::Image.new_from_file(@portrait.path).size
-      vips_image = vips_load(@portrait, shrink: 2)
-      assert_equal original_dimensions.map{|n| n/2}, vips_image.size
-    end
-
-    it "fails with corrupted files" do
-      corrupted = fixture_image("corrupted.jpg")
-      assert_raises(Vips::Error) { vips_save(vips_load(corrupted)) }
-    end
-  end
-
-  describe "#vips_save" do
-    it "returns a Tempfile" do
-      vips_image = vips_load(@portrait)
-      tempfile = vips_save(vips_image)
-      assert_instance_of Tempfile, tempfile
-      assert tempfile.binmode?
-    end
-
-    it "retains the original extension" do
-      png = vips(@portrait, format: "png")
-      result = vips_save(vips_load(png))
-      assert_type "PNG", result
-      assert_equal ".png", File.extname(result.path)
-    end
-
-    it "saves in JPEG format when original didn't have extension" do
-      png = vips(@portrait, format: "png")
-      png_no_extension = copy_to_tempfile(png)
-      result = vips_save(vips_load(png_no_extension))
-      assert_type "JPEG", result
-      assert_equal ".jpg", File.extname(result.path)
-    end
-
-    it "saves in JPEG format when original extension is unknown" do
-      png = vips(@portrait, format: "png")
-      result = vips_save(Vips::Image.new_from_file(png.path))
-      assert_type "JPEG", result
-      assert_equal ".jpg", File.extname(result.path)
-    end
-
-    it "accepts format" do
-      result = vips_save(vips_load(@portrait), format: "png")
-      assert_type "PNG", result
-      assert_equal ".png", File.extname(result.path)
-    end
-
-    it "accepts saver options" do
-      result = vips_save(vips_load(@portrait), strip: true)
-      result_image = Vips::Image.new_from_file(result.path)
-      refute_includes result_image.get_fields, "exif-data"
     end
   end
 end
