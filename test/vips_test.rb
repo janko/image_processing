@@ -320,4 +320,32 @@ describe "ImageProcessing::Vips" do
       refute_equal pad.read, crop.read
     end
   end
+
+  describe "Color" do
+    describe "#get" do
+      it "returns rgb format of color" do
+        color = ImageProcessing::Vips::Color.get("snow")
+        assert_equal [255, 250, 250], color
+      end
+
+      it "accepts both spellings of grey" do
+        color = ImageProcessing::Vips::Color.get("grey3")
+        assert_equal [8, 8, 8], color
+
+        color = ImageProcessing::Vips::Color.get("slategray")
+        assert_equal [112, 128, 144], color
+      end
+
+      it "accepts any casing" do
+        color = ImageProcessing::Vips::Color.get("LightCoral")
+        assert_equal [240, 128, 128], color
+      end
+
+      it "raise an error if color is not found" do
+        assert_raises ImageProcessing::Vips::Error do
+          ImageProcessing::Vips::Color.get("unknown")
+        end
+      end
+    end
+  end
 end

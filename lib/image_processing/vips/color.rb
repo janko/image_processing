@@ -1,8 +1,6 @@
 module ImageProcessing
   module Vips
     module Color
-      class InvalidColorName < StandardError; end
-
       MAPPING = {
         "snow" => [255, 250, 250],
         "snow1" => [255, 250, 250],
@@ -155,13 +153,11 @@ module ImageProcessing
         "lightsteelblue2" => [188, 210, 238],
         "lightsteelblue3" => [162, 181, 205],
         "lightsteelblue4" => [110, 123, 139],
-        "slategray4" => [108, 123, 139],
-        "slategray1" => [198, 226, 255],
-        "slategray2" => [185, 211, 238],
-        "slategray3" => [159, 182, 205],
-        "lightslategray" => [119, 136, 153],
+        "slategrey4" => [108, 123, 139],
+        "slategrey1" => [198, 226, 255],
+        "slategrey2" => [185, 211, 238],
+        "slategrey3" => [159, 182, 205],
         "lightslategrey" => [119, 136, 153],
-        "slategray" => [112, 128, 144],
         "slategrey" => [112, 128, 144],
         "dodgerblue" => [ 30, 144, 255],
         "dodgerblue1" => [ 30, 144, 255],
@@ -215,12 +211,12 @@ module ImageProcessing
         "paleturquoise1" => [187, 255, 255],
         "paleturquoise" => [175, 238, 238],
         "paleturquoise2" => [174, 238, 238],
-        "darkslategray1" => [151, 255, 255],
+        "darkslategrey1" => [151, 255, 255],
         "azure3" => [193, 205, 205],
         "lightcyan3" => [180, 205, 205],
-        "darkslategray2" => [141, 238, 238],
+        "darkslategrey2" => [141, 238, 238],
         "paleturquoise3" => [150, 205, 205],
-        "darkslategray3" => [121, 205, 205],
+        "darkslategrey3" => [121, 205, 205],
         "azure4" => [131, 139, 139],
         "lightcyan4" => [122, 139, 139],
         "aqua" => [ 0, 255, 255],
@@ -228,12 +224,11 @@ module ImageProcessing
         "cyan1" => [ 0, 255, 255],
         "paleturquoise4" => [102, 139, 139],
         "cyan2" => [ 0, 238, 238],
-        "darkslategray4" => [ 82, 139, 139],
+        "darkslategrey4" => [ 82, 139, 139],
         "cyan3" => [ 0, 205, 205],
         "cyan4" => [ 0, 139, 139],
         "darkcyan" => [ 0, 139, 139],
         "teal" => [ 0, 128, 128],
-        "darkslategray" => [ 47, 79, 79],
         "darkslategrey" => [ 47, 79, 79],
         "mediumturquoise" => [ 72, 209, 204],
         "lightseagreen" => [ 32, 178, 170],
@@ -478,7 +473,6 @@ module ImageProcessing
         "grey85" => [217, 217, 217],
         "grey84" => [214, 214, 214],
         "grey83" => [212, 212, 212],
-        "lightgray" => [211, 211, 211],
         "lightgrey" => [211, 211, 211],
         "grey82" => [209, 209, 209],
         "grey81" => [207, 207, 207],
@@ -497,7 +491,6 @@ module ImageProcessing
         "grey69" => [176, 176, 176],
         "grey68" => [173, 173, 173],
         "grey67" => [171, 171, 171],
-        "darkgray" => [169, 169, 169],
         "darkgrey" => [169, 169, 169],
         "grey66" => [168, 168, 168],
         "grey65" => [166, 166, 166],
@@ -525,7 +518,6 @@ module ImageProcessing
         "grey44" => [112, 112, 112],
         "grey43" => [110, 110, 110],
         "grey42" => [107, 107, 107],
-        "dimgray" => [105, 105, 105],
         "dimgrey" => [105, 105, 105],
         "grey41" => [105, 105, 105],
         "grey40" => [102, 102, 102],
@@ -577,16 +569,13 @@ module ImageProcessing
       module_function
 
       def get(name)
-        name = handle_gray(name)
-        MAPPING.fetch(name) { raise InvalidColorName }
+        MAPPING.fetch(normalize(name))
+      rescue KeyError
+        raise Error, "unknown color name: #{name.inspect}"
       end
 
-      def handle_gray(name)
-        if match = name.match(/\Agray(?<number>\d+)\z/)
-          "grey#{match[:number]}"
-        else
-          name
-        end
+      def normalize(name)
+        name.downcase.sub("gray", "grey")
       end
     end
   end
