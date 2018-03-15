@@ -8,21 +8,6 @@ require "tempfile"
 module ImageProcessing
   module Vips
     class Processor
-      DEFAULT_FORMAT = "jpg"
-
-      def initialize(source)
-        fail Error, "source file not provided" unless source
-        fail Error, "source file doesn't respond to #path" unless source.respond_to?(:path) || source.is_a?(::Vips::Image)
-
-        @source = source
-      end
-
-      def load_image(**options)
-        return @source if @source.is_a?(::Vips::Image)
-
-        ::Vips::Image.new_from_file(@source.path, fail: true, **options)
-      end
-
       def apply_operation(name, image, *args)
         if respond_to?(name)
           public_send(name, image, *args)
@@ -50,9 +35,17 @@ module ImageProcessing
           .gravity(gravity, width, height, extend: :background, background: Color.get(background))
       end
 
-      def save_image(image, format = nil, **options)
-        format ||= desired_format
-        result   = Tempfile.new(["image_processing-vips", ".#{format}"], binmode: true)
+      def load_image(file, **options)
+        fail Error, "source file not provided" unless file
+        fail Error, "source file doesn't respond to #path" unless file.respond_to?(:path) || file.is_a?(::Vips::Image)
+
+        return file if file.is_a?(::Vips::Image)
+
+        ::Vips::Image.new_from_file(file.path, fail: true, **options)
+      end
+
+      def save_image(image, format, **options)
+        result = Tempfile.new(["image_processing-vips", ".#{format}"], binmode: true)
 
         image.write_to_file(result.path, **options)
         result.open # refresh content
@@ -75,14 +68,6 @@ module ImageProcessing
         end
 
         [width, height]
-      end
-
-      def desired_format
-        File.extname(original_path.to_s)[1..-1] || DEFAULT_FORMAT
-      end
-
-      def original_path
-        @source.path if @source.respond_to?(:path)
       end
     end
   end

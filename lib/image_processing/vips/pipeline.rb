@@ -8,8 +8,8 @@ module ImageProcessing
       end
 
       def call!
-        processor = Processor.new(default_options[:source])
-        image     = processor.load_image(default_options[:loader])
+        processor = Processor.new
+        image     = processor.load_image(default_options[:source], default_options[:loader])
 
         default_options[:operations].each do |name, args|
           if name == :custom
