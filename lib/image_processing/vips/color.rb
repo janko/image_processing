@@ -569,6 +569,8 @@ module ImageProcessing
       module_function
 
       def get(name)
+        return name if name.is_a?(Array)
+
         MAPPING.fetch(normalize(name))
       rescue KeyError
         raise Error, "unknown color name: #{name.inspect}"

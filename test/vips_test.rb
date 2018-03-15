@@ -341,6 +341,11 @@ describe "ImageProcessing::Vips" do
         assert_equal [240, 128, 128], color
       end
 
+      it "accepts actual rgb values" do
+        color = ImageProcessing::Vips::Color.get [0, 0, 0]
+        assert_equal [0, 0, 0], color
+      end
+
       it "raise an error if color is not found" do
         assert_raises ImageProcessing::Vips::Error do
           ImageProcessing::Vips::Color.get("unknown")
