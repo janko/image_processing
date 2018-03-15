@@ -105,6 +105,12 @@ describe "ImageProcessing::Vips" do
       assert_dimensions [400, 400], result
     end
 
+    it "accepts a custom block" do
+      actual   = ImageProcessing::Vips.custom(&:invert).call(@portrait)
+      expected = ImageProcessing::Vips.invert.call(@portrait)
+      assert_similar expected, actual
+    end
+
     it "returns the tempfile in binary mode" do
       tempfile = ImageProcessing::Vips.convert("png").call(@portrait)
       assert tempfile.binmode?
@@ -151,15 +157,15 @@ describe "ImageProcessing::Vips" do
     end
 
     it "applies a sequence of operations" do
-      result1 = ImageProcessing::Vips
+      actual = ImageProcessing::Vips
         .invert
         .shrink(2, 2)
         .call(@portrait)
 
-      result2 = ImageProcessing::Vips.invert.call(@portrait)
-      result2 = ImageProcessing::Vips.shrink(2, 2).call(result2)
+      expected = ImageProcessing::Vips.invert.call(@portrait)
+      expected = ImageProcessing::Vips.shrink(2, 2).call(expected)
 
-      assert_similar result1, result2
+      assert_similar expected, actual
     end
 
     it "fails for corrupted files" do

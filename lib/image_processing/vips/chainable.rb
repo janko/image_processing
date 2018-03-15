@@ -24,6 +24,10 @@ module ImageProcessing
         branch default_options.merge(operations: operations)
       end
 
+      def custom(&block)
+        operation(:custom, block)
+      end
+
       def method_missing(name, *args)
         if name.to_s.end_with?("!")
           send(name.to_s.chomp("!"), *args).call!

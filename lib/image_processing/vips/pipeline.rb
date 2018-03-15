@@ -12,7 +12,11 @@ module ImageProcessing
         image     = processor.load_image(default_options[:loader])
 
         default_options[:operations].each do |name, args|
-          image = processor.apply_operation(name, image, *args)
+          if name == :custom
+            image = args.first.call(image)
+          else
+            image = processor.apply_operation(name, image, *args)
+          end
         end
 
         processor.save_image(image, default_options[:format], default_options[:saver])
