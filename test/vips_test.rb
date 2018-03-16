@@ -187,6 +187,15 @@ describe "ImageProcessing::Vips" do
       assert_similar expected, actual
     end
 
+    it "allows setting metadata" do
+      result = ImageProcessing::Vips
+        .set("icc-profile-data", "foobar")
+        .call(@portrait)
+
+      vips_image = Vips::Image.new_from_file(result.path)
+      assert_equal "foobar", vips_image.get("icc-profile-data")
+    end
+
     it "fails for corrupted files" do
       corrupted = fixture_image("corrupted.jpg")
       pipeline = ImageProcessing::Vips.source(corrupted).shrink(2, 2)

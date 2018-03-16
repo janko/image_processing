@@ -23,7 +23,8 @@ module ImageProcessing
         if respond_to?(name)
           public_send(name, image, *args)
         else
-          image.send(name, *args)
+          result = image.send(name, *args)
+          result.is_a?(::Vips::Image) ? result : image
         end
       end
 
