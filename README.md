@@ -36,11 +36,26 @@ chainable API:
 require "image_processing/vips"
 
 processed = ImageProcessing::Vips
-  .convert("png")
+  .source(file)
+  .autorot
   .resize_to_limit(400, 400)
-  .call(image)
+  .convert("png")
+  .call
 
 processed #=> #<File:/var/folders/.../image_processing-vips20180316-18446-1j247h6.png>
+```
+
+This allows easy branching when generating multiple derivatives:
+
+```rb
+pipeline = ImageProcessing::Vips
+  .source(file)
+  .autorot
+  .convert("png")
+
+large  = pipeline.resize_to_limit!(800, 800)
+medium = pipeline.resize_to_limit!(500, 500)
+small  = pipeline.resize_to_limit!(300, 300)
 ```
 
 The processing is executed on `#call` or when a processing method is called
