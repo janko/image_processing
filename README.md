@@ -40,7 +40,7 @@ processed = ImageProcessing::Vips
   .resize_to_limit(400, 400)
   .call(image)
 
-processed #=> #<File:/var/folders/k7/6zx6dx6x7ys3rv3srh0nyfj00000gn/T/image_processing-vips20180316-18446-1j247h6.png>
+processed #=> #<File:/var/folders/.../image_processing-vips20180316-18446-1j247h6.png>
 ```
 
 The processing is executed on `#call` or when a processing method is called
@@ -328,11 +328,11 @@ include ImageProcessing::MiniMagick
 original = File.open("path/to/image.jpg")
 
 converted = convert(original, "png") # makes a converted copy
-converted #=> #<Tempfile:/var/folders/k7/6zx6dx6x7ys3rv3srh0nyfj00000gn/T/mini_magick20151003-23030-9e1vjz.png (closed)>
+converted #=> #<File:/var/folders/.../mini_magick20151003-23030-9e1vjz.png (closed)>
 File.exist?(original.path) #=> true
 
 converted = convert!(original, "png") # converts the file in-place
-converted #=> #<Tempfile:/var/folders/k7/6zx6dx6x7ys3rv3srh0nyfj00000gn/T/mini_magick20151003-23030-9e1vjz.png (closed)>
+converted #=> #<File:/var/folders/.../mini_magick20151003-23030-9e1vjz.png (closed)>
 File.exist?(original.path) #=> false
 ```
 
