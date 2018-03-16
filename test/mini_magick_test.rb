@@ -3,27 +3,6 @@ require "image_processing/mini_magick"
 require "stringio"
 
 describe ImageProcessing::MiniMagick do
-  include ImageProcessing::MiniMagick
-
-  def assert_similar(expected, actual)
-    return if RUBY_ENGINE == "jruby"
-
-    a = Phashion::Image.new(expected.path)
-    b = Phashion::Image.new(actual.path)
-
-    distance = a.distance_from(b).abs
-
-    assert_operator distance, :<, 2
-  end
-
-  def assert_dimensions(dimensions, file)
-    assert_equal dimensions, MiniMagick::Image.new(file.path).dimensions
-  end
-
-  def assert_type(type, file)
-    assert_equal type, MiniMagick::Image.new(file.path).type
-  end
-
   def assert_resolution(resolution, file)
     actual_resolution = MiniMagick::Image.new(file.path).resolution
     # Travis has old imagemagick version
