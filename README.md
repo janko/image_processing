@@ -202,6 +202,8 @@ You can specify the background [color] that will be used for padding:
 
 ```rb
 pipeline.resize_and_pad!(400, 400, color: "RoyalBlue")
+# or
+pipeline.resize_and_pad!(400, 400, color: [65, 105, 225])
 ```
 
 You can also specify the [direction] where the source image will be positioned:
