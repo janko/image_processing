@@ -189,6 +189,7 @@ describe "ImageProcessing::Vips" do
 
     it "allows setting metadata" do
       result = ImageProcessing::Vips
+        .copy
         .set("icc-profile-data", "foobar")
         .call(@portrait)
 
