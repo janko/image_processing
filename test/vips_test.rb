@@ -111,6 +111,23 @@ describe "ImageProcessing::Vips" do
       assert_similar expected, actual
     end
 
+    it "returns a Vips::Image if :save is set to false" do
+      vips_image = ImageProcessing::Vips
+        .resize_to_limit(400, 400)
+        .call(@portrait, save: false)
+
+      assert_instance_of Vips::Image, vips_image
+      assert_equal [300, 400], vips_image.size
+
+      vips_image = ImageProcessing::Vips
+        .source(@portrait)
+        .resize_to_limit(400, 400)
+        .call(save: false)
+
+      assert_instance_of Vips::Image, vips_image
+      assert_equal [300, 400], vips_image.size
+    end
+
     it "returns the tempfile in binary mode" do
       tempfile = ImageProcessing::Vips.convert("png").call(@portrait)
       assert tempfile.binmode?

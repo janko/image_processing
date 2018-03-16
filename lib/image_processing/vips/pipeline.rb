@@ -7,7 +7,7 @@ module ImageProcessing
         @default_options = options
       end
 
-      def call!
+      def call!(save: true)
         processor = Processor.new(default_options[:source])
         image     = processor.load_image(default_options[:loader])
 
@@ -19,7 +19,11 @@ module ImageProcessing
           end
         end
 
-        processor.save_image(image, default_options[:format], default_options[:saver])
+        if save
+          processor.save_image(image, default_options[:format], default_options[:saver])
+        else
+          image
+        end
       end
     end
   end
