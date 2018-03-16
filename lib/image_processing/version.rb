@@ -1,3 +1,3 @@
 module ImageProcessing
-  VERSION = "0.4.5"
+  VERSION = "0.9.0"
 end

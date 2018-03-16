@@ -1,3 +1,9 @@
+## 0.9.0 (2018-03-16)
+
+* Added libvips module (@GustavoCaso, @janko-m)
+
+* Drop official support for MRI 2.0 and 2.1
+
 ## 0.4.5 (2017-09-08)
 
 * Add `lib/image_processing.rb` to allow loading via `Bundler.require` (@printercu)
