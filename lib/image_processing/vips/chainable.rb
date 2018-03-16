@@ -52,7 +52,7 @@ module ImageProcessing
           source:     nil,
           loader:     {},
           saver:      {},
-          format:     "jpg",
+          format:     nil,
           operations: [],
         }
       end

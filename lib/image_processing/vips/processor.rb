@@ -12,6 +12,13 @@ module ImageProcessing
       # size.
       MAX_COORD = 10_000_000
 
+      def initialize(source)
+        fail Error, "source file not provided" unless source
+        fail Error, "source file doesn't respond to #path" unless source.respond_to?(:path) || source.is_a?(::Vips::Image)
+
+        @source = source
+      end
+
       def apply_operation(name, image, *args)
         if respond_to?(name)
           public_send(name, image, *args)
@@ -39,16 +46,14 @@ module ImageProcessing
           .gravity(gravity, width, height, extend: :background, background: Color.get(background))
       end
 
-      def load_image(file, **options)
-        fail Error, "source file not provided" unless file
-        fail Error, "source file doesn't respond to #path" unless file.respond_to?(:path) || file.is_a?(::Vips::Image)
+      def load_image(**options)
+        return @source if @source.is_a?(::Vips::Image)
 
-        return file if file.is_a?(::Vips::Image)
-
-        ::Vips::Image.new_from_file(file.path, fail: true, **options)
+        ::Vips::Image.new_from_file(@source.path, fail: true, **options)
       end
 
       def save_image(image, format, **options)
+        format ||= default_format
         result = Tempfile.new(["image_processing-vips", ".#{format}"], binmode: true)
 
         image.write_to_file(result.path, **options)
@@ -63,6 +68,14 @@ module ImageProcessing
         raise Error, "either width or height must be specified" unless width || height
 
         [width || MAX_COORD, height || MAX_COORD]
+      end
+
+      def default_format
+        File.extname(original_path.to_s)[1..-1] || "jpg"
+      end
+
+      def original_path
+        @source.path if @source.respond_to?(:path)
       end
     end
   end

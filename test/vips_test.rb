@@ -34,9 +34,6 @@ describe "ImageProcessing::Vips" do
     end
 
     it "accepts format" do
-      pipeline = ImageProcessing::Vips.source(@portrait)
-      assert_equal "jpg", pipeline.default_options[:format]
-
       pipeline = ImageProcessing::Vips.convert("png")
       assert_equal "png", pipeline.default_options[:format]
     end
@@ -125,6 +122,22 @@ describe "ImageProcessing::Vips" do
       result = ImageProcessing::Vips.convert("png").call(@portrait)
       assert_equal ".png", File.extname(result.path)
       assert_type "PNG", result
+    end
+
+    it "retains original format if format was not specified" do
+      jpg = ImageProcessing::Vips.convert("jpg").call(@portrait)
+      png = ImageProcessing::Vips.convert("png").call(@portrait)
+      result_jpg = ImageProcessing::Vips.invert.call(jpg)
+      result_png = ImageProcessing::Vips.invert.call(png)
+      assert_equal ".jpg", File.extname(result_jpg.path)
+      assert_equal ".png", File.extname(result_png.path)
+    end
+
+    it "saves as JPEG when format is unknown" do
+      png = ImageProcessing::Vips.convert("png").call(@portrait)
+      result = ImageProcessing::Vips.invert.call(copy_to_tempfile(png))
+      assert_equal ".jpg", File.extname(result.path)
+      assert_type "JPEG", result
     end
 
     it "accepts Vips::Image as source" do
