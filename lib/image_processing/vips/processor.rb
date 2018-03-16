@@ -8,6 +8,10 @@ require "tempfile"
 module ImageProcessing
   module Vips
     class Processor
+      # libvips has this arbitrary number as a sanity-check upper bound on image
+      # size.
+      MAX_COORD = 10_000_000
+
       def apply_operation(name, image, *args)
         if respond_to?(name)
           public_send(name, image, *args)
@@ -17,12 +21,12 @@ module ImageProcessing
       end
 
       def resize_to_limit(image, width, height, **options)
-        width, height = infer_dimensions([width, height], image.size)
+        width, height = default_dimensions(width, height)
         image.thumbnail_image(width, height: height, size: :down, **options)
       end
 
       def resize_to_fit(image, width, height, **options)
-        width, height = infer_dimensions([width, height], image.size)
+        width, height = default_dimensions(width, height)
         image.thumbnail_image(width, height: height, **options)
       end
 
@@ -55,19 +59,10 @@ module ImageProcessing
 
       private
 
-      def infer_dimensions((width, height), (current_width, current_height))
+      def default_dimensions(width, height)
         raise Error, "either width or height must be specified" unless width || height
 
-        case
-        when width.nil?
-          ratio  = Rational(height, current_height)
-          width  = (current_width * ratio).ceil
-        when height.nil?
-          ratio  = Rational(width, current_width)
-          height = (current_height * ratio).ceil
-        end
-
-        [width, height]
+        [width || MAX_COORD, height || MAX_COORD]
       end
     end
   end

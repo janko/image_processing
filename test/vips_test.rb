@@ -205,6 +205,12 @@ describe "ImageProcessing::Vips" do
       assert_dimensions [600, 800], result
     end
 
+    it "raises exception when neither dimension is specified" do
+      assert_raises(ImageProcessing::Vips::Error) do
+        @pipeline.resize_to_limit!(nil, nil)
+      end
+    end
+
     it "produces correct image" do
       result = @pipeline.resize_to_limit!(400, 400)
       assert_similar fixture_image("limit.jpg"), result
@@ -237,6 +243,12 @@ describe "ImageProcessing::Vips" do
 
       result = @pipeline.resize_to_fit!(nil, 1000)
       assert_dimensions [750, 1000], result
+    end
+
+    it "raises exception when neither dimension is specified" do
+      assert_raises(ImageProcessing::Vips::Error) do
+        @pipeline.resize_to_limit!(nil, nil)
+      end
     end
 
     it "produces correct image" do
