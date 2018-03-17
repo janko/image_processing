@@ -14,30 +14,18 @@ Refile, Dragonfly and ActiveStorage each implementing their own versions.
 gem "image_processing"
 ```
 
-## ruby-vips
+## Usage
 
-The `ImageProcessing::Vips` module contains processing macros that use the
-[ruby-vips] gem, which you need to install:
-
-```rb
-# Gemfile
-gem "ruby-vips", "~> 2.0"
-```
-
-Note that you'll need to have [libvips] 8.6 or higher installed; see
-the [installation instructions][libvips installation] for more details.
-
-### Usage
-
-`ImageProcessing::Vips` lets you define the processing pipeline using a
-chainable API:
+Processing is performed through `ImageProcessing::Vips` or
+`ImageProcessing::MiniMagick` modules. Both modules share the same chainable
+API for defining the processing pipeline:
 
 ```rb
-require "image_processing/vips"
+require "image_processing/mini_magick"
 
-processed = ImageProcessing::Vips
+processed = ImageProcessing::MiniMagick
   .source(file)
-  .autorot
+  .auto_orient
   .resize_to_limit(400, 400)
   .convert("png")
   .call
@@ -48,6 +36,8 @@ processed #=> #<File:/var/folders/.../image_processing-vips20180316-18446-1j247h
 This allows easy branching when generating multiple derivatives:
 
 ```rb
+require "image_processing/vips"
+
 pipeline = ImageProcessing::Vips
   .source(file)
   .autorot
@@ -83,9 +73,8 @@ processed = ImageProcessing::Vips
   .resize_to_limit!(400, 400) # bang method
 ```
 
-The source image needs to be an object that responds to `#path` or a
-`Vips::Image` object. The result is a `Tempfile` object, or a `Vips::Image`
-object if `save: false` is passed in.
+The source image needs to be an object that responds to `#path`, and the
+processing result is a `Tempfile` object.
 
 ```rb
 pipeline = ImageProcessing::Vips.source(image)
@@ -95,6 +84,31 @@ tempfile #=> #<Tempfile ...>
 
 vips_image = pipeline.call(save: false)
 vips_image #=> #<Vips::Image ...>
+```
+
+## ruby-vips
+
+The `ImageProcessing::Vips` module contains processing macros that use the
+[ruby-vips] gem, which you need to install:
+
+```rb
+# Gemfile
+gem "ruby-vips", "~> 2.0"
+```
+
+Note that you'll need to have [libvips] 8.6 or higher installed; see
+the [installation instructions][libvips installation] for more details.
+
+### Methods
+
+#### `.valid_image?`
+
+Returns true if the image is processable, and false if it's corrupted or not
+supported by libvips.
+
+```rb
+ImageProcessing::Vips.valid_image?(normal_image)    #=> true
+ImageProcessing::Vips.valid_image?(corrupted_image) #=> false
 ```
 
 #### `#resize_to_limit`
@@ -108,8 +122,7 @@ pipeline = ImageProcessing::Vips.source(image) # 600x800
 
 result = pipeline.resize_to_limit!(400, 400)
 
-Vips::Image.new_from_file(result.path).size
-#=> [300, 400]
+Vips::Image.new_from_file(result.path).size #=> [300, 400]
 ```
 
 It's possible to omit one dimension, in which case the image will be resized
@@ -140,8 +153,7 @@ pipeline = ImageProcessing::Vips.source(image) # 600x800
 
 result = pipeline.resize_to_fit!(400, 400)
 
-Vips::Image.new_from_file(result.path).size
-#=> [300, 400]
+Vips::Image.new_from_file(result.path).size #=> [300, 400]
 ```
 
 It's possible to omit one dimension, in which case the image will be resized
@@ -171,8 +183,7 @@ pipeline = ImageProcessing::Vips.source(image) # 600x800
 
 result = pipeline.resize_to_fill!(400, 400)
 
-Vips::Image.new_from_file(result.path).size
-#=> [400, 400]
+Vips::Image.new_from_file(result.path).size #=> [400, 400]
 ```
 
 Any additional options are forwarded to [`Vips::Image#thumbnail_image`]:
@@ -187,18 +198,18 @@ See [`vips_thumbnail()`] for more details.
 
 Resizes the image to fit within the specified dimensions while retaining the
 original aspect ratio. If necessary, will pad the remaining area with the given
-color, which defaults to transparent (for GIF and PNG, white for JPEG).
+color.
 
 ```rb
 pipeline = ImageProcessing::Vips.source(image) # 600x800
 
 result = pipeline.resize_and_pad!(400, 400)
 
-Vips::Image.new_from_file(result.path).size
-#=> [400, 400]
+Vips::Image.new_from_file(result.path).size #=> [400, 400]
 ```
 
-You can specify the background [color] that will be used for padding:
+It accepts `:background` for specifying the background [color] that will be
+used for padding (defaults to black).
 
 ```rb
 pipeline.resize_and_pad!(400, 400, color: "RoyalBlue")
@@ -206,7 +217,8 @@ pipeline.resize_and_pad!(400, 400, color: "RoyalBlue")
 pipeline.resize_and_pad!(400, 400, color: [65, 105, 225])
 ```
 
-You can also specify the [direction] where the source image will be positioned:
+It also accepts `:gravity` for specifying the [direction] where the source
+image will be positioned (defaults to `"centre"`).
 
 ```rb
 pipeline.resize_and_pad!(400, 400, gravity: "north-west")
@@ -236,19 +248,6 @@ File.extname(result.path)
 By default the original format is retained when writing the image to a file. If
 the source file doesn't have a file extension, the format will default to JPEG.
 
-#### `#set`, `#set_type`
-
-Sets `Vips::Image` metadata. Delegates to [`Vips::Image#set`] and
-[`Vips::Image#set_type`].
-
-```rb
-pipeline = ImageProcessing::Vips.source(image)
-
-pipeline.set("icc-profile-data", profile).call
-# or
-pipeline.set_type(Vips::BLOB_TYPE, "icc-profile-data", profile).call
-```
-
 #### `#method_missing`
 
 Any unknown methods will be delegated to [`Vips::Image`].
@@ -257,6 +256,7 @@ Any unknown methods will be delegated to [`Vips::Image`].
 ImageProcessing::Vips
   .crop(0, 0, 300, 300)
   .invert
+  .set("icc-profile-data", custom_profile)
   .gaussblur(2)
   # ...
 ```
@@ -332,113 +332,177 @@ the [MiniMagick] gem, which you need to install:
 
 ```rb
 # Gemfile
-gem "mini_magick", ">= 4.3.5"
-```
-
-Typically you will include the module in your class:
-
-```rb
-require "image_processing/mini_magick"
-
-include ImageProcessing::MiniMagick
-
-original = File.open("path/to/image.jpg")
-
-converted = convert(original, "png") # makes a converted copy
-converted #=> #<File:/var/folders/.../mini_magick20151003-23030-9e1vjz.png (closed)>
-File.exist?(original.path) #=> true
-
-converted = convert!(original, "png") # converts the file in-place
-converted #=> #<File:/var/folders/.../mini_magick20151003-23030-9e1vjz.png (closed)>
-File.exist?(original.path) #=> false
-```
-
-You can also call processing methods directly on the module:
-
-```rb
-image = File.open("path/to/image.jpg")
-
-ImageProcessing::MiniMagick.resize_to_fit(image, 400, 400)
+gem "mini_magick", "~> 4.0"
 ```
 
 ### Methods
 
-The following is the list of processing methods provided by
-`ImageProcessing::MiniMagick` (each one has both a destructive and a
-nondestructive version):
+#### `.valid_image?`
+
+Returns true if the image is processable, and false if it's corrupted or not
+supported by imagemagick.
 
 ```rb
-# Adjust an image so that its orientation is suitable for viewing.
-auto_orient[!](file)
-
-# Converts file to the specified format, and you can specify to convert only a
-# certain page for multilayered formats.
-convert[!](file, format, page = nil)
-
-# Crop image to the defined area.
-crop[!](file, width, height, x_offset, y_offset, gravity: "NorthWest")
-
-# Resizes image to fit the specified dimensions (shrinks if larger, enlarges if
-# smaller, but keeps the aspect ratio).
-resize_to_fit[!](file, width, height)
-
-# Resizes image in limit of the specified dimensions (shrinks if larger, keeps
-# if smaller, but keeps the aspect ratio).
-resize_to_limit[!](file, width, height)
-
-# Resizes image to fill the specified dimensions (shrinks if larger,
-# enlarges if smaller, crops the longer side).
-resize_to_fill[!](file, width, height, gravity: "Center")
-
-# Resizes image to the specified dimensions and pads missing space (shrinks if
-# larger, enlarges if smaller, fills the shorter side with specified color).
-resize_and_pad[!](file, width, height, background: "transparent", gravity: "Center")
-
-# Resamples the image to a different resolution
-resample[!](file, horizontal, vertical)
-
-# Returns true if the given image is corrupted
-corrupted?(file)
+ImageProcessing::MiniMagick.valid_image?(normal_image)    #=> true
+ImageProcessing::MiniMagick.valid_image?(corrupted_image) #=> false
 ```
 
-The `#resize_to_limit[!]` and `#resize_to_fit[!]` allow specifying only one
-dimension:
+#### `#resize_to_limit`
+
+Downsizes the image to fit within the specified dimensions while retaining the
+original aspect ratio. Will only resize the image if it's larger than the
+specified dimensions.
 
 ```rb
-resize_to_limit(image, 300, nil)
-resize_to_fit(image, nil, 500)
+pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
+
+result = pipeline.resize_to_limit!(400, 400)
+
+MiniMagick::Image.new(result.path).dimensions #=> [300, 400]
 ```
 
-### Dropping to MiniMagick
-
-If you want to do custom MiniMagick processing, each of the above optionally
-yields an instance of `MiniMagick::Tool`, which you can use for additional
-processing:
+It's possible to omit one dimension, in which case the image will be resized
+only by the provided dimension.
 
 ```rb
-convert(file, "png") do |cmd|
-  cmd.background("none")
-end
+pipeline.resize_to_limit!(400, nil)
+# or
+pipeline.resize_to_limit!(nil, 400)
 ```
 
-There is also a helper method for doing MiniMagick processing directly (though
-note that this will process the image in-place!):
+#### `#resize_to_fit`
+
+Resizes the image to fit within the specified dimensions while retaining the
+*original aspect ratio. Will downsize the image if it's larger than the
+specified dimensions or upsize if it's smaller.
 
 ```rb
-processed = with_minimagick(file) do |image|
-  image #=> #<MiniMagick::Image ...>
-  image.combine_options do |cmd|
-    # ...
-  end
-end
+pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
 
-processed #=> #<File ...>
+result = pipeline.resize_to_fit!(400, 400)
+
+MiniMagick::Image.new(result.path).dimensions #=> [300, 400]
+```
+
+It's possible to omit one dimension, in which case the image will be resized
+only by the provided dimension.
+
+```rb
+pipeline.resize_to_fit!(400, nil)
+# or
+pipeline.resize_to_fit!(nil, 400)
+```
+
+#### `#resize_to_fill`
+
+Resizes the image to fill the specified dimensions while retaining the original
+aspect ratio. If necessary, will crop the image in the larger dimension.
+
+```rb
+pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
+
+result = pipeline.resize_to_fill!(400, 400)
+
+MiniMagick.new(result.path).dimensions #=> [400, 400]
+```
+
+It accepts `:gravity` for specifying the [gravity] to apply while cropping
+(defaults to `"Center"`).
+
+```rb
+pipeline.resize_to_fill!(400, 400, gravity: "NorthWest")
+```
+
+#### `#resize_and_pad`
+
+Resizes the image to fit within the specified dimensions while retaining the
+original aspect ratio. If necessary, will pad the remaining area with the given
+color.
+
+```rb
+pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
+
+result = pipeline.resize_and_pad!(400, 400)
+
+MiniMagick::Image.new(result.path).dimensions #=> [400, 400]
+```
+
+It accepts `:background` for specifying the background [color] that will be
+used for padding (defaults to transparent/white).
+
+```rb
+pipeline.resize_and_pad!(400, 400, color: "RoyalBlue")
+```
+
+It accepts `:gravity` for specifying the [gravity] to apply while cropping
+(defaults to `"Center"`).
+
+```rb
+pipeline.resize_and_pad!(400, 400, gravity: "NorthWest")
+```
+
+#### `#convert`
+
+Specifies the output format.
+
+```rb
+pipeline = ImageProcessing::MiniMagick.source(image)
+
+result = pipeline.convert!("png")
+
+File.extname(result.path)
+#=> ".png"
+```
+
+By default the original format is retained when writing the image to a file. If
+the source file doesn't have a file extension, the format will default to JPEG.
+
+#### `#method_missing`
+
+Any unknown methods will be appended directly as `convert`/`magick` options.
+
+```rb
+ImageProcessing::MiniMagick
+  .quality(100)
+  .crop("300x300+0+0")
+  .resample("300x300")
+  # ...
+```
+
+#### `#append`
+
+Appends given values directly as arguments to the `convert` command.
+
+```rb
+ImageProcessing::MiniMagick
+  .append("-quality", 100)
+  .append("-flip")
+  # ...
+```
+
+#### `#loader`
+
+It accepts the following options:
+
+* `:page` -- specific page(s) that should be loaded
+* `:geometry` -- geometry that should be applied when loading
+* `:fail` -- whether processing should fail on warnings
+
+```rb
+ImageProcessing::MiniMagick.source(document).loader(page: 0).convert!("png")
+# convert input.pdf[0] output.png
+
+ImageProcessing::MiniMagick.source(image).loader(geometry: "300x300").convert!("png")
+# convert input.jpg[300x300] output.png
+
+ImageProcessing::MiniMagick.source(image).loader(fail: true).convert!("png")
+# convert -regard-warnings input.jpg output.png (raises MiniMagick::Error in case of warnings)
 ```
 
 ## Contributing
 
-Test suite requires `imagemagick`, `graphicsmagick` and `libvips` be installed.
-On Mac OS you can install them with Homebrew:
+Test suite requires `imagemagick`, `graphicsmagick` and `libvips` to be
+installed. On Mac OS you can install them with Homebrew:
 
 ```
 $ brew install imagemagick graphicsmagick vips
@@ -481,3 +545,4 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [`vips_pngsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngsave
 [color]: https://www.imagemagick.org/script/color.php#color_names
 [direction]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#VipsCompassDirection
+[gravity]: https://www.imagemagick.org/script/command-line-options.php#gravity

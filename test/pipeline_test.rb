@@ -16,6 +16,22 @@ describe "ImageProcessing::Pipeline" do
     assert_equal "png", pipeline.default_options[:format]
   end
 
+  it "retains original format if format was not specified" do
+    jpg = ImageProcessing::Vips.convert("jpg").call(@portrait)
+    png = ImageProcessing::Vips.convert("png").call(@portrait)
+    result_jpg = ImageProcessing::Vips.invert.call(jpg)
+    result_png = ImageProcessing::Vips.invert.call(png)
+    assert_equal ".jpg", File.extname(result_jpg.path)
+    assert_equal ".png", File.extname(result_png.path)
+  end
+
+  it "saves as JPEG when format is unknown" do
+    png = ImageProcessing::Vips.convert("png").call(@portrait)
+    result = ImageProcessing::Vips.invert.call(copy_to_tempfile(png))
+    assert_equal ".jpg", File.extname(result.path)
+    assert_type "JPEG", result
+  end
+
   it "accepts loader options" do
     pipeline = ImageProcessing::Vips.loader(shrink: 2)
     assert_equal Hash[shrink: 2], pipeline.default_options[:loader]
@@ -40,6 +56,15 @@ describe "ImageProcessing::Pipeline" do
     assert_equal [[:shrink, [2, 2]], [:invert, []]], pipeline.default_options[:operations]
   end
 
+  it "accepts a custom block" do
+    actual   = ImageProcessing::Vips.custom(&:invert).call(@portrait)
+    expected = ImageProcessing::Vips.invert.call(@portrait)
+    assert_similar expected, actual
+
+    identity = ImageProcessing::Vips.custom.call(@portrait)
+    assert_similar @portrait, identity
+  end
+
   it "merges different options" do
     pipeline = ImageProcessing::Vips
       .resize_to_fill(400, 400)
@@ -49,7 +74,7 @@ describe "ImageProcessing::Pipeline" do
     assert_equal "png", pipeline.default_options[:format]
   end
 
-  it "doesn't mutate the receiver" do
+  it "doesn't mutate the receiver when branching" do
     pipeline_jpg = ImageProcessing::Vips.convert("jpg")
     pipeline_png = pipeline_jpg.convert("png")
 
@@ -83,9 +108,52 @@ describe "ImageProcessing::Pipeline" do
     assert_dimensions [400, 400], result
   end
 
-  it "accepts a custom block" do
-    actual   = ImageProcessing::Vips.custom(&:invert).call(@portrait)
+  it "applies a sequence of operations" do
+    actual = ImageProcessing::Vips
+      .invert
+      .shrink(2, 2)
+      .call(@portrait)
+
     expected = ImageProcessing::Vips.invert.call(@portrait)
+    expected = ImageProcessing::Vips.shrink(2, 2).call(expected)
+
     assert_similar expected, actual
+  end
+
+  it "returns a rewinded and refreshed tempfile in binary mode" do
+    tempfile = ImageProcessing::Vips.convert("png").call(@portrait)
+    assert_instance_of Tempfile, tempfile
+    assert tempfile.binmode?
+    assert_equal 0, tempfile.pos
+    assert_equal File.binread(tempfile.path), tempfile.read
+  end
+
+  it "returns a Vips::Image on #call(save: false)" do
+    vips_image = ImageProcessing::Vips
+      .resize_to_limit(400, 400)
+      .call(@portrait, save: false)
+
+    assert_instance_of Vips::Image, vips_image
+    assert_equal [300, 400], vips_image.size
+
+    vips_image = ImageProcessing::Vips
+      .source(@portrait)
+      .resize_to_limit(400, 400)
+      .call(save: false)
+
+    assert_instance_of Vips::Image, vips_image
+    assert_equal [300, 400], vips_image.size
+  end
+
+  it "raises exception when source was not provided" do
+    assert_raises(ImageProcessing::Error) do
+      ImageProcessing::Vips.call
+    end
+  end
+
+  it "raises a NoMethodError when predicate method is not defined" do
+    assert_raises(NoMethodError) do
+      ImageProcessing::Vips.valid?(@portrait)
+    end
   end
 end

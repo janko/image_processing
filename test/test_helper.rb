@@ -1,5 +1,7 @@
 require "bundler/setup"
 
+ENV["MT_NO_EXPECTATIONS"] = "1" # disable Minitest's expectations monkey-patches
+
 require "minitest/autorun"
 require "minitest/pride"
 
@@ -22,15 +24,16 @@ class MiniTest::Test
     tempfile.tap(&:open)
   end
 
-  def assert_similar(expected, actual)
-    return if RUBY_ENGINE == "jruby"
+  def assert_similar(image1, image2)
+    return if RUBY_ENGINE == "jruby" # Phashion has C extensions
 
-    a = Phashion::Image.new(expected.path)
-    b = Phashion::Image.new(actual.path)
+    assert_operator distance(image1, image2), :<=, 4
+  end
 
-    distance = a.distance_from(b).abs
+  def refute_similar(image1, image2)
+    return if RUBY_ENGINE == "jruby" # Phashion has C extensions
 
-    assert_operator distance, :<=, 4
+    assert_operator distance(image1, image2), :>, 4
   end
 
   def assert_dimensions(dimensions, file)
@@ -39,5 +42,28 @@ class MiniTest::Test
 
   def assert_type(type, file)
     assert_equal type, MiniMagick::Image.new(file.path).type
+  end
+
+  private
+
+  def distance(image1, image2)
+    a = Phashion::Image.new(image1.path)
+    b = Phashion::Image.new(image2.path)
+
+    a.distance_from(b).abs
+  end
+end
+
+class Minitest::Spec
+  def self.deprecated(name, &block)
+    it("#{name} (deprecated)") do
+      deprecated{instance_exec(&block)}
+    end
+  end
+
+  def deprecated
+    $stderr = StringIO.new
+    yield
+    $stderr = STDERR
   end
 end

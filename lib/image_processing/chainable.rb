@@ -24,12 +24,14 @@ module ImageProcessing
     end
 
     def custom(&block)
-      operation(:custom, block)
+      block ? operation(:custom, block) : self
     end
 
     def method_missing(name, *args)
       if name.to_s.end_with?("!")
         send(name.to_s.chomp("!"), *args).call!
+      elsif name.to_s.end_with?("?")
+        super
       else
         operation(name, *args)
       end
