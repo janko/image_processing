@@ -86,8 +86,8 @@ vips_image #=> #<Vips::Image ...>
 
 You can continue reading the API documentation for specific modules:
 
-* **[ImageProcessing::Vips](/doc/vips.md)**
-* **[ImageProcessing::MiniMagick](/doc/minimagick.md)**
+* **[ImageProcessing::Vips](/doc/vips.md#imageprocessingvips)**
+* **[ImageProcessing::MiniMagick](/doc/minimagick.md#imageprocessingminimagick)**
 
 ## Contributing
 
