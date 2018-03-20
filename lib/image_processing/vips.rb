@@ -65,10 +65,10 @@ module ImageProcessing
         save_nickname  = ::Vips.vips_foreign_find_save(destination.path)
         save_operation = ::Vips::Operation.new(save_nickname)
 
-        accepted_options = []
-        save_operation.argument_map do |spec, _, _|
-          accepted_options << spec[:name].tr("-", "_").to_sym
-        end
+        accepted_options = save_operation.get_construct_args
+          .select { |name, flags| (flags & ::Vips::ARGUMENT_INPUT)    != 0 }
+          .select { |name, flags| (flags & ::Vips::ARGUMENT_REQUIRED) == 0 }
+          .map(&:first).map(&:to_sym)
 
         options.select! { |name, _| accepted_options.include?(name) }
 
