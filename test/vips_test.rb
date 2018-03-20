@@ -50,6 +50,11 @@ describe "ImageProcessing::Vips" do
     assert_dimensions [300, 400], result
   end
 
+  it "ignores loader options that are not defined" do
+    png = ImageProcessing::Vips.convert("png").call(@portrait)
+    ImageProcessing::Vips.loader(shrink: 2).call(png)
+  end
+
   it "auto rotates by default" do
     result = ImageProcessing::Vips.call(fixture_image("rotated.jpg"))
     assert_dimensions [600, 800], result
@@ -63,7 +68,7 @@ describe "ImageProcessing::Vips" do
     refute_includes Vips::Image.new_from_file(result.path).get_fields, "exif-data"
   end
 
-  it "ignores options that are not defined for a saver" do
+  it "ignores saver options that are not defined" do
     ImageProcessing::Vips.saver(Q: 85).convert("png").call(@portrait)
   end
 

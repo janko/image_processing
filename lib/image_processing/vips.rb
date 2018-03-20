@@ -55,6 +55,9 @@ module ImageProcessing
 
         fail Error, "source file needs to respond to #path or be a Vips::Image" unless file.respond_to?(:path)
 
+        loader  = ::Vips.vips_foreign_find_load(file.path)
+        options = select_valid_options(loader, options)
+
         image = ::Vips::Image.new_from_file(file.path, fail: true, **options)
         image = image.autorot if autorot
 
@@ -62,15 +65,8 @@ module ImageProcessing
       end
 
       def save_image(image, destination, **options)
-        save_nickname  = ::Vips.vips_foreign_find_save(destination.path)
-        save_operation = ::Vips::Operation.new(save_nickname)
-
-        accepted_options = save_operation.get_construct_args
-          .select { |name, flags| (flags & ::Vips::ARGUMENT_INPUT)    != 0 }
-          .select { |name, flags| (flags & ::Vips::ARGUMENT_REQUIRED) == 0 }
-          .map(&:first).map(&:to_sym)
-
-        options.select! { |name, _| accepted_options.include?(name) }
+        saver   = ::Vips.vips_foreign_find_save(destination.path)
+        options = select_valid_options(saver, options)
 
         image.write_to_file(destination.path, **options)
       end
@@ -81,6 +77,17 @@ module ImageProcessing
         raise Error, "either width or height must be specified" unless width || height
 
         [width || MAX_COORD, height || MAX_COORD]
+      end
+
+      def select_valid_options(operation_name, options)
+        operation = ::Vips::Operation.new(operation_name)
+
+        operation_options = operation.get_construct_args
+          .select { |name, flags| (flags & ::Vips::ARGUMENT_INPUT)    != 0 }
+          .select { |name, flags| (flags & ::Vips::ARGUMENT_REQUIRED) == 0 }
+          .map(&:first).map(&:to_sym)
+
+        options.select { |name, value| operation_options.include?(name) }
       end
     end
 

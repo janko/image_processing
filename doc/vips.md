@@ -195,8 +195,8 @@ ImageProcessing::Vips
 ```
 
 See [`vips_jpegload()`], [`vips_pngload()`] etc. for more details on
-format-specific load options. Note that `:fail` is set to `true` by default, so
-that an exception is raised when the image is corrupted.
+format-specific load options. Note that `:fail` is set to `true` by default.
+Any provided options that are not defined for a specific loader will be ignored.
 
 An additional `:autorot` option is accepted to specify whether
 [`vips_autorot()`] should be automatically called after the image is loaded
