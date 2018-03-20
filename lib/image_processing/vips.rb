@@ -62,6 +62,16 @@ module ImageProcessing
       end
 
       def save_image(image, destination, **options)
+        save_nickname  = ::Vips.vips_foreign_find_save(destination.path)
+        save_operation = ::Vips::Operation.new(save_nickname)
+
+        accepted_options = []
+        save_operation.argument_map do |spec, _, _|
+          accepted_options << spec[:name].tr("-", "_").to_sym
+        end
+
+        options.select! { |name, _| accepted_options.include?(name) }
+
         image.write_to_file(destination.path, **options)
       end
 

@@ -230,7 +230,8 @@ ImageProcessing::Vips
 ```
 
 See [`vips_jpegsave()`], [`vips_pngsave()`] etc. for more details on
-format-specific save options.
+format-specific save options. Any provided options that are not defined for a
+specific saver will be ignored.
 
 If you would like to have more control over saving, you can call `#call(save:
 false)` to get the `Vips::Image` object, and call the saver on it directly.

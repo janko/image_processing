@@ -60,15 +60,11 @@ describe "ImageProcessing::Vips" do
 
   it "applies saver options" do
     result = ImageProcessing::Vips.saver(strip: true).call(@portrait)
-    result_image = Vips::Image.new_from_file(result.path)
-    refute_includes result_image.get_fields, "exif-data"
+    refute_includes Vips::Image.new_from_file(result.path).get_fields, "exif-data"
   end
 
-  it "accepts Vips::Image as source" do
-    vips_image = Vips::Image.new_from_file(@portrait.path)
-    result = ImageProcessing::Vips.convert("png").call(vips_image)
-    assert_equal ".png", File.extname(result.path)
-    assert_type "PNG", result
+  it "ignores options that are not defined for a saver" do
+    ImageProcessing::Vips.saver(Q: 85).convert("png").call(@portrait)
   end
 
   it "fails on invalid source" do
