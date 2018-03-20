@@ -13,7 +13,7 @@ You'll need to have [ImageMagick] or [GraphicsMagick] installed, see the
 
 ## Methods
 
-### `.valid_image?`
+#### `.valid_image?`
 
 Returns true if the image is processable, and false if it's corrupted or not
 supported by imagemagick.
@@ -23,7 +23,7 @@ ImageProcessing::MiniMagick.valid_image?(normal_image)    #=> true
 ImageProcessing::MiniMagick.valid_image?(corrupted_image) #=> false
 ```
 
-### `#resize_to_limit`
+#### `#resize_to_limit`
 
 Downsizes the image to fit within the specified dimensions while retaining the
 original aspect ratio. Will only resize the image if it's larger than the
@@ -46,7 +46,7 @@ pipeline.resize_to_limit!(400, nil)
 pipeline.resize_to_limit!(nil, 400)
 ```
 
-### `#resize_to_fit`
+#### `#resize_to_fit`
 
 Resizes the image to fit within the specified dimensions while retaining the
 *original aspect ratio. Will downsize the image if it's larger than the
@@ -69,7 +69,7 @@ pipeline.resize_to_fit!(400, nil)
 pipeline.resize_to_fit!(nil, 400)
 ```
 
-### `#resize_to_fill`
+#### `#resize_to_fill`
 
 Resizes the image to fill the specified dimensions while retaining the original
 aspect ratio. If necessary, will crop the image in the larger dimension.
@@ -89,7 +89,7 @@ It accepts `:gravity` for specifying the [gravity] to apply while cropping
 pipeline.resize_to_fill!(400, 400, gravity: "NorthWest")
 ```
 
-### `#resize_and_pad`
+#### `#resize_and_pad`
 
 Resizes the image to fit within the specified dimensions while retaining the
 original aspect ratio. If necessary, will pad the remaining area with the given
@@ -117,7 +117,7 @@ It accepts `:gravity` for specifying the [gravity] to apply while cropping
 pipeline.resize_and_pad!(400, 400, gravity: "NorthWest")
 ```
 
-### `#convert`
+#### `#convert`
 
 Specifies the output format.
 
@@ -133,7 +133,7 @@ File.extname(result.path)
 By default the original format is retained when writing the image to a file. If
 the source file doesn't have a file extension, the format will default to JPEG.
 
-### `#method_missing`
+#### `#method_missing`
 
 Any unknown methods will be appended directly as `convert`/`magick` options.
 
@@ -145,7 +145,7 @@ ImageProcessing::MiniMagick
   # ...
 ```
 
-### `#append`
+#### `#append`
 
 Appends given values directly as arguments to the `convert` command.
 
@@ -156,7 +156,7 @@ ImageProcessing::MiniMagick
   # ...
 ```
 
-### `#loader`
+#### `#loader`
 
 It accepts the following options:
 

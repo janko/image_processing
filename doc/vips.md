@@ -13,7 +13,7 @@ Note that you'll need to have [libvips] 8.6 or higher installed; see the
 
 ## Methods
 
-### `.valid_image?`
+#### `.valid_image?`
 
 Returns true if the image is processable, and false if it's corrupted or not
 supported by libvips.
@@ -23,7 +23,7 @@ ImageProcessing::Vips.valid_image?(normal_image)    #=> true
 ImageProcessing::Vips.valid_image?(corrupted_image) #=> false
 ```
 
-### `#resize_to_limit`
+#### `#resize_to_limit`
 
 Downsizes the image to fit within the specified dimensions while retaining the
 original aspect ratio. Will only resize the image if it's larger than the
@@ -54,7 +54,7 @@ pipeline.resize_to_limit!(400, 400, linear: true)
 
 See [`vips_thumbnail()`] for more details.
 
-### `#resize_to_fit`
+#### `#resize_to_fit`
 
 Resizes the image to fit within the specified dimensions while retaining the
 original aspect ratio. Will downsize the image if it's larger than the
@@ -85,7 +85,7 @@ pipeline.resize_to_fit!(400, 400, linear: true)
 
 See [`vips_thumbnail()`] for more details.
 
-### `#resize_to_fill`
+#### `#resize_to_fill`
 
 Resizes the image to fill the specified dimensions while retaining the original
 aspect ratio. If necessary, will crop the image in the larger dimension.
@@ -106,7 +106,7 @@ pipeline.resize_to_fill!(400, 400, crop: :attention) # smart crop
 
 See [`vips_thumbnail()`] for more details.
 
-### `#resize_and_pad`
+#### `#resize_and_pad`
 
 Resizes the image to fit within the specified dimensions while retaining the
 original aspect ratio. If necessary, will pad the remaining area with the given
@@ -144,7 +144,7 @@ pipeline.resize_to_fill!(400, 400, linear: true)
 
 See [`vips_thumbnail()`] and [`vips_gravity()`] for more details.
 
-### `#convert`
+#### `#convert`
 
 Specifies the output format.
 
@@ -160,7 +160,7 @@ File.extname(result.path)
 By default the original format is retained when writing the image to a file. If
 the source file doesn't have a file extension, the format will default to JPEG.
 
-### `#method_missing`
+#### `#method_missing`
 
 Any unknown methods will be delegated to [`Vips::Image`].
 
@@ -173,7 +173,7 @@ ImageProcessing::Vips
   # ...
 ```
 
-### `#custom`
+#### `#custom`
 
 Calls the provided block with the intermediary `Vips::Image` object. The return
 value of the provided block must be a `Vips::Image` object.
@@ -220,7 +220,7 @@ ImageProcessing::Vips
   # ...
 ```
 
-### `#saver`
+#### `#saver`
 
 Specifies options that will be forwarded to [`Vips::Image#write_to_file`].
 
