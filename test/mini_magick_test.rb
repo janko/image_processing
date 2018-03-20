@@ -56,18 +56,18 @@ describe "ImageProcessing::MiniMagick" do
   end
 
   it "accepts page" do
-    pdf = Tempfile.new(["file", ".pdf"])
+    tiff = Tempfile.new(["file", ".tiff"])
     MiniMagick::Tool::Convert.new do |convert|
       convert.merge! [@portrait.path, @portrait.path, @portrait.path]
-      convert << pdf.path
+      convert << tiff.path
     end
 
     processed = ImageProcessing::MiniMagick
-      .source(pdf)
+      .source(tiff)
       .loader(page: 0)
       .convert!("jpg")
 
-    assert File.exist?(processed.path)
+    refute_equal 0, processed.size
   end
 
   it "accepts geometry" do
