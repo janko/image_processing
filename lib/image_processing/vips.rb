@@ -50,12 +50,15 @@ module ImageProcessing
           .gravity(gravity, width, height, extend: :background, background: Color.get(background))
       end
 
-      def load_image(file, **options)
+      def load_image(file, autorot: true, **options)
         return file if file.is_a?(::Vips::Image)
 
         fail Error, "source file needs to respond to #path or be a Vips::Image" unless file.respond_to?(:path)
 
-        ::Vips::Image.new_from_file(file.path, fail: true, **options)
+        image = ::Vips::Image.new_from_file(file.path, fail: true, **options)
+        image = image.autorot if autorot
+
+        image
       end
 
       def save_image(image, destination, **options)

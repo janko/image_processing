@@ -56,7 +56,7 @@ module ImageProcessing
         magick.merge! args
       end
 
-      def load_image(file, page: nil, geometry: nil, fail: true)
+      def load_image(file, page: nil, geometry: nil, fail: true, auto_orient: true)
         fail(Error, "source file needs to respond to #path") unless file.respond_to?(:path)
 
         magick = ::MiniMagick::Tool::Convert.new
@@ -67,6 +67,9 @@ module ImageProcessing
         input_path += "[#{geometry}]" if geometry
 
         magick << input_path
+        magick.auto_orient if auto_orient
+
+        magick
       end
 
       def save_image(magick, destination, **options)

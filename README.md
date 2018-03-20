@@ -25,12 +25,11 @@ require "image_processing/mini_magick"
 
 processed = ImageProcessing::MiniMagick
   .source(file)
-  .auto_orient
   .resize_to_limit(400, 400)
   .convert("png")
   .call
 
-processed #=> #<File:/var/folders/.../image_processing-vips20180316-18446-1j247h6.png>
+processed #=> #<File:/var/folders/.../image_processing20180316-18446-1j247h6.png>
 ```
 
 This allows easy branching when generating multiple derivatives:
@@ -40,7 +39,6 @@ require "image_processing/vips"
 
 pipeline = ImageProcessing::Vips
   .source(file)
-  .autorot
   .convert("png")
 
 large  = pipeline.resize_to_limit!(800, 800)
@@ -268,10 +266,8 @@ value of the provided block must be a `Vips::Image` object.
 
 ```rb
 ImageProcessing::Vips
-  .source(file)
-  .resize_to_limit(400, 400)
   .custom { |image| image + image.invert }
-  .call
+  # ...
 ```
 
 #### `#loader`
@@ -281,12 +277,22 @@ Specifies options that will be forwarded to [`Vips::Image.new_from_file`].
 ```rb
 ImageProcessing::Vips
   .loader(access: :sequential)
-  .resize_to_limit(400, 400)
-  .call(source)
+  # ...
 ```
 
 See [`vips_jpegload()`], [`vips_pngload()`] etc. for more details on
-format-specific load options.
+format-specific load options. Note that `:fail` is set to `true` by default, so
+that an exception is raised when the image is corrupted.
+
+An additional `:autorot` option is accepted to specify whether
+[`vips_autorot()`] will be automatically called after the image is loaded
+(defaults to `true`).
+
+```rb
+ImageProcessing::Vips
+  .loader(autorot: false)
+  # ...
+```
 
 If you would like to have more control over loading, you can load the image
 directly using `Vips::Image`, and just pass the `Vips::Image` object as the
@@ -307,8 +313,6 @@ Specifies options that will be forwarded to [`Vips::Image#write_to_file`].
 ```rb
 ImageProcessing::Vips
   .saver(Q: 100)
-  .resize_to_limit(400, 400)
-  .call(source)
 ```
 
 See [`vips_jpegsave()`], [`vips_pngsave()`] etc. for more details on
@@ -486,7 +490,8 @@ It accepts the following options:
 
 * `:page` -- specific page(s) that should be loaded
 * `:geometry` -- geometry that should be applied when loading
-* `:fail` -- whether processing should fail on warnings
+* `:fail` -- whether processing should fail on warnings (defaults to `true`)
+* `:auto_orient` -- whether the image should be automatically oriented after it's loaded (defaults to `true`)
 
 ```rb
 ImageProcessing::MiniMagick.source(document).loader(page: 0).convert!("png")
@@ -495,7 +500,7 @@ ImageProcessing::MiniMagick.source(document).loader(page: 0).convert!("png")
 ImageProcessing::MiniMagick.source(image).loader(geometry: "300x300").convert!("png")
 # convert input.jpg[300x300] output.png
 
-ImageProcessing::MiniMagick.source(image).loader(fail: true).convert!("png")
+ImageProcessing::MiniMagick.source(image).loader(fail: false).convert!("png")
 # convert -regard-warnings input.jpg output.png (raises MiniMagick::Error in case of warnings)
 ```
 
@@ -539,6 +544,7 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [`Vips::Image#set_type`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#set_type-instance_method
 [`vips_thumbnail()`]: https://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
 [`vips_gravity()`]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-gravity
+[`vips_autorot()`]: https://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
 [`vips_jpegload()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegload
 [`vips_pngload()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngload
 [`vips_jpegsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave

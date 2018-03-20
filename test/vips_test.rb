@@ -50,6 +50,14 @@ describe "ImageProcessing::Vips" do
     assert_dimensions [300, 400], result
   end
 
+  it "auto rotates by default" do
+    result = ImageProcessing::Vips.call(fixture_image("rotated.jpg"))
+    assert_dimensions [600, 800], result
+
+    result = ImageProcessing::Vips.loader(autorot: false).call(fixture_image("rotated.jpg"))
+    assert_dimensions [800, 600], result
+  end
+
   it "applies saver options" do
     result = ImageProcessing::Vips.saver(strip: true).call(@portrait)
     result_image = Vips::Image.new_from_file(result.path)

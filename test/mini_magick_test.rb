@@ -75,6 +75,14 @@ describe "ImageProcessing::MiniMagick" do
     assert_dimensions [300, 400], pipeline.loader(geometry: "400x400").call
   end
 
+  it "auto orients by default" do
+    result = ImageProcessing::MiniMagick.call(fixture_image("rotated.jpg"))
+    assert_dimensions [600, 800], result
+
+    result = ImageProcessing::MiniMagick.loader(auto_orient: false).call(fixture_image("rotated.jpg"))
+    assert_dimensions [800, 600], result
+  end
+
   it "fails for corrupted files" do
     corrupted = fixture_image("corrupted.jpg")
     pipeline = ImageProcessing::MiniMagick.source(corrupted)
