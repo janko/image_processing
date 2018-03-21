@@ -56,7 +56,7 @@ describe "ImageProcessing::Vips" do
   end
 
   it "raises correct Vips::Error on unknown loader" do
-    error = assert_raises(Vips::Error) { ImageProcessing::Vips.convert("jpg").call(Tempfile.new) }
+    error = assert_raises(Vips::Error) { ImageProcessing::Vips.convert("jpg").call(Tempfile.new("")) }
     assert_includes error.message, "not a known file format"
   end
 
