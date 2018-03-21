@@ -56,7 +56,7 @@ module ImageProcessing
         fail Error, "source file needs to respond to #path or be a Vips::Image" unless file.respond_to?(:path)
 
         loader  = ::Vips.vips_foreign_find_load(file.path)
-        options = select_valid_options(loader, options)
+        options = select_valid_options(loader, options) if loader
 
         image = ::Vips::Image.new_from_file(file.path, fail: true, **options)
         image = image.autorot if autorot
@@ -66,7 +66,7 @@ module ImageProcessing
 
       def save_image(image, destination, **options)
         saver   = ::Vips.vips_foreign_find_save(destination.path)
-        options = select_valid_options(saver, options)
+        options = select_valid_options(saver, options) if saver
 
         image.write_to_file(destination.path, **options)
       end

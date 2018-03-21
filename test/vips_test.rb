@@ -55,6 +55,11 @@ describe "ImageProcessing::Vips" do
     ImageProcessing::Vips.loader(shrink: 2).call(png)
   end
 
+  it "raises correct Vips::Error on unknown loader" do
+    error = assert_raises(Vips::Error) { ImageProcessing::Vips.convert("jpg").call(Tempfile.new) }
+    assert_includes error.message, "not a known file format"
+  end
+
   it "auto rotates by default" do
     result = ImageProcessing::Vips.call(fixture_image("rotated.jpg"))
     assert_dimensions [600, 800], result
@@ -70,6 +75,11 @@ describe "ImageProcessing::Vips" do
 
   it "ignores saver options that are not defined" do
     ImageProcessing::Vips.saver(Q: 85).convert("png").call(@portrait)
+  end
+
+  it "raises correct Vips::Error on unknown saver" do
+    error = assert_raises(Vips::Error) { ImageProcessing::Vips.convert("foo").call(@portrait) }
+    assert_includes error.message, "No known saver"
   end
 
   it "fails on invalid source" do
