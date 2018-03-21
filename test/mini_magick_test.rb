@@ -1,5 +1,6 @@
 require "test_helper"
 require "image_processing/mini_magick"
+require "stringio"
 
 describe "ImageProcessing::MiniMagick" do
   include ImageProcessing::MiniMagick
@@ -152,9 +153,11 @@ describe "ImageProcessing::MiniMagick" do
 
       assert_similar expected, resize_to_limit(@portrait, 400, 400)
       assert_similar expected, resize_to_limit!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      assert_similar expected, resize_to_limit(StringIO.new(@portrait.read), 400, 400)
 
       assert_similar expected, ImageProcessing::MiniMagick.resize_to_limit(@portrait, 400, 400)
       assert_similar expected, ImageProcessing::MiniMagick.resize_to_limit!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      assert_similar expected, ImageProcessing::MiniMagick.resize_to_limit!(StringIO.new(@portrait.read), 400, 400)
     end
   end
 
@@ -189,9 +192,11 @@ describe "ImageProcessing::MiniMagick" do
 
       assert_similar expected, resize_to_fit(@portrait, 400, 400)
       assert_similar expected, resize_to_fit!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      assert_similar expected, resize_to_fit(StringIO.new(@portrait.read), 400, 400)
 
       assert_similar expected, ImageProcessing::MiniMagick.resize_to_fit(@portrait, 400, 400)
       assert_similar expected, ImageProcessing::MiniMagick.resize_to_fit!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      assert_similar expected, ImageProcessing::MiniMagick.resize_to_fit(StringIO.new(@portrait.read), 400, 400)
     end
   end
 
@@ -224,9 +229,11 @@ describe "ImageProcessing::MiniMagick" do
 
       assert_similar expected, resize_to_fill(@portrait, 400, 400)
       assert_similar expected, resize_to_fill!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      assert_similar expected, resize_to_fill(StringIO.new(@portrait.read), 400, 400)
 
       assert_similar expected, ImageProcessing::MiniMagick.resize_to_fill(@portrait, 400, 400)
       assert_similar expected, ImageProcessing::MiniMagick.resize_to_fill!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      assert_similar expected, ImageProcessing::MiniMagick.resize_to_fill(StringIO.new(@portrait.read), 400, 400)
     end
   end
 
@@ -274,9 +281,11 @@ describe "ImageProcessing::MiniMagick" do
 
       assert_similar expected, resize_and_pad(@portrait, 400, 400)
       assert_similar expected, resize_and_pad!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      assert_similar expected, resize_and_pad(StringIO.new(@portrait.read), 400, 400)
 
       assert_similar expected, ImageProcessing::MiniMagick.resize_and_pad(@portrait, 400, 400)
       assert_similar expected, ImageProcessing::MiniMagick.resize_and_pad!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      assert_similar expected, ImageProcessing::MiniMagick.resize_and_pad!(StringIO.new(@portrait.read), 400, 400)
     end
   end
 end
