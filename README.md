@@ -99,6 +99,26 @@ You can continue reading the API documentation for specific modules:
 * **[`ImageProcessing::Vips`]**
 * **[`ImageProcessing::MiniMagick`]**
 
+## Optimization
+
+After images have been processed, you might want to additionally optimize them
+to reduce their filesize. You can do that with the [image_optim] gem:
+
+```rb
+require "image_optim"
+
+result = ImageProcessing::Vips
+  .resize_to_limit(400, 400)
+  .saver(Q: 85)
+  .call(image)
+
+image_optim = ImageOptim.new(...)
+image_optim.optimize_image!(result.path)
+result.open # refresh file descriptor
+
+result # optimized image
+```
+
 ## Contributing
 
 Test suite requires `imagemagick`, `graphicsmagick` and `libvips` to be
@@ -128,4 +148,5 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [VIPS]: http://jcupitt.github.io/libvips/
 [`ImageProcessing::Vips`]: /doc/vips.md#imageprocessingvips
 [`ImageProcessing::MiniMagick`]: /doc/minimagick.md#imageprocessingminimagick
+[image_optim]: https://github.com/toy/image_optim
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick
