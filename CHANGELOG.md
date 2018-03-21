@@ -1,3 +1,33 @@
+## 0.10.0 (2018-03-21)
+
+* [minimagick] Rewrite MiniMagick module to use the chainable API (@janko-m)
+
+* [minimagick] Deprecate the old API (@janko-m)
+
+* [minimagick] Raise an exception on processing warnings (@janko-m)
+
+* [minimagick] Speed up `.valid_image?` by an order of magnitude (@janko-m)
+
+* [minimagick] Don't accept arbitrary IO object anymore (@janko-m)
+
+* [minimagick] Removed unnecessary `#crop` and `#resample` macros (@janko-m)
+
+* [vips] Ignore undefined loader/saver options (@janko-m)
+
+* [vips] Preserve transparent background in `#resize_to_pad` (@janko-m)
+
+* [vips] Remove the ability to specify colors using names (@janko-m)
+
+* [minimagick, vips] Autorotate images after loading them (@janko-m)
+
+* [core] Delete result `Tempfile` object in case of processing errors (@janko-m)
+
+* [core] Allow returning `nil` in the `#custom` block (@janko-m)
+
+* [core] Allow specifying a path string as source file (@janko-m)
+
+* [core] Allow saving to a specific location with the `:destination` call option (@janko-m)
+
 ## 0.9.0 (2018-03-16)
 
 * Added libvips module (@GustavoCaso, @janko-m)

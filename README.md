@@ -11,7 +11,7 @@ Refile, Dragonfly and ActiveStorage each implementing their own versions.
 ## Installation
 
 ```rb
-gem "image_processing"
+gem "image_processing", "~> 0.10"
 ```
 
 ## Usage
