@@ -175,12 +175,13 @@ ImageProcessing::Vips
 
 #### `#custom`
 
-Calls the provided block with the intermediary `Vips::Image` object. The return
-value of the provided block must be a `Vips::Image` object.
+Yields the intermediary `Vips::Image` object. If the block return value is a
+`Vips::Image` object it will be used in further processing, otherwise if `nil`
+is returned the original `Vips::Image` object will be used.
 
 ```rb
 ImageProcessing::Vips
-  .custom { |image| image + image.invert }
+  .custom { |image| image + image.invert if invert? }
   # ...
 ```
 

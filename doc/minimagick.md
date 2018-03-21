@@ -145,6 +145,19 @@ ImageProcessing::MiniMagick
   # ...
 ```
 
+#### `#custom`
+
+Yields the intermediary `MiniMagick::Tool::Convert` object. If the block return
+value is a `MiniMagick::Tool::Convert` object it will be used in further
+processing, otherwise if `nil` is returned the original
+`MiniMagick::Tool::Convert` object will be used.
+
+```rb
+ImagePocessing::MiniMagick
+  .custom { |magick| magick.colorspace("grayscale") if gray? }
+  # ...
+```
+
 #### `#append`
 
 Appends given values directly as arguments to the `convert` command.

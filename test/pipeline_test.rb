@@ -61,6 +61,10 @@ describe "ImageProcessing::Pipeline" do
     expected = ImageProcessing::Vips.invert.call(@portrait)
     assert_similar expected, actual
 
+    actual   = ImageProcessing::Vips.custom { nil }.call(@portrait)
+    expected = ImageProcessing::Vips.call(@portrait)
+    assert_similar expected, actual
+
     identity = ImageProcessing::Vips.custom.call(@portrait)
     assert_similar @portrait, identity
   end

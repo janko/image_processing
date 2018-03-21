@@ -16,7 +16,7 @@ module ImageProcessing
 
       default_options[:operations].each do |name, args|
         if name == :custom
-          image = args.first.call(image)
+          image = args.first.call(image) || image
         else
           image = processor.apply_operation(name, image, *args)
         end
