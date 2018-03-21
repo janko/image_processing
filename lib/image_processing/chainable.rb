@@ -37,11 +37,11 @@ module ImageProcessing
       end
     end
 
-    def call(file = nil, save: true)
+    def call(file = nil, **call_options)
       options = default_options
       options = options.merge(source: file) if file
 
-      branch(options).call!(save: save)
+      branch(options).call!(**call_options)
     end
 
     def branch(options)

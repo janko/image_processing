@@ -56,22 +56,22 @@ module ImageProcessing
         if path_or_image.is_a?(::Vips::Image)
           image = path_or_image
         else
-          path    = path_or_image
-          loader  = ::Vips.vips_foreign_find_load(path)
+          source_path = path_or_image
+          loader  = ::Vips.vips_foreign_find_load(source_path)
           options = select_valid_options(loader, options) if loader
 
-          image = ::Vips::Image.new_from_file(path, fail: true, **options)
+          image = ::Vips::Image.new_from_file(source_path, fail: true, **options)
         end
 
         image = image.autorot if autorot
         image
       end
 
-      def save_image(image, destination, **options)
-        saver   = ::Vips.vips_foreign_find_save(destination.path)
+      def save_image(image, destination_path, **options)
+        saver   = ::Vips.vips_foreign_find_save(destination_path)
         options = select_valid_options(saver, options) if saver
 
-        image.write_to_file(destination.path, **options)
+        image.write_to_file(destination_path, **options)
       end
 
       private

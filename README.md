@@ -72,18 +72,26 @@ processed = ImageProcessing::MiniMagick
 ```
 
 The source object needs to responds to `#path`, or be a String, a Pathname, or
-a `Vips::Image`/`MiniMagick::Tool` object. The result of processing is a
-`Tempfile` object, or a `Vips::Image`/`MiniMagick::Tool` if `:save` was set to
-`false`.
+a `Vips::Image`/`MiniMagick::Tool` object.
+
+```rb
+ImageProcessing::Vips.source(File.open("source.jpg"))
+ImageProcessing::Vips.source("source.jpg")
+ImageProcessing::Vips.source(Pathname.new("source.jpg"))
+ImageProcessing::Vips.source(Vips::Image.new_from_file("source.jpg"))
+```
+
+Without any call options the result of processing is a newly created `Tempfile`
+object. You can save processing result to a specific location by passing
+`:destination` to `#call`. You can also pass `save: false` to `#call` to
+retrieve the raw `Vips::Image`/`MiniMagick::Tool` object.
 
 ```rb
 pipeline = ImageProcessing::Vips.source(image)
 
-tempfile = pipeline.call
-tempfile #=> #<Tempfile ...>
-
-tempfile = pipeline.call(save: false)
-tempfile #=> #<Vips::Image ...>
+pipeline.call #=> #<Tempfile ...>
+pipeline.call(save: false) #=> #<Vips::Image ...>
+pipeline.call(destination: "/path/to/destination")
 ```
 
 You can continue reading the API documentation for specific modules:

@@ -8,7 +8,7 @@ module ImageProcessing
       @default_options = options
     end
 
-    def call!(save: true)
+    def call!(save: true, destination: nil)
       fail Error, "source file is not provided" unless default_options[:source]
 
       image_class = default_options[:processor]::IMAGE_CLASS
@@ -38,13 +38,15 @@ module ImageProcessing
 
       return image unless save
 
+      return processor.save_image(image, destination, default_options[:saver]) if destination
+
       source_path = source if source.is_a?(String)
       format      = default_options[:format] || File.extname(source_path.to_s)[1..-1] || "jpg"
 
       result = Tempfile.new(["image_processing", ".#{format}"], binmode: true)
 
       begin
-        processor.save_image(image, result, default_options[:saver])
+        processor.save_image(image, result.path, default_options[:saver])
       rescue
         result.close!
         raise

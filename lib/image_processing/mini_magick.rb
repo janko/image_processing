@@ -61,10 +61,10 @@ module ImageProcessing
         if path_or_magick.is_a?(::MiniMagick::Tool)
           magick = path_or_magick
         else
-          path   = path_or_magick
+          source_path = path_or_magick
           magick = ::MiniMagick::Tool::Convert.new
 
-          input_path  = path
+          input_path  = source_path
           input_path += "[#{page}]" if page
           input_path += "[#{geometry}]" if geometry
 
@@ -77,8 +77,8 @@ module ImageProcessing
         magick
       end
 
-      def save_image(magick, destination, **options)
-        magick << destination.path
+      def save_image(magick, destination_path, **options)
+        magick << destination_path
         magick.call
       end
     end

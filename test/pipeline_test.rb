@@ -40,6 +40,12 @@ describe "ImageProcessing::Pipeline" do
     assert_type "JPEG", result
   end
 
+  it "accepts destination path" do
+    destination = Tempfile.new(["tempfile", ".jpg"])
+    ImageProcessing::Vips.source(@portrait).call(destination: destination.path)
+    refute_equal 0, destination.path
+  end
+
   it "accepts loader options" do
     pipeline = ImageProcessing::Vips.loader(shrink: 2)
     assert_equal Hash[shrink: 2], pipeline.default_options[:loader]
