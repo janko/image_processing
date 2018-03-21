@@ -47,7 +47,7 @@ module ImageProcessing
         embed_options.reject! { |name, value| value.nil? }
 
         image = image.thumbnail_image(width, height: height, **options)
-        image = image.bandjoin(255) until image.bands >= 4 if alpha
+        image = image.bandjoin(255) if alpha && image.bands == 3
         image.gravity(gravity, width, height, **embed_options)
       end
 
