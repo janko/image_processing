@@ -247,8 +247,11 @@ describe "ImageProcessing::MiniMagick" do
     end
 
     it "produces correct image" do
-      expected = fixture_image("pad.jpg")
-      assert_similar expected, @pipeline.resize_and_pad!(400, 400, background: "red")
+      expected = fixture_image("pad.png")
+      assert_similar expected, @pipeline.convert("png").resize_and_pad!(400, 400)
+
+      png = @pipeline.convert!("png")
+      assert_similar expected, @pipeline.source(png).resize_and_pad!(400, 400)
     end
 
     it "produces correct image when enlarging" do

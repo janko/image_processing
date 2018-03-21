@@ -2,9 +2,6 @@ gem "ruby-vips", "~> 2.0"
 require "vips"
 
 require "image_processing"
-require "image_processing/vips/color"
-
-require "tempfile"
 
 fail "image_processing/vips requires libvips 8.6+" unless Vips.at_least_libvips?(8, 6)
 
@@ -45,9 +42,13 @@ module ImageProcessing
         image.thumbnail_image(width, height: height, crop: :centre, **options)
       end
 
-      def resize_and_pad(image, width, height, background: "opaque", gravity: "centre", **options)
-        image.thumbnail_image(width, height: height, **options)
-          .gravity(gravity, width, height, extend: :background, background: Color.get(background))
+      def resize_and_pad(image, width, height, gravity: "centre", extend: nil, background: nil, alpha: nil, **options)
+        embed_options = { extend: extend, background: background }
+        embed_options.reject! { |name, value| value.nil? }
+
+        image = image.thumbnail_image(width, height: height, **options)
+        image = image.bandjoin(255) until image.bands >= 4 if alpha
+        image.gravity(gravity, width, height, **embed_options)
       end
 
       def load_image(file, autorot: true, **options)

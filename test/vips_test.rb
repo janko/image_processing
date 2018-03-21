@@ -228,15 +228,18 @@ describe "ImageProcessing::Vips" do
       assert_dimensions [1000, 1000], @pipeline.resize_and_pad!(1000, 1000)
     end
 
-    it "produces correct image" do
-      expected = fixture_image("pad.jpg")
-      assert_similar expected, @pipeline.resize_and_pad!(400, 400, background: "red")
+    it "produces correct image when shrinking" do
+      expected = fixture_image("pad.png")
+      assert_similar expected, @pipeline.convert("png").resize_and_pad!(400, 400, alpha: true)
+
+      png = @pipeline.bandjoin(255).convert!("png")
+      assert_similar expected, @pipeline.source(png).resize_and_pad!(400, 400, alpha: true)
     end
 
     it "produces correct image when enlarging" do
       @pipeline = ImageProcessing::Vips.source(@landscape)
       expected = fixture_image("pad-large.jpg")
-      assert_similar expected, @pipeline.resize_and_pad!(1000, 1000, background: "green")
+      assert_similar expected, @pipeline.resize_and_pad!(1000, 1000, background: [0, 255, 0])
     end
 
     it "accepts gravity" do
@@ -249,31 +252,6 @@ describe "ImageProcessing::Vips" do
       pad  = @pipeline.resize_and_pad!(400, 400)
       crop = @pipeline.resize_and_pad!(400, 400, crop: :centre)
       refute_similar pad, crop
-    end
-  end
-
-  describe "Color" do
-    it "returns rgb format of color" do
-      assert_equal [255, 250, 250], ImageProcessing::Vips::Color.get("snow")
-    end
-
-    it "accepts both spellings of grey" do
-      assert_equal [8, 8, 8],       ImageProcessing::Vips::Color.get("grey3")
-      assert_equal [112, 128, 144], ImageProcessing::Vips::Color.get("slategray")
-    end
-
-    it "accepts any casing" do
-      assert_equal [240, 128, 128], ImageProcessing::Vips::Color.get("LightCoral")
-    end
-
-    it "accepts actual rgb values" do
-      assert_equal [0, 0, 0], ImageProcessing::Vips::Color.get([0, 0, 0])
-    end
-
-    it "raise an error if color is not found" do
-      assert_raises ImageProcessing::Error do
-        ImageProcessing::Vips::Color.get("unknown")
-      end
     end
   end
 end

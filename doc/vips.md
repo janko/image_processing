@@ -109,8 +109,8 @@ See [`vips_thumbnail()`] for more details.
 #### `#resize_and_pad`
 
 Resizes the image to fit within the specified dimensions while retaining the
-original aspect ratio. If necessary, will pad the remaining area with the given
-color.
+original aspect ratio. If necessary, will pad the remaining area with
+transparent color if source image has alpha channel, black otherwise.
 
 ```rb
 pipeline = ImageProcessing::Vips.source(image) # 600x800
@@ -120,16 +120,22 @@ result = pipeline.resize_and_pad!(400, 400)
 Vips::Image.new_from_file(result.path).size #=> [400, 400]
 ```
 
-It accepts `:background` for specifying the background [color] that will be
-used for padding (defaults to black).
+If you're converting from a format that doesn't support transparent colors
+(e.g. JPEG) to a format that does (e.g. PNG), setting `:alpha` to `true` will
+add the alpha channel to the image:
 
 ```rb
-pipeline.resize_and_pad!(400, 400, color: "RoyalBlue")
-# or
-pipeline.resize_and_pad!(400, 400, color: [65, 105, 225])
+pipeline.resize_and_pad!(400, 400, alpha: true)
 ```
 
-It also accepts `:gravity` for specifying the [direction] where the source
+The `:extend` and `:background` options are also accepted and are forwarded to
+[`Vips::Image#gravity`]:
+
+```rb
+pipeline.resize_and_pad!(400, 400, extend: :copy)
+```
+
+The `:gravity` option can be used to specify the [direction] where the source
 image will be positioned (defaults to `"centre"`).
 
 ```rb
@@ -252,8 +258,7 @@ vips_image.write_to_file("/path/to/destination", **options)
 [`Vips::Image.new_from_file`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#new_from_file-class_method
 [`Vips::Image#write_to_file`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#write_to_file-instance_method
 [`Vips::Image#thumbnail_image`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
-[`Vips::Image#set`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#set-instance_method
-[`Vips::Image#set_type`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#set_type-instance_method
+[`Vips::Image#gravity`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#gravity-instance_method
 [`vips_thumbnail()`]: https://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
 [`vips_gravity()`]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-gravity
 [`vips_autorot()`]: https://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
@@ -261,5 +266,4 @@ vips_image.write_to_file("/path/to/destination", **options)
 [`vips_pngload()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngload
 [`vips_jpegsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
 [`vips_pngsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngsave
-[color]: https://www.imagemagick.org/script/color.php#color_names
 [direction]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#VipsCompassDirection
