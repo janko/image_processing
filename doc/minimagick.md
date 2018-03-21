@@ -135,7 +135,7 @@ the source file doesn't have a file extension, the format will default to JPEG.
 
 #### `#method_missing`
 
-Any unknown methods will be appended directly as `convert`/`magick` options.
+Any unknown methods will be delegated to [`MiniMagick::Tool::Convert`].
 
 ```rb
 ImageProcessing::MiniMagick
@@ -199,9 +199,40 @@ ImageProcessing::MiniMagick
   .loader(page: 0, geometry: "300x300")
 ```
 
+If you would like to have more control over loading, you can create the
+`MiniMagick::Tool` object directly, and just pass it as the source file.
+
+```rb
+magick = MiniMagick::Tool::Convert.new
+magick << "..." << "..." << "..."
+
+ImageProcessing::MiniMagick
+  .source(magick)
+  # ...
+```
+
+#### `#saver`
+
+ImageMagick doesn't have any special saver options.
+
+If you would like to have more control over saving, you can call `#call(save:
+false)` to get the `MiniMagick::Tool` object, and finish saving yourself.
+
+```rb
+magick = ImageProcessing::MiniMagick
+  .resize_to_limit(400, 400)
+  .call(save: false)
+
+magick #=> #<MiniMagick::Tool::Convert ...>
+
+magick << "output.png"
+magick.call
+```
+
 [MiniMagick]: https://github.com/minimagick/minimagick
 [ImageMagick]: https://www.imagemagick.org
 [GraphicsMagick]: http://www.graphicsmagick.org
 [installation instructions]: https://www.imagemagick.org/script/download.php
 [gravity]: https://www.imagemagick.org/script/command-line-options.php#gravity
 [color]: https://www.imagemagick.org/script/color.php
+[`MiniMagick::Tool::Convert`]: https://github.com/minimagick/minimagick#metal

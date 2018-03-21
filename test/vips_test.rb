@@ -1,6 +1,5 @@
 require "test_helper"
 require "image_processing/vips"
-require "mini_magick"
 
 describe "ImageProcessing::Vips" do
   before do
@@ -45,6 +44,20 @@ describe "ImageProcessing::Vips" do
     assert_type "PNG", result
   end
 
+  it "auto rotates by default" do
+    result = ImageProcessing::Vips.call(fixture_image("rotated.jpg"))
+    assert_dimensions [600, 800], result
+
+    result = ImageProcessing::Vips.loader(autorot: false).call(fixture_image("rotated.jpg"))
+    assert_dimensions [800, 600], result
+  end
+
+  it "accepts Vips::Image as source" do
+    vips_image = Vips::Image.new_from_file(fixture_image("rotated.jpg").path)
+    result = ImageProcessing::Vips.source(vips_image).call
+    assert_dimensions [600, 800], result
+  end
+
   it "applies loader options" do
     result = ImageProcessing::Vips.loader(shrink: 2).call(@portrait)
     assert_dimensions [300, 400], result
@@ -60,14 +73,6 @@ describe "ImageProcessing::Vips" do
     assert_includes error.message, "not a known file format"
   end
 
-  it "auto rotates by default" do
-    result = ImageProcessing::Vips.call(fixture_image("rotated.jpg"))
-    assert_dimensions [600, 800], result
-
-    result = ImageProcessing::Vips.loader(autorot: false).call(fixture_image("rotated.jpg"))
-    assert_dimensions [800, 600], result
-  end
-
   it "applies saver options" do
     result = ImageProcessing::Vips.saver(strip: true).call(@portrait)
     refute_includes Vips::Image.new_from_file(result.path).get_fields, "exif-data"
@@ -80,16 +85,6 @@ describe "ImageProcessing::Vips" do
   it "raises correct Vips::Error on unknown saver" do
     error = assert_raises(Vips::Error) { ImageProcessing::Vips.convert("foo").call(@portrait) }
     assert_includes error.message, "No known saver"
-  end
-
-  it "fails on invalid source" do
-    assert_raises(ImageProcessing::Error) do
-      ImageProcessing::Vips.call(StringIO.new)
-    end
-
-    assert_raises(ImageProcessing::Error) do
-      ImageProcessing::Vips.source(StringIO.new).call
-    end
   end
 
   it "fails for corrupted files" do

@@ -1,5 +1,6 @@
 require "test_helper"
 require "image_processing/vips"
+require "pathname"
 
 describe "ImageProcessing::Pipeline" do
   before do
@@ -9,6 +10,13 @@ describe "ImageProcessing::Pipeline" do
   it "accepts source" do
     pipeline = ImageProcessing::Vips.source(@portrait)
     assert_equal @portrait, pipeline.default_options[:source]
+  end
+
+  it "accepts File, Tempfile, String, and Pathname objects as source" do
+    ImageProcessing::Vips.source(@portrait).call
+    ImageProcessing::Vips.source(copy_to_tempfile(@portrait, "jpg")).call
+    ImageProcessing::Vips.source(@portrait.path).call
+    ImageProcessing::Vips.source(Pathname(@portrait.path)).call
   end
 
   it "accepts format" do
@@ -132,21 +140,14 @@ describe "ImageProcessing::Pipeline" do
     assert_equal File.binread(tempfile.path), tempfile.read
   end
 
-  it "returns a Vips::Image on #call(save: false)" do
-    vips_image = ImageProcessing::Vips
-      .resize_to_limit(400, 400)
-      .call(@portrait, save: false)
-
+  it "returns an intermediary object on #call(save: false)" do
+    vips_image = ImageProcessing::Vips.resize_to_limit(400, 400).call(@portrait, save: false)
     assert_instance_of Vips::Image, vips_image
     assert_equal [300, 400], vips_image.size
 
-    vips_image = ImageProcessing::Vips
-      .source(@portrait)
-      .resize_to_limit(400, 400)
-      .call(save: false)
-
-    assert_instance_of Vips::Image, vips_image
-    assert_equal [300, 400], vips_image.size
+    magick = ImageProcessing::MiniMagick.source(@portrait).resize_to_limit(400, 400).call(save: false)
+    assert_instance_of MiniMagick::Tool::Convert, magick
+    assert_includes magick.args, "400x400>"
   end
 
   it "raises exception when source was not provided" do

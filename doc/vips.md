@@ -275,6 +275,8 @@ vips_image = ImageProcessing::Vips
   .resize_to_limit(400, 400)
   .call(save: false)
 
+vips_image #=> #<Vips::Image ...>
+
 vips_image.write_to_file("/path/to/destination", **options)
 ```
 

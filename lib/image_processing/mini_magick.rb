@@ -18,6 +18,7 @@ module ImageProcessing
     end
 
     class Processor
+      IMAGE_CLASS = ::MiniMagick::Tool
       TRANSPARENT = "rgba(255,255,255,0.0)"
 
       def apply_operation(name, magick, *args)
@@ -56,17 +57,21 @@ module ImageProcessing
         magick.merge! args
       end
 
-      def load_image(file, page: nil, geometry: nil, fail: true, auto_orient: true)
-        fail(Error, "source file needs to respond to #path") unless file.respond_to?(:path)
+      def load_image(path_or_magick, page: nil, geometry: nil, fail: true, auto_orient: true)
+        if path_or_magick.is_a?(::MiniMagick::Tool)
+          magick = path_or_magick
+        else
+          path   = path_or_magick
+          magick = ::MiniMagick::Tool::Convert.new
 
-        magick = ::MiniMagick::Tool::Convert.new
+          input_path  = path
+          input_path += "[#{page}]" if page
+          input_path += "[#{geometry}]" if geometry
+
+          magick << input_path
+        end
+
         magick.regard_warnings if fail
-
-        input_path  = file.path
-        input_path += "[#{page}]" if page
-        input_path += "[#{geometry}]" if geometry
-
-        magick << input_path
         magick.auto_orient if auto_orient
 
         magick

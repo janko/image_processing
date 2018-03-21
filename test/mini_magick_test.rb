@@ -1,6 +1,5 @@
 require "test_helper"
 require "image_processing/mini_magick"
-require "stringio"
 
 describe "ImageProcessing::MiniMagick" do
   include ImageProcessing::MiniMagick
@@ -83,6 +82,13 @@ describe "ImageProcessing::MiniMagick" do
     assert_dimensions [800, 600], result
   end
 
+  it "accepts magick object as source" do
+    magick = MiniMagick::Tool::Convert.new
+    magick << fixture_image("rotated.jpg").path
+    result = ImageProcessing::MiniMagick.source(magick).call
+    assert_dimensions [600, 800], result
+  end
+
   it "fails for corrupted files" do
     corrupted = fixture_image("corrupted.jpg")
     pipeline = ImageProcessing::MiniMagick.source(corrupted)
@@ -93,15 +99,6 @@ describe "ImageProcessing::MiniMagick" do
     corrupted = fixture_image("corrupted.jpg")
     pipeline = ImageProcessing::MiniMagick.source(corrupted).loader(fail: false)
     pipeline.resize_to_limit!(400, 400)
-  end
-
-  it "fails for invalid source" do
-    assert_raises(ImageProcessing::Error) do
-      ImageProcessing::MiniMagick.call(StringIO.new)
-    end
-    assert_raises(ImageProcessing::Error) do
-      ImageProcessing::MiniMagick.source(StringIO.new).call
-    end
   end
 
   describe ".valid_image?" do

@@ -50,14 +50,14 @@ The processing is executed on `#call` or when a processing method is called
 with a bang (`!`).
 
 ```rb
-processed = ImageProcessing::Vips
+processed = ImageProcessing::MiniMagick
   .convert("png")
   .resize_to_limit(400, 400)
   .call(image)
 
 # OR
 
-processed = ImageProcessing::Vips
+processed = ImageProcessing::MiniMagick
   .source(image) # declare source image
   .convert("png")
   .resize_to_limit(400, 400)
@@ -65,25 +65,31 @@ processed = ImageProcessing::Vips
 
 # OR
 
-processed = ImageProcessing::Vips
+processed = ImageProcessing::MiniMagick
   .source(image)
   .convert("png")
   .resize_to_limit!(400, 400) # bang method
 ```
 
-The source image needs to be an object that responds to `#path`, and the
-processing result is a `Tempfile` object.
+The source object needs to responds to `#path`, or be a String, a Pathname, or
+a `Vips::Image`/`MiniMagick::Tool` object. The result of processing is a
+`Tempfile` object, or a `Vips::Image`/`MiniMagick::Tool` if `:save` was set to
+`false`.
 
 ```rb
 pipeline = ImageProcessing::Vips.source(image)
+
 tempfile = pipeline.call
 tempfile #=> #<Tempfile ...>
+
+tempfile = pipeline.call(save: false)
+tempfile #=> #<Vips::Image ...>
 ```
 
 You can continue reading the API documentation for specific modules:
 
-* **[ImageProcessing::Vips](/doc/vips.md#imageprocessingvips)**
-* **[ImageProcessing::MiniMagick](/doc/minimagick.md#imageprocessingminimagick)**
+* **[ImageProcessing::Vips]**
+* **[ImageProcessing::MiniMagick]**
 
 ## Contributing
 
@@ -112,4 +118,6 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [ImageMagick]: https://www.imagemagick.org
 [GraphicsMagick]: http://www.graphicsmagick.org
 [VIPS]: http://jcupitt.github.io/libvips/
+[ImageProcessing::Vips]: /doc/vips.md#imageprocessingvips
+[ImageProcessing::MiniMagick]: /doc/minimagick.md#imageprocessingminimagick
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick

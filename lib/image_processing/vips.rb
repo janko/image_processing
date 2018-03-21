@@ -15,6 +15,7 @@ module ImageProcessing
     end
 
     class Processor
+      IMAGE_CLASS = ::Vips::Image
       # libvips has this arbitrary number as a sanity-check upper bound on image
       # size.
       MAX_COORD = 10_000_000
@@ -51,17 +52,18 @@ module ImageProcessing
         image.gravity(gravity, width, height, **embed_options)
       end
 
-      def load_image(file, autorot: true, **options)
-        return file if file.is_a?(::Vips::Image)
+      def load_image(path_or_image, autorot: true, **options)
+        if path_or_image.is_a?(::Vips::Image)
+          image = path_or_image
+        else
+          path    = path_or_image
+          loader  = ::Vips.vips_foreign_find_load(path)
+          options = select_valid_options(loader, options) if loader
 
-        fail Error, "source file needs to respond to #path or be a Vips::Image" unless file.respond_to?(:path)
+          image = ::Vips::Image.new_from_file(path, fail: true, **options)
+        end
 
-        loader  = ::Vips.vips_foreign_find_load(file.path)
-        options = select_valid_options(loader, options) if loader
-
-        image = ::Vips::Image.new_from_file(file.path, fail: true, **options)
         image = image.autorot if autorot
-
         image
       end
 
