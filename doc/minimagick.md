@@ -49,7 +49,7 @@ pipeline.resize_to_limit!(nil, 400)
 #### `#resize_to_fit`
 
 Resizes the image to fit within the specified dimensions while retaining the
-*original aspect ratio. Will downsize the image if it's larger than the
+original aspect ratio. Will downsize the image if it's larger than the
 specified dimensions or upsize if it's smaller.
 
 ```rb
@@ -179,14 +179,24 @@ It accepts the following options:
 * `:auto_orient` -- whether the image should be automatically oriented after it's loaded (defaults to `true`)
 
 ```rb
-ImageProcessing::MiniMagick.source(document).loader(page: 0).convert!("png")
+ImageProcessing::MiniMagick.loader(page: 0).convert("png").call(pdf)
 # convert input.pdf[0] output.png
 
-ImageProcessing::MiniMagick.source(image).loader(geometry: "300x300").convert!("png")
-# convert input.jpg[300x300] output.png
+ImageProcessing::MiniMagick.loader(geometry: "300x300").call(image)
+# convert input.jpg[300x300] output.jpg
+```
 
-ImageProcessing::MiniMagick.source(image).loader(fail: false).convert!("png")
-# convert -regard-warnings input.jpg output.png (raises MiniMagick::Error in case of warnings)
+If the `#loader` clause is repeated multiple times, the options are merged.
+
+```rb
+ImageProcessing::MiniMagick
+  .loader(page: 0)
+  .loader(geometry: "300x300")
+
+# resolves to
+
+ImageProcessing::MiniMagick
+  .loader(page: 0, geometry: "300x300")
 ```
 
 [MiniMagick]: https://github.com/minimagick/minimagick
@@ -194,4 +204,4 @@ ImageProcessing::MiniMagick.source(image).loader(fail: false).convert!("png")
 [GraphicsMagick]: http://www.graphicsmagick.org
 [installation instructions]: https://www.imagemagick.org/script/download.php
 [gravity]: https://www.imagemagick.org/script/command-line-options.php#gravity
-[color]: https://www.imagemagick.org/script/color.php#color_names
+[color]: https://www.imagemagick.org/script/color.php

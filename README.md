@@ -76,12 +76,8 @@ processing result is a `Tempfile` object.
 
 ```rb
 pipeline = ImageProcessing::Vips.source(image)
-
 tempfile = pipeline.call
 tempfile #=> #<Tempfile ...>
-
-vips_image = pipeline.call(save: false)
-vips_image #=> #<Vips::Image ...>
 ```
 
 You can continue reading the API documentation for specific modules:

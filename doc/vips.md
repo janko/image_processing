@@ -201,6 +201,19 @@ ImageProcessing::Vips
   # ...
 ```
 
+If the `#loader` clause is specified multiple times, the options are merged.
+
+```rb
+ImageProcessing::Vips
+  .loader(page: 0)
+  .loader(dpi: 300)
+
+# resolves to
+
+ImageProcessing::Vips
+  .loader(page: 0, dpi: 300)
+```
+
 See [`vips_jpegload()`], [`vips_pngload()`] etc. for more details on
 format-specific load options. Note that `:fail` is set to `true` by default.
 Any provided options that are not defined for a specific loader will be ignored.
@@ -234,6 +247,20 @@ Specifies options that will be forwarded to [`Vips::Image#write_to_file`].
 ```rb
 ImageProcessing::Vips
   .saver(Q: 100, interlace: true)
+  # ...
+```
+
+If the `#saver` clause is repeated multiple times, the options are merged.
+
+```rb
+ImageProcessing::Vips
+  .saver(tile: true)
+  .saver(compression: :lzw)
+
+# resolves to
+
+ImageProcessing::Vips
+  .saver(tile: true, compression: :lzw)
 ```
 
 See [`vips_jpegsave()`], [`vips_pngsave()`] etc. for more details on
