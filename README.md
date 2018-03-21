@@ -16,8 +16,8 @@ gem "image_processing"
 
 ## Usage
 
-Processing is performed through `ImageProcessing::Vips` or
-`ImageProcessing::MiniMagick` modules. Both modules share the same chainable
+Processing is performed through [`ImageProcessing::Vips`] or
+[`ImageProcessing::MiniMagick`] modules. Both modules share the same chainable
 API for defining the processing pipeline:
 
 ```rb
@@ -96,8 +96,8 @@ pipeline.call(destination: "/path/to/destination")
 
 You can continue reading the API documentation for specific modules:
 
-* **[ImageProcessing::Vips]**
-* **[ImageProcessing::MiniMagick]**
+* **[`ImageProcessing::Vips`]**
+* **[`ImageProcessing::MiniMagick`]**
 
 ## Contributing
 
@@ -126,6 +126,6 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [ImageMagick]: https://www.imagemagick.org
 [GraphicsMagick]: http://www.graphicsmagick.org
 [VIPS]: http://jcupitt.github.io/libvips/
-[ImageProcessing::Vips]: /doc/vips.md#imageprocessingvips
-[ImageProcessing::MiniMagick]: /doc/minimagick.md#imageprocessingminimagick
+[`ImageProcessing::Vips`]: /doc/vips.md#imageprocessingvips
+[`ImageProcessing::MiniMagick`]: /doc/minimagick.md#imageprocessingminimagick
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick
