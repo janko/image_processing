@@ -191,7 +191,7 @@ ImageProcessing::Vips
   # ...
 ```
 
-### `#loader`
+#### `#loader`
 
 Specifies options that will be forwarded to [`Vips::Image.new_from_file`].
 
