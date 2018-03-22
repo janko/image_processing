@@ -21,7 +21,7 @@ module ImageProcessing
             instance_exec(file, *args, block, &body)
           else
             Utils.copy_to_tempfile(file) do |tempfile|
-              send(name, tempfile, *args, &block)
+              instance_exec(tempfile, *args, block, &body)
             end
           end
         end
