@@ -87,7 +87,7 @@ module ImageProcessing
           .resample!("#{width}x#{height}")
       end
 
-      deprecated_processing_method :crop do |file, width, height, x_offset, y_offset, block|
+      deprecated_processing_method :crop do |file, width, height, x_offset = 0, y_offset = 0, block|
         source(file)
           .custom(&block)
           .crop!("#{width}x#{height}+#{x_offset}+#{y_offset}")
