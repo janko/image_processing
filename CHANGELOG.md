@@ -1,3 +1,7 @@
+## 0.10.2 (2018-03-22)
+
+* [minimagick] Add back default offset arguments to deprecated `#crop` (@janko-m)
+
 ## 0.10.1 (2018-03-22)
 
 * [minimagick] Don't print deprecation warning for old API twice when IO objects are used (@janko-m)
