@@ -1,3 +1,7 @@
+## 0.10.1 (2018-03-22)
+
+* [minimagick] Don't print deprecation warning for old API twice when IO objects are used (@janko-m)
+
 ## 0.10.0 (2018-03-21)
 
 * [minimagick] Rewrite MiniMagick module to use the chainable API (@janko-m)
