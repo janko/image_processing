@@ -1,4 +1,4 @@
-# ImageProcesing::Vips
+# ImageProcessing::Vips
 
 The `ImageProcessing::Vips` module contains processing macros that use the
 [ruby-vips] gem, which you need to install:
