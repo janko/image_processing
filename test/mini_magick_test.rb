@@ -288,4 +288,40 @@ describe "ImageProcessing::MiniMagick" do
       assert_similar expected, ImageProcessing::MiniMagick.resize_and_pad(StringIO.new(File.binread(@portrait.path)), 400, 400)
     end
   end
+
+  describe "#auto_orient" do
+    deprecated "still supports the legacy API" do
+      auto_orient(@portrait)
+      auto_orient!(copy_to_tempfile(@portrait, ".jpg"))
+      auto_orient(StringIO.new(File.binread(@portrait.path)))
+
+      ImageProcessing::MiniMagick.auto_orient(@portrait)
+      ImageProcessing::MiniMagick.auto_orient!(copy_to_tempfile(@portrait, ".jpg"))
+      ImageProcessing::MiniMagick.auto_orient(StringIO.new(File.binread(@portrait.path)))
+    end
+  end
+
+  describe "#resample" do
+    deprecated "still supports the legacy API" do
+      resample(@portrait, 400, 400)
+      resample!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      resample(StringIO.new(File.binread(@portrait.path)), 400, 400)
+
+      ImageProcessing::MiniMagick.resample(@portrait, 400, 400)
+      ImageProcessing::MiniMagick.resample!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      ImageProcessing::MiniMagick.resample(StringIO.new(File.binread(@portrait.path)), 400, 400)
+    end
+  end
+
+  describe "#crop" do
+    deprecated "still supports the legacy API" do
+      crop(@portrait, 400, 400)
+      crop!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      crop(StringIO.new(File.binread(@portrait.path)), 400, 400)
+
+      ImageProcessing::MiniMagick.crop(@portrait, 400, 400)
+      ImageProcessing::MiniMagick.crop!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
+      ImageProcessing::MiniMagick.crop(StringIO.new(File.binread(@portrait.path)), 400, 400)
+    end
+  end
 end
