@@ -1,3 +1,7 @@
+## 0.10.3 (2018-03-24)
+
+* [minimagick] Fix bang methods in deprecated API calling nondestructive versions (@janko-m)
+
 ## 0.10.2 (2018-03-22)
 
 * [minimagick] Add back default offset arguments to deprecated `#crop` (@janko-m)
