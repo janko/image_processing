@@ -27,7 +27,7 @@ module ImageProcessing
         end
 
         define_method("#{name}!") do |*args, &block|
-          return ImageProcessing::MiniMagick.send(name, *args, &block) if self != ImageProcessing::MiniMagick
+          return ImageProcessing::MiniMagick.send("#{name}!", *args, &block) if self != ImageProcessing::MiniMagick
           return super(*args, &block) unless args.first.respond_to?(:read)
 
           processed = send(name, *args, &block)
