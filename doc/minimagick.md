@@ -11,6 +11,20 @@ gem "mini_magick", "~> 4.0"
 You'll need to have [ImageMagick] or [GraphicsMagick] installed, see the
 [installation instructions] for more details.
 
+When generating thumbnails from JPEG images, it's recommended to tell the JPEG
+image library the maximum dimensions that need to be loaded, so that it can
+avoid loading the whole image into memory.
+
+```rb
+pipeline = ImageProcessing::MiniMagick
+  .source(image)
+  .loader(define: { jpeg: { size: "800x800" } }) # avoids loading the whole JPEG into memory
+
+size_800 = pipeline.resize_to_limit!(800, 800)
+size_500 = pipeline.resize_to_limit!(500, 500)
+size_300 = pipeline.resize_to_limit!(300, 300)
+```
+
 ## Methods
 
 #### `.valid_image?`
@@ -171,19 +185,38 @@ ImageProcessing::MiniMagick
 
 #### `#loader`
 
-It accepts the following options:
+It accepts the following special options:
 
 * `:page` -- specific page(s) that should be loaded
 * `:geometry` -- geometry that should be applied when loading
 * `:fail` -- whether processing should fail on warnings (defaults to `true`)
 * `:auto_orient` -- whether the image should be automatically oriented after it's loaded (defaults to `true`)
+* `:define` -- creates definitions that coders and decoders use for reading and writing image data
 
 ```rb
 ImageProcessing::MiniMagick.loader(page: 0).convert("png").call(pdf)
-# convert input.pdf[0] output.png
+# convert input.pdf[0] -regard-warnings -auto-orient output.png
 
 ImageProcessing::MiniMagick.loader(geometry: "300x300").call(image)
-# convert input.jpg[300x300] output.jpg
+# convert input.jpg[300x300] -regard-warnings -auto-orient output.jpg
+
+ImageProcessing::MiniMagick.loader(fail: false).call(image)
+# convert input.jpg -auto-orient output.jpg
+
+ImageProcessing::MiniMagick.loader(auto_orient: false).call(image)
+# convert input.jpg -regard-warnings output.jpg
+
+ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "300x300" } }).call(image)
+# convert -define jpeg:size=300x300 input.jpg -regard-warnings -auto-orient output.jpg
+```
+
+All other options given will be interpreted as direct options to be applied
+before the image is loaded.
+
+```rb
+ImageProcessing::MiniMagick
+  .loader(strip: true, type: "TrueColorMatte")
+  .call(image) # convert -strip -type TrueColorMatte input.jpg ... output.jpg
 ```
 
 If the `#loader` clause is repeated multiple times, the options are merged.
@@ -213,7 +246,24 @@ ImageProcessing::MiniMagick
 
 #### `#saver`
 
-ImageMagick doesn't have any special saver options.
+It accepts the following special options:
+
+* `:define` -- definitions that coders and decoders use for reading and writing image data
+
+```rb
+ImageProcessing::MiniMagick.saver(define: { jpeg: { optimize_coding: false } }).call(image)
+# convert input.jpg -regard-warnings -auto-orient -define jpeg:optimize-coding=false output.jpg
+```
+
+All other options given will be interpreted as direct options to be applied
+before the image is saved. This is the same as applying the options via the
+chainable API.
+
+```rb
+ImageProcessing::MiniMagick
+  .saver(quality: 80, interlace: "Line")
+  .call(image) # convert input.jpg ... -quality 80 -interlace Line output.jpg
+```
 
 If you would like to have more control over saving, you can call `#call(save:
 false)` to get the `MiniMagick::Tool` object, and finish saving yourself.

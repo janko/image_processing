@@ -83,6 +83,40 @@ describe "ImageProcessing::MiniMagick" do
     assert_dimensions [800, 600], result
   end
 
+  it "applies loader options" do
+    result = ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "100x100" } }).call(@portrait)
+    assert_dimensions [150, 200], result
+
+    result = ImageProcessing::MiniMagick.loader(strip: true).call(@portrait)
+    assert_empty MiniMagick::Image.new(result.path).exif
+
+    result = ImageProcessing::MiniMagick.loader(strip: false).call(@portrait)
+    assert_empty MiniMagick::Image.new(result.path).exif
+
+    result = ImageProcessing::MiniMagick.loader(colorspace: "Gray").call(@portrait)
+    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"]
+
+    result = ImageProcessing::MiniMagick.loader(set: ["comment", "This is a comment"]).call(@portrait)
+    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"]
+  end
+
+  it "applies saver options" do
+    result = ImageProcessing::MiniMagick.saver(define: { jpeg: { fancy_unsampling: "off", extent: "20KB" } }).call(@portrait)
+    assert_operator result.size, :<, 20*1024
+
+    result = ImageProcessing::MiniMagick.saver(strip: true).call(@portrait)
+    assert_empty MiniMagick::Image.new(result.path).exif
+
+    result = ImageProcessing::MiniMagick.saver(strip: false).call(@portrait)
+    assert_empty MiniMagick::Image.new(result.path).exif
+
+    result = ImageProcessing::MiniMagick.saver(colorspace: "Gray").call(@portrait)
+    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"]
+
+    result = ImageProcessing::MiniMagick.saver(set: ["comment", "This is a comment"]).call(@portrait)
+    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"]
+  end
+
   it "accepts magick object as source" do
     magick = MiniMagick::Tool::Convert.new
     magick << fixture_image("rotated.jpg").path

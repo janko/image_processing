@@ -1,3 +1,7 @@
+## HEAD
+
+* [minimagick] Add loader and saver options (@janko-m)
+
 ## 0.10.3 (2018-03-24)
 
 * [minimagick] Fix bang methods in deprecated API calling nondestructive versions (@janko-m)
