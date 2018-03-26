@@ -211,7 +211,8 @@ ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "300x300" } }).call(i
 ```
 
 All other options given will be interpreted as direct options to be applied
-before the image is loaded.
+before the image is loaded (see [Reading JPEG Control Options] for some
+examples).
 
 ```rb
 ImageProcessing::MiniMagick
@@ -256,8 +257,8 @@ ImageProcessing::MiniMagick.saver(define: { jpeg: { optimize_coding: false } }).
 ```
 
 All other options given will be interpreted as direct options to be applied
-before the image is saved. This is the same as applying the options via the
-chainable API.
+before the image is saved (see [Writing JPEG Control Options] for some
+examples). This is the same as applying the options via the chainable API.
 
 ```rb
 ImageProcessing::MiniMagick
@@ -286,3 +287,5 @@ magick.call
 [gravity]: https://www.imagemagick.org/script/command-line-options.php#gravity
 [color]: https://www.imagemagick.org/script/color.php
 [`MiniMagick::Tool::Convert`]: https://github.com/minimagick/minimagick#metal
+[Reading JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_read
+[Writing JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_write
