@@ -30,15 +30,15 @@ module ImageProcessing
       end
 
       def resize_to_limit(magick, width, height)
-        magick.resize "#{width}x#{height}>"
+        magick.thumbnail "#{width}x#{height}>"
       end
 
       def resize_to_fit(magick, width, height)
-        magick.resize "#{width}x#{height}"
+        magick.thumbnail "#{width}x#{height}"
       end
 
       def resize_to_fill(magick, width, height, gravity: "Center")
-        magick.resize "#{width}x#{height}^"
+        magick.thumbnail "#{width}x#{height}^"
         magick.gravity gravity
         magick.background TRANSPARENT
         magick.extent "#{width}x#{height}"
@@ -47,7 +47,7 @@ module ImageProcessing
       def resize_and_pad(magick, width, height, background: TRANSPARENT, gravity: "Center")
         background = TRANSPARENT if background == "transparent"
 
-        magick.resize "#{width}x#{height}"
+        magick.thumbnail "#{width}x#{height}"
         magick.background background
         magick.gravity gravity
         magick.extent "#{width}x#{height}"

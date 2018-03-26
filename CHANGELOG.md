@@ -1,5 +1,7 @@
 ## HEAD
 
+* [minimagick] Use `-thumbnail` instead of `-resize` in `#resize_*` methods (@janko-m)
+
 * [minimagick] Add loader and saver options (@janko-m)
 
 ## 0.10.3 (2018-03-24)
