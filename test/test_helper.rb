@@ -8,6 +8,8 @@ require "minitest/pride"
 require "minitest/hooks/default"
 require "minispec-metadata"
 
+ENV["VIPS_WARNING"] = "0" # disable libvips warnings
+
 require "phashion" unless RUBY_ENGINE == "jruby"
 require "vips"
 require "mini_magick"
