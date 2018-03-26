@@ -57,8 +57,7 @@ module ImageProcessing
           image = path_or_image
         else
           source_path = path_or_image
-          loader  = ::Vips.vips_foreign_find_load(source_path)
-          options = select_valid_options(loader, options) if loader
+          options     = select_valid_loader_options(source_path, options)
 
           image = ::Vips::Image.new_from_file(source_path, fail: true, **options)
         end
@@ -68,8 +67,7 @@ module ImageProcessing
       end
 
       def save_image(image, destination_path, **options)
-        saver   = ::Vips.vips_foreign_find_save(destination_path)
-        options = select_valid_options(saver, options) if saver
+        options = select_valid_saver_options(destination_path, options)
 
         image.write_to_file(destination_path, **options)
       end
@@ -80,6 +78,16 @@ module ImageProcessing
         raise Error, "either width or height must be specified" unless width || height
 
         [width || MAX_COORD, height || MAX_COORD]
+      end
+
+      def select_valid_loader_options(source_path, options)
+        loader = ::Vips.vips_foreign_find_load(source_path)
+        loader ? select_valid_options(loader, options) : options
+      end
+
+      def select_valid_saver_options(destination_path, options)
+        saver = ::Vips.vips_foreign_find_save(destination_path)
+        saver ? select_valid_options(saver, options) : options
       end
 
       def select_valid_options(operation_name, options)
