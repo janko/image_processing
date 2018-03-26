@@ -323,6 +323,14 @@ describe "ImageProcessing::MiniMagick" do
     end
   end
 
+  describe "#limit" do
+    it "adds resource limits" do
+      pipeline = ImageProcessing::MiniMagick.limit(time: 0.001).source(@portrait)
+      exception = assert_raises(MiniMagick::Error) { pipeline.call }
+      assert_includes exception.message, "time limit exceeded"
+    end
+  end
+
   describe "#auto_orient" do
     deprecated "still supports the legacy API" do
       auto_orient(@portrait)

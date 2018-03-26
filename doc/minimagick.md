@@ -281,6 +281,19 @@ magick << "output.png"
 magick.call
 ```
 
+#### `#limit`
+
+Sets the pixel cache resource limits for the ImageMagick command.
+
+```rb
+ImageProcessing::MiniMagick
+  .limit(memory: "50MiB", width: "10MP", time: 30)
+  .resize_to_limit(400, 400)
+  .call(image) # convert -limit memory 50MiB -limit width 10MP -limit time 30 input.jpg ... output.jpg
+```
+
+See the [`-limit`] documentation and the [Architecture] article.
+
 [MiniMagick]: https://github.com/minimagick/minimagick
 [ImageMagick]: https://www.imagemagick.org
 [GraphicsMagick]: http://www.graphicsmagick.org
@@ -290,3 +303,5 @@ magick.call
 [`MiniMagick::Tool::Convert`]: https://github.com/minimagick/minimagick#metal
 [Reading JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_read
 [Writing JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_write
+[`-limit`]: https://www.imagemagick.org/script/command-line-options.php#limit
+[Architecture]: https://www.imagemagick.org/script/architecture.php#cache

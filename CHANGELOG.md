@@ -1,5 +1,7 @@
 ## HEAD
 
+* [minimagick] Add `#limit` for specifying resource limits using `-limit` (@janko-m)
+
 * [minimagick] Use `-thumbnail` instead of `-resize` in `#resize_*` methods (@janko-m)
 
 * [minimagick] Add loader and saver options (@janko-m)
