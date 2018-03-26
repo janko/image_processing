@@ -305,7 +305,7 @@ describe "ImageProcessing::MiniMagick" do
     end
 
     it "accepts transparent color" do
-      transparent = @pipeline.resize_and_pad!(400, 400, background: "transparent")
+      transparent = @pipeline.resize_and_pad!(400, 400, background: :transparent)
       default     = @pipeline.resize_and_pad!(400, 400)
       assert_similar transparent, default
     end
