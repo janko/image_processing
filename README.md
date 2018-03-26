@@ -99,7 +99,7 @@ You can continue reading the API documentation for specific modules:
 * **[`ImageProcessing::Vips`]**
 * **[`ImageProcessing::MiniMagick`]**
 
-See the [wiki] for additional "How To" guides for common scenarios.
+See the **[wiki]** for additional "How To" guides for common scenarios.
 
 ## Contributing
 
