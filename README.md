@@ -131,4 +131,4 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [`ImageProcessing::Vips`]: /doc/vips.md#imageprocessingvips
 [`ImageProcessing::MiniMagick`]: /doc/minimagick.md#imageprocessingminimagick
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick
-[wiki]: /wiki
+[wiki]: https://github.com/janko-m/image_processing/wiki
