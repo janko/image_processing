@@ -19,7 +19,6 @@ module ImageProcessing
 
     class Processor
       IMAGE_CLASS = ::MiniMagick::Tool
-      TRANSPARENT = "rgba(255,255,255,0.0)"
 
       def apply_operation(name, magick, *args)
         if respond_to?(name)
@@ -40,12 +39,12 @@ module ImageProcessing
       def resize_to_fill(magick, width, height, gravity: "Center")
         magick.thumbnail "#{width}x#{height}^"
         magick.gravity gravity
-        magick.background TRANSPARENT
+        magick.background "rgba(255,255,255,0.0)" # transparent
         magick.extent "#{width}x#{height}"
       end
 
-      def resize_and_pad(magick, width, height, background: TRANSPARENT, gravity: "Center")
-        background = TRANSPARENT if background == "transparent"
+      def resize_and_pad(magick, width, height, background: :transparent, gravity: "Center")
+        background = "rgba(255,255,255,0.0)" if background.to_s == "transparent"
 
         magick.thumbnail "#{width}x#{height}"
         magick.background background

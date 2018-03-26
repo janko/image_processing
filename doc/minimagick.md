@@ -121,7 +121,8 @@ It accepts `:background` for specifying the background [color] that will be
 used for padding (defaults to transparent/white).
 
 ```rb
-pipeline.resize_and_pad!(400, 400, color: "RoyalBlue")
+pipeline.resize_and_pad!(400, 400, background: "RoyalBlue")
+pipeline.resize_and_pad!(400, 400, background: :transparent) # default
 ```
 
 It accepts `:gravity` for specifying the [gravity] to apply while cropping
