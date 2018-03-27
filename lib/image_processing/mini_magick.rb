@@ -52,8 +52,8 @@ module ImageProcessing
         magick.extent "#{width}x#{height}"
       end
 
-      def limit(magick, limits)
-        limit_args = limits.flat_map { |type, value| %W[-limit #{type} #{value}] }
+      def limits(magick, options)
+        limit_args = options.flat_map { |type, value| %W[-limit #{type} #{value}] }
         magick.args.replace limit_args + magick.args
         magick
       end

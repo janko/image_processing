@@ -281,13 +281,13 @@ magick << "output.png"
 magick.call
 ```
 
-#### `#limit`
+#### `#limits`
 
 Sets the pixel cache resource limits for the ImageMagick command.
 
 ```rb
 ImageProcessing::MiniMagick
-  .limit(memory: "50MiB", width: "10MP", time: 30)
+  .limits(memory: "50MiB", width: "10MP", time: 30)
   .resize_to_limit(400, 400)
   .call(image) # convert -limit memory 50MiB -limit width 10MP -limit time 30 input.jpg ... output.jpg
 ```

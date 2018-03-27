@@ -323,9 +323,9 @@ describe "ImageProcessing::MiniMagick" do
     end
   end
 
-  describe "#limit" do
+  describe "#limits" do
     it "adds resource limits" do
-      pipeline = ImageProcessing::MiniMagick.limit(time: 0.001).source(@portrait)
+      pipeline = ImageProcessing::MiniMagick.limits(time: 0.001).source(@portrait)
       exception = assert_raises(MiniMagick::Error) { pipeline.call }
       assert_includes exception.message, "time limit exceeded"
     end
