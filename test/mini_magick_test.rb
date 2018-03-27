@@ -366,4 +366,14 @@ describe "ImageProcessing::MiniMagick" do
       ImageProcessing::MiniMagick.crop(StringIO.new(File.binread(@portrait.path)), 400, 400)
     end
   end
+
+  describe "#convert" do
+    deprecated "still supports the legacy API" do
+      assert_type "PNG", convert(@portrait, "png")
+      assert_type "PNG", convert(StringIO.new(File.binread(@portrait.path)), "png")
+
+      assert_type "PNG", ImageProcessing::MiniMagick.convert(@portrait, "png")
+      assert_type "PNG", ImageProcessing::MiniMagick.convert(StringIO.new(File.binread(@portrait.path)), "png")
+    end
+  end
 end

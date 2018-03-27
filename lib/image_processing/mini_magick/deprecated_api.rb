@@ -70,7 +70,8 @@ module ImageProcessing
       end
 
       deprecated_processing_method :convert do |file, format, page = nil, block|
-        source(file, page: page)
+        source(file)
+          .loader(page: page)
           .custom(&block)
           .convert!(format)
       end
