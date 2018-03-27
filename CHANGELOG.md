@@ -1,3 +1,7 @@
+## 0.11.1 (2017-03-27)
+
+* [minimagick] Rename `#limit` to `#limits` to still allow adding `-limit` arguments directly (@janko-m)
+
 ## 0.11.0 (2018-03-27)
 
 * [minimagick] Fix broken deprecated `#convert` (@janko-m)
