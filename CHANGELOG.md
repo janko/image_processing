@@ -1,4 +1,4 @@
-## HEAD
+## 0.11.0 (2018-03-27)
 
 * [minimagick] Fix broken deprecated `#convert` (@janko-m)
 
