@@ -17,16 +17,8 @@ module ImageProcessing
       false
     end
 
-    class Processor
+    class Processor < ImageProcessing::Processor
       IMAGE_CLASS = ::MiniMagick::Tool
-
-      def apply_operation(name, magick, *args)
-        if respond_to?(name)
-          public_send(name, magick, *args)
-        else
-          magick.send(name, *args)
-        end
-      end
 
       def resize_to_limit(magick, width, height)
         magick.thumbnail "#{width}x#{height}>"

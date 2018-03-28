@@ -14,19 +14,15 @@ module ImageProcessing
       false
     end
 
-    class Processor
+    class Processor < ImageProcessing::Processor
       IMAGE_CLASS = ::Vips::Image
       # libvips has this arbitrary number as a sanity-check upper bound on image
       # size.
       MAX_COORD = 10_000_000
 
       def apply_operation(name, image, *args)
-        if respond_to?(name)
-          public_send(name, image, *args)
-        else
-          result = image.send(name, *args)
-          result.is_a?(::Vips::Image) ? result : image
-        end
+        result = super
+        result.is_a?(::Vips::Image) ? result : image
       end
 
       def resize_to_limit(image, width, height, **options)

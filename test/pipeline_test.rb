@@ -126,6 +126,11 @@ describe "ImageProcessing::Pipeline" do
     assert_dimensions [400, 400], result
   end
 
+  it "can be called directly" do
+    result = ImageProcessing::Vips.call(@portrait)
+    assert_similar result, @portrait
+  end
+
   it "applies a sequence of operations" do
     actual = ImageProcessing::Vips
       .invert
