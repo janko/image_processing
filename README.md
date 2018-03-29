@@ -112,7 +112,7 @@ $ brew install imagemagick vips
 Afterwards you can run tests with
 
 ```
-$ rake test
+$ bundle exec rake test
 ```
 
 ## Credits
