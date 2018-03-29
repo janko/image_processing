@@ -40,7 +40,6 @@ before_install:
   - make
   - sudo make install
   - sudo ldconfig /usr/local/lib
-  - sudo apt-get install -qq graphicsmagick
 
 env:
   global:

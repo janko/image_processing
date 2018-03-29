@@ -1,3 +1,7 @@
+## HEAD
+
+* Drop official support for GraphicsMagick (@janko-m)
+
 ## 0.11.1 (2017-03-27)
 
 * [minimagick] Rename `#limit` to `#limits` to still allow adding `-limit` arguments directly (@janko-m)

@@ -1,8 +1,7 @@
 # ImageProcessing
 
 Provides higher-level image processing functionality that is commonly needed
-when accepting user uploads. Supports processing with [VIPS] and
-[ImageMagick]/[GraphicsMagick].
+when accepting user uploads. Supports processing with [VIPS] and [ImageMagick].
 
 The goal of this project is to have a single place where common image
 processing helper methods are maintained, instead of Paperclip, CarrierWave,
@@ -103,11 +102,11 @@ See the **[wiki]** for additional "How To" guides for common scenarios.
 
 ## Contributing
 
-Test suite requires `imagemagick`, `graphicsmagick` and `libvips` to be
-installed. On Mac OS you can install them with Homebrew:
+Test suite requires `imagemagick` and `libvips` to be installed. On Mac OS you
+can install them with Homebrew:
 
 ```
-$ brew install imagemagick graphicsmagick vips
+$ brew install imagemagick vips
 ```
 
 Afterwards you can run tests with
@@ -126,7 +125,6 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [MIT](LICENSE.txt)
 
 [ImageMagick]: https://www.imagemagick.org
-[GraphicsMagick]: http://www.graphicsmagick.org
 [VIPS]: http://jcupitt.github.io/libvips/
 [`ImageProcessing::Vips`]: /doc/vips.md#imageprocessingvips
 [`ImageProcessing::MiniMagick`]: /doc/minimagick.md#imageprocessingminimagick

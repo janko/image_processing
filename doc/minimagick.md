@@ -8,8 +8,8 @@ the [MiniMagick] gem, which you need to install:
 gem "mini_magick", "~> 4.0"
 ```
 
-You'll need to have [ImageMagick] or [GraphicsMagick] installed, see the
-[installation instructions] for more details.
+You'll need to have [ImageMagick] installed, see the [installation
+instructions] for more details.
 
 When generating thumbnails from JPEG images, it's recommended to tell the JPEG
 image library the maximum dimensions that need to be loaded, so that it can
@@ -296,7 +296,6 @@ See the [`-limit`] documentation and the [Architecture] article.
 
 [MiniMagick]: https://github.com/minimagick/minimagick
 [ImageMagick]: https://www.imagemagick.org
-[GraphicsMagick]: http://www.graphicsmagick.org
 [installation instructions]: https://www.imagemagick.org/script/download.php
 [gravity]: https://www.imagemagick.org/script/command-line-options.php#gravity
 [color]: https://www.imagemagick.org/script/color.php
