@@ -1,7 +1,7 @@
 # ImageProcessing
 
 Provides higher-level image processing functionality that is commonly needed
-when accepting user uploads. Supports processing with [VIPS] and [ImageMagick].
+when accepting user uploads. Supports processing with [libvips] and [ImageMagick].
 
 The goal of this project is to have a single place where common image
 processing helper methods are maintained, instead of Paperclip, CarrierWave,
@@ -124,8 +124,8 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 
 [MIT](LICENSE.txt)
 
+[libvps]: http://jcupitt.github.io/libvips/
 [ImageMagick]: https://www.imagemagick.org
-[VIPS]: http://jcupitt.github.io/libvips/
 [`ImageProcessing::Vips`]: /doc/vips.md#imageprocessingvips
 [`ImageProcessing::MiniMagick`]: /doc/minimagick.md#imageprocessingminimagick
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick
