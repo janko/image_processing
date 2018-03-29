@@ -15,5 +15,3 @@ rvm:
   - "jruby-9.1.16.0"
 
 script: bundle exec rake test
-
-cache: bundler
