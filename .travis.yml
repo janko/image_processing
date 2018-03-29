@@ -1,60 +1,11 @@
 language: ruby
 
 sudo: required
-
-addons:
-  apt:
-    packages:
-      - imagemagick
-      - libmagickcore-dev
-      - libmagickwand-dev
-      - graphicsmagick
-      - libexpat1-dev
-      - gettext
-      - liblcms2-dev
-      - libmagickwand-dev
-      - libopenexr-dev
-      - libcfitsio3-dev
-      - libgif-dev
-      - libgs-dev
-      - libgsf-1-dev
-      - libmatio-dev
-      - libopenslide-dev
-      - liborc-0.4-dev
-      - libpango1.0-dev
-      - libpoppler-glib-dev
-      - librsvg2-dev
-      - libwebp-dev
-        # missing on trusty, unfortunately
-        # - libwebpmux2
-      - libfftw3-dev
-      - libglib2.0-dev
+dist: trusty
 
 before_install:
-  - uname -a
-  - bash install-vips.sh --without-python
-  - wget http://www.imagemagick.org/download/ImageMagick.tar.gz
-  - tar -xvf ImageMagick.tar.gz
-  - cd ImageMagick-7.*
-  - ./configure
-  - make
-  - sudo make install
-  - sudo ldconfig /usr/local/lib
-
-env:
-  global:
-    - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-    - VIPS_VERSION_MAJOR=8
-    - VIPS_VERSION_MINOR=6
-    - VIPS_VERSION_MICRO=3
-    - PATH=$HOME/vips/bin:$PATH
-    - LD_LIBRARY_PATH=$HOME/vips/lib:$LD_LIBRARY_PATH
-    - PKG_CONFIG_PATH=$HOME/vips/lib/pkgconfig:$PKG_CONFIG_PATH
-
-cache:
-  bundler: true
-  directories:
-    - $HOME/vips
+  - bash install/libvips.sh
+  - bash install/imagemagick.sh
 
 rvm:
   - "2.2"
