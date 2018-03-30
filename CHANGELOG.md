@@ -1,4 +1,4 @@
-## HEAD
+## 0.11.2 (2018-03-31)
 
 * [minimagick] Avoid `#resize_*` operations stripping data by switching back to `-resize` (@janko-m)
 
@@ -8,7 +8,7 @@
 
 * [minimagick] Drop official support for GraphicsMagick (@janko-m)
 
-## 0.11.1 (2017-03-27)
+## 0.11.1 (2018-03-27)
 
 * [minimagick] Rename `#limit` to `#limits` to still allow adding `-limit` arguments directly (@janko-m)
 
