@@ -1,5 +1,7 @@
 ## HEAD
 
+* [minimagick] Avoid `#resize_*` operations stripping data by switching back to `-resize` (@janko-m)
+
 * [core] Make sure an empty destination file doesn't remain on processing errors when `:destination` is used (@janko-m)
 
 * [vips] Fix `:alpha` not correctly adding alpha for certain types of images (@janko-m)
