@@ -291,10 +291,42 @@ Sets the pixel cache resource limits for the ImageMagick command.
 ImageProcessing::MiniMagick
   .limits(memory: "50MiB", width: "10MP", time: 30)
   .resize_to_limit(400, 400)
-  .call(image) # convert -limit memory 50MiB -limit width 10MP -limit time 30 input.jpg ... output.jpg
+  .call(image)
+
+# convert -limit memory 50MiB -limit width 10MP -limit time 30 input.jpg ... output.jpg
 ```
 
 See the [`-limit`] documentation and the [Architecture] article.
+
+## Sharpening
+
+All `#resize_*` operations will automatically sharpen the resulting thumbnails
+after resizing, using the [`-sharpen`] option.
+
+```rb
+ImageProcessing::MiniMagick
+  .source(image)
+  .resize_to_limit!(400, 400)
+
+# convert input.jpg -resize 400x400> -sharpen 0x1 output.jpg
+```
+
+You can modify the radius and sigma of the Gaussian operator via the `:sharpen`
+option (higher sigma means more sharpening):
+
+```rb
+ImageProcessing::MiniMagick
+  .source(image)
+  .resize_to_limit!(400, 400, sharpen: { radius: 1, sigma: 2 })
+```
+
+You can disable automatic sharpening by setting `:sharpen` to `false`:
+
+```rb
+ImageProcessing::MiniMagick
+  .source(image)
+  .resize_to_limit!(400, 400, sharpen: false)
+```
 
 [MiniMagick]: https://github.com/minimagick/minimagick
 [ImageMagick]: https://www.imagemagick.org
@@ -309,3 +341,4 @@ See the [`-limit`] documentation and the [Architecture] article.
 [Writing JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_write
 [`-limit`]: https://www.imagemagick.org/script/command-line-options.php#limit
 [Architecture]: https://www.imagemagick.org/script/architecture.php#cache
+[`-sharpen`]: https://www.imagemagick.org/script/command-line-options.php#sharpen

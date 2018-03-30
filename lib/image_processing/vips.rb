@@ -15,10 +15,13 @@ module ImageProcessing
     end
 
     class Processor < ImageProcessing::Processor
-      IMAGE_CLASS = ::Vips::Image
-      # libvips has this arbitrary number as a sanity-check upper bound on image
-      # size.
-      MAX_COORD = 10_000_000
+      IMAGE_CLASS  = ::Vips::Image
+      # maximum coordinate that libvips accepts
+      MAX_COORD    = 10_000_000
+      # default sharpening mask that provides a fast and mild sharpen
+      SHARPEN_MASK = ::Vips::Image.new_from_array [[-1, -1, -1],
+                                                   [-1, 32, -1],
+                                                   [-1, -1, -1]], 24
 
       def apply_operation(name, image, *args)
         result = super
@@ -27,23 +30,23 @@ module ImageProcessing
 
       def resize_to_limit(image, width, height, **options)
         width, height = default_dimensions(width, height)
-        image.thumbnail_image(width, height: height, size: :down, **options)
+        generate_thumbnail(image, width, height, size: :down, **options)
       end
 
       def resize_to_fit(image, width, height, **options)
         width, height = default_dimensions(width, height)
-        image.thumbnail_image(width, height: height, **options)
+        generate_thumbnail(image, width, height, **options)
       end
 
       def resize_to_fill(image, width, height, **options)
-        image.thumbnail_image(width, height: height, crop: :centre, **options)
+        generate_thumbnail(image, width, height, crop: :centre, **options)
       end
 
       def resize_and_pad(image, width, height, gravity: "centre", extend: nil, background: nil, alpha: nil, **options)
         embed_options = { extend: extend, background: background }
         embed_options.reject! { |name, value| value.nil? }
 
-        image = image.thumbnail_image(width, height: height, **options)
+        image = generate_thumbnail(image, width, height, **options)
         image = add_alpha(image) if alpha && !has_alpha?(image)
         image.gravity(gravity, width, height, **embed_options)
       end
@@ -69,6 +72,12 @@ module ImageProcessing
       end
 
       private
+
+      def generate_thumbnail(image, width, height, sharpen: SHARPEN_MASK, **options)
+        image = image.thumbnail_image(width, height: height, **options)
+        image = image.conv(sharpen) if sharpen
+        image
+      end
 
       # Port of libvips' vips_addalpha().
       def add_alpha(image)

@@ -1,3 +1,9 @@
+## HEAD
+
+* [minimagick] Automatically sharpen thumbnails after resizing (@janko-m, @mokolabs)
+
+* [vips] Automatically sharpen thumbnails after resizing (@janko-m, @mokolabs)
+
 ## 0.11.2 (2018-03-31)
 
 * [minimagick] Avoid `#resize_*` operations stripping data by switching back to `-resize` (@janko-m)
