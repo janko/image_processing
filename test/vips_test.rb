@@ -146,6 +146,12 @@ describe "ImageProcessing::Vips" do
     it "accepts thumbnail options" do
       assert_dimensions [400, 400], @pipeline.resize_to_limit!(400, 400, crop: :centre)
     end
+
+    it "accepts sharpening options" do
+      sharpened = @pipeline.resize_to_limit!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
+      normal    = @pipeline.resize_to_limit!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
   end
 
   describe "#resize_to_fit" do
@@ -183,6 +189,12 @@ describe "ImageProcessing::Vips" do
     it "accepts thumbnail options" do
       assert_dimensions [400, 400], @pipeline.resize_to_fit!(400, 400, crop: :centre)
     end
+
+    it "accepts sharpening options" do
+      sharpened = @pipeline.resize_to_fit!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
+      normal    = @pipeline.resize_to_fit!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
   end
 
   describe "#resize_to_fill" do
@@ -207,6 +219,12 @@ describe "ImageProcessing::Vips" do
       attention = @pipeline.resize_to_fill!(400, 400, crop: :attention)
       centre    = @pipeline.resize_to_fill!(400, 400, crop: :centre)
       refute_similar centre, attention
+    end
+
+    it "accepts sharpening options" do
+      sharpened = @pipeline.resize_to_fill!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
+      normal   = @pipeline.resize_to_fill!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
   end
 
@@ -247,6 +265,12 @@ describe "ImageProcessing::Vips" do
       pad  = @pipeline.resize_and_pad!(400, 400)
       crop = @pipeline.resize_and_pad!(400, 400, crop: :centre)
       refute_similar pad, crop
+    end
+
+    it "accepts sharpening options" do
+      sharpened = @pipeline.resize_and_pad!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
+      normal    = @pipeline.resize_and_pad!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
   end
 end

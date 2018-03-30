@@ -283,6 +283,39 @@ vips_image #=> #<Vips::Image ...>
 vips_image.write_to_file("/path/to/destination", **options)
 ```
 
+## Sharpening
+
+All `#resize_*` operations will automatically sharpen the resulting thumbnails
+after resizing, using the following [convolution mask]:
+
+```rb
+Vips::Image.new_from_array [
+  [-1, -1, -1],
+  [-1, 32, -1],
+  [-1, -1, -1]], 24
+```
+
+You can assign a different convolution mask via the `:sharpen` option:
+
+```rb
+sharpen_mask = Vips::Image.new_from_array [
+  [-1, -1, -1],
+  [-1, 24, -1],
+  [-1, -1, -1]], 16
+
+ImageProcessing::Vips
+  .source(image)
+  .resize_to_limit!(400, 400, sharpen: sharpen_mask)
+```
+
+You can disable automatic sharpening by setting `:sharpen` to `false`:
+
+```rb
+ImageProcessing::Vips
+  .source(image)
+  .resize_to_limit!(400, 400, sharpen: false)
+```
+
 [ruby-vips]: https://github.com/jcupitt/ruby-vips
 [libvips]: https://github.com/jcupitt/libvips
 [installation instructions]: https://github.com/jcupitt/libvips/wiki#building-and-installing
@@ -299,3 +332,4 @@ vips_image.write_to_file("/path/to/destination", **options)
 [`vips_jpegsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
 [`vips_pngsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngsave
 [direction]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#VipsCompassDirection
+[convolution mask]: https://en.wikipedia.org/wiki/Kernel_(image_processing)
