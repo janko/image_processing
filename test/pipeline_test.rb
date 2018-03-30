@@ -41,9 +41,29 @@ describe "ImageProcessing::Pipeline" do
   end
 
   it "accepts destination path" do
-    destination = Tempfile.new(["tempfile", ".jpg"])
+    destination = Tempfile.new(["destination", ".jpg"])
     ImageProcessing::Vips.source(@portrait).call(destination: destination.path)
     refute_equal 0, destination.path
+  end
+
+  it "makes sure the destination file is deleted on processing errors" do
+    destination_path = Dir::Tmpname.create(["destination", ".jpg"]) {}
+    pipeline = ImageProcessing::MiniMagick.source(fixture_image("corrupted.jpg"))
+    assert_raises(MiniMagick::Error) { pipeline.call(destination: destination_path) }
+    refute File.exist?(destination_path)
+  end
+
+  it "doesn't delete the destination file if it has already existed" do
+    destination = Tempfile.new(["destination", ".jpg"])
+    pipeline = ImageProcessing::MiniMagick.source(fixture_image("corrupted.jpg"))
+    assert_raises(MiniMagick::Error) { pipeline.call(destination: destination.path) }
+    assert File.exist?(destination.path)
+  end
+
+  it "doesn't fail when destination file hasn't been created" do
+    destination_path = Dir::Tmpname.create("destination") {}
+    pipeline = ImageProcessing::Vips.source(@portrait)
+    assert_raises(Vips::Error) { pipeline.call(destination: destination_path) }
   end
 
   it "accepts loader options" do

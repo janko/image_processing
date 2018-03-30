@@ -24,7 +24,9 @@ module ImageProcessing
       if save == false
         image
       elsif destination
-        processor.save_image(image, destination, **saver)
+        handle_destination do
+          processor.save_image(image, destination, **saver)
+        end
       else
         create_tempfile do |tempfile|
           processor.save_image(image, tempfile.path, **saver)
@@ -55,6 +57,17 @@ module ImageProcessing
       tempfile
     rescue
       tempfile.close! if tempfile
+      raise
+    end
+
+    # In case of processing errors, both libvips and imagemagick will leave the
+    # empty destination file they created, so this method makes sure it is
+    # deleted in case an exception is raised on saving the image.
+    def handle_destination
+      destination_existed = File.exist?(destination)
+      yield
+    rescue
+      File.delete(destination) if File.exist?(destination) && !destination_existed
       raise
     end
 

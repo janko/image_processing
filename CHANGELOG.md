@@ -1,5 +1,7 @@
 ## HEAD
 
+* [core] Make sure an empty destination file doesn't remain on processing errors when `:destination` is used (@janko-m)
+
 * [vips] Fix `:alpha` not correctly adding alpha for certain types of images (@janko-m)
 
 * [minimagick] Drop official support for GraphicsMagick (@janko-m)
