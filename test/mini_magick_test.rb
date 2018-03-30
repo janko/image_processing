@@ -182,6 +182,12 @@ describe "ImageProcessing::MiniMagick" do
       assert_similar expected, @pipeline.resize_to_limit!(400, 400)
     end
 
+    it "accepts sharpening options" do
+      sharpened = @pipeline.resize_to_limit!(400, 400, sharpen: { sigma: 1 })
+      normal    = @pipeline.resize_to_limit!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
+
     deprecated "still supports the legacy API" do
       expected = @pipeline.resize_to_limit!(400, 400)
 
@@ -221,6 +227,12 @@ describe "ImageProcessing::MiniMagick" do
       assert_similar expected, @pipeline.resize_to_fit!(400, 400)
     end
 
+    it "accepts sharpening options" do
+      sharpened = @pipeline.resize_to_fit!(400, 400, sharpen: { sigma: 1 })
+      normal    = @pipeline.resize_to_fit!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
+
     deprecated "still supports the legacy API" do
       expected = @pipeline.resize_to_fit!(400, 400)
 
@@ -256,6 +268,12 @@ describe "ImageProcessing::MiniMagick" do
       centre    = @pipeline.resize_to_fill!(400, 400)
       northwest = @pipeline.resize_to_fill!(400, 400, gravity: "NorthWest")
       refute_similar centre, northwest
+    end
+
+    it "accepts sharpening options" do
+      sharpened = @pipeline.resize_to_fill!(400, 400, sharpen: { sigma: 1 })
+      normal    = @pipeline.resize_to_fill!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
 
     deprecated "still supports the legacy API" do
@@ -308,6 +326,12 @@ describe "ImageProcessing::MiniMagick" do
       transparent = @pipeline.resize_and_pad!(400, 400, background: :transparent)
       default     = @pipeline.resize_and_pad!(400, 400)
       assert_similar transparent, default
+    end
+
+    it "accepts sharpening options" do
+      sharpened = @pipeline.resize_and_pad!(400, 400, sharpen: { sigma: 1 })
+      normal    = @pipeline.resize_and_pad!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
 
     deprecated "still supports the legacy API" do

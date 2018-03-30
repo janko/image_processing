@@ -18,27 +18,28 @@ module ImageProcessing
     end
 
     class Processor < ImageProcessing::Processor
-      IMAGE_CLASS = ::MiniMagick::Tool
+      IMAGE_CLASS        = ::MiniMagick::Tool
+      SHARPEN_PARAMETERS = { radius: 0, sigma: 1 }
 
-      def resize_to_limit(magick, width, height)
-        magick.resize "#{width}x#{height}>"
+      def resize_to_limit(magick, width, height, **options)
+        generate_thumbnail(magick, "#{width}x#{height}>", **options)
       end
 
-      def resize_to_fit(magick, width, height)
-        magick.resize "#{width}x#{height}"
+      def resize_to_fit(magick, width, height, **options)
+        generate_thumbnail(magick, "#{width}x#{height}", **options)
       end
 
-      def resize_to_fill(magick, width, height, gravity: "Center")
-        magick.resize "#{width}x#{height}^"
+      def resize_to_fill(magick, width, height, gravity: "Center", **options)
+        generate_thumbnail(magick, "#{width}x#{height}^", **options)
         magick.gravity gravity
         magick.background "rgba(255,255,255,0.0)" # transparent
         magick.extent "#{width}x#{height}"
       end
 
-      def resize_and_pad(magick, width, height, background: :transparent, gravity: "Center")
+      def resize_and_pad(magick, width, height, background: :transparent, gravity: "Center", **options)
         background = "rgba(255,255,255,0.0)" if background.to_s == "transparent"
 
-        magick.resize "#{width}x#{height}"
+        generate_thumbnail(magick, "#{width}x#{height}", **options)
         magick.background background
         magick.gravity gravity
         magick.extent "#{width}x#{height}"
@@ -87,6 +88,19 @@ module ImageProcessing
       end
 
       private
+
+      def generate_thumbnail(magick, geometry, sharpen: {})
+        magick.resize(geometry)
+        magick.sharpen(sharpen_value(sharpen)) if sharpen
+        magick
+      end
+
+      def sharpen_value(parameters)
+        parameters    = SHARPEN_PARAMETERS.merge(parameters)
+        radius, sigma = parameters.values_at(:radius, :sigma)
+
+        "#{radius}x#{sigma}"
+      end
 
       def apply_define(magick, define)
         define.each do |namespace, options|
