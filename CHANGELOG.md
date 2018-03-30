@@ -1,6 +1,8 @@
 ## HEAD
 
-* Drop official support for GraphicsMagick (@janko-m)
+* [vips] Fix `:alpha` not correctly adding alpha for certain types of images (@janko-m)
+
+* [minimagick] Drop official support for GraphicsMagick (@janko-m)
 
 ## 0.11.1 (2017-03-27)
 

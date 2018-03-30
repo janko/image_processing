@@ -44,7 +44,7 @@ module ImageProcessing
         embed_options.reject! { |name, value| value.nil? }
 
         image = image.thumbnail_image(width, height: height, **options)
-        image = image.bandjoin(255) if alpha && image.bands == 3
+        image = add_alpha(image) if alpha && !has_alpha?(image)
         image.gravity(gravity, width, height, **embed_options)
       end
 
@@ -69,6 +69,19 @@ module ImageProcessing
       end
 
       private
+
+      # Port of libvips' vips_addalpha().
+      def add_alpha(image)
+        max_alpha = (image.interpretation == :grey16 || image.interpretation == :rgb16) ? 65535 : 255
+        image.bandjoin(max_alpha)
+      end
+
+      # Port of libvips' vips_hasalpha().
+      def has_alpha?(image)
+        image.bands == 2 ||
+        (image.bands == 4 && image.interpretation != :cmyk) ||
+        image.bands > 4
+      end
 
       def default_dimensions(width, height)
         raise Error, "either width or height must be specified" unless width || height
