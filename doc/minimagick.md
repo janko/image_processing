@@ -41,7 +41,7 @@ ImageProcessing::MiniMagick.valid_image?(corrupted_image) #=> false
 
 Downsizes the image to fit within the specified dimensions while retaining the
 original aspect ratio. Will only resize the image if it's larger than the
-specified dimensions.
+specified dimensions. See [this article][fit] for more details.
 
 ```rb
 pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
@@ -64,7 +64,8 @@ pipeline.resize_to_limit!(nil, 400)
 
 Resizes the image to fit within the specified dimensions while retaining the
 original aspect ratio. Will downsize the image if it's larger than the
-specified dimensions or upsize if it's smaller.
+specified dimensions or upsize if it's smaller. See [this article][fit] for
+more details.
 
 ```rb
 pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
@@ -86,7 +87,8 @@ pipeline.resize_to_fit!(nil, 400)
 #### `#resize_to_fill`
 
 Resizes the image to fill the specified dimensions while retaining the original
-aspect ratio. If necessary, will crop the image in the larger dimension.
+aspect ratio. If necessary, will crop the image in the larger dimension. See
+[this article][fill] for more details.
 
 ```rb
 pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
@@ -107,7 +109,7 @@ pipeline.resize_to_fill!(400, 400, gravity: "NorthWest")
 
 Resizes the image to fit within the specified dimensions while retaining the
 original aspect ratio. If necessary, will pad the remaining area with the given
-color.
+color. See [this article][pad] for more details.
 
 ```rb
 pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
@@ -297,6 +299,9 @@ See the [`-limit`] documentation and the [Architecture] article.
 [MiniMagick]: https://github.com/minimagick/minimagick
 [ImageMagick]: https://www.imagemagick.org
 [installation instructions]: https://www.imagemagick.org/script/download.php
+[fit]: http://www.imagemagick.org/Usage/thumbnails/#fit
+[fill]: http://www.imagemagick.org/Usage/thumbnails/#cut
+[pad]: http://www.imagemagick.org/Usage/thumbnails/#pad
 [gravity]: https://www.imagemagick.org/script/command-line-options.php#gravity
 [color]: https://www.imagemagick.org/script/color.php
 [`MiniMagick::Tool::Convert`]: https://github.com/minimagick/minimagick#metal
