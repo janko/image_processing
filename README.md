@@ -120,6 +120,8 @@ $ bundle exec rake test
 The `ImageProcessing::MiniMagick` functionality was extracted from
 [refile-mini_magick].
 
+The chainable interface was heavily inspired by [HTTP.rb].
+
 ## License
 
 [MIT](LICENSE.txt)
@@ -130,3 +132,4 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [`ImageProcessing::MiniMagick`]: /doc/minimagick.md#imageprocessingminimagick
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick
 [wiki]: https://github.com/janko-m/image_processing/wiki
+[HTTP.rb]: https://github.com/httprb/http
