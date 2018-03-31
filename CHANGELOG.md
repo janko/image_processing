@@ -1,5 +1,7 @@
 ## HEAD
 
+* [vips] Accept `:quality` saver option as an alias to `:Q` (@janko-m)
+
 * [minimagick] Automatically sharpen thumbnails after resizing (@janko-m, @mokolabs)
 
 * [vips] Automatically sharpen thumbnails after resizing (@janko-m, @mokolabs)

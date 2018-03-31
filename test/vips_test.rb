@@ -78,6 +78,12 @@ describe "ImageProcessing::Vips" do
     refute_includes Vips::Image.new_from_file(result.path).get_fields, "exif-data"
   end
 
+  it "converts :quality saver option to :Q" do
+    result1 = ImageProcessing::Vips.saver(quality: 50).call(@portrait)
+    result2 = ImageProcessing::Vips.saver(quality: 100).call(@portrait)
+    assert result1.size < result2.size
+  end
+
   it "ignores saver options that are not defined" do
     ImageProcessing::Vips.saver(Q: 85).convert("png").call(@portrait)
   end

@@ -66,6 +66,8 @@ module ImageProcessing
       end
 
       def save_image(image, destination_path, **options)
+        options[:Q] = options.delete(:quality) if options.key?(:quality)
+
         options = select_valid_saver_options(destination_path, options)
 
         image.write_to_file(destination_path, **options)

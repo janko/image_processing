@@ -249,7 +249,7 @@ Specifies options that will be forwarded to [`Vips::Image#write_to_file`].
 
 ```rb
 ImageProcessing::Vips
-  .saver(Q: 100, interlace: true)
+  .saver(quality: 100) # alias for :Q
   # ...
 ```
 
