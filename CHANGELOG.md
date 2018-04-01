@@ -1,5 +1,7 @@
 ## HEAD
 
+* [minimagick] Allow using value `nil` to add ImageMagick options that don't have a value (@janko-m)
+
 * [vips] Accept `:quality` saver option as an alias to `:Q` (@janko-m)
 
 * [minimagick] Automatically sharpen thumbnails after resizing (@janko-m, @mokolabs)

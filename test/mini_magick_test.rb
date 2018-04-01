@@ -90,6 +90,9 @@ describe "ImageProcessing::MiniMagick" do
     result = ImageProcessing::MiniMagick.loader(strip: true).call(@portrait)
     assert_empty MiniMagick::Image.new(result.path).exif
 
+    result = ImageProcessing::MiniMagick.loader(strip: nil).call(@portrait)
+    assert_empty MiniMagick::Image.new(result.path).exif
+
     result = ImageProcessing::MiniMagick.loader(strip: false).call(@portrait)
     assert_empty MiniMagick::Image.new(result.path).exif
 
@@ -105,6 +108,9 @@ describe "ImageProcessing::MiniMagick" do
     assert_operator result.size, :<, 20*1024
 
     result = ImageProcessing::MiniMagick.saver(strip: true).call(@portrait)
+    assert_empty MiniMagick::Image.new(result.path).exif
+
+    result = ImageProcessing::MiniMagick.saver(strip: nil).call(@portrait)
     assert_empty MiniMagick::Image.new(result.path).exif
 
     result = ImageProcessing::MiniMagick.saver(strip: false).call(@portrait)
