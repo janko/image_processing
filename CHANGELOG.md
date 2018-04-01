@@ -1,5 +1,7 @@
 ## HEAD
 
+* [vips] Don't apply `Vips::Image#autorot` if `:autorotate` loader option was passed in (@janko-m)
+
 * [minimagick] Allow using value `nil` to add ImageMagick options that don't have a value (@janko-m)
 
 * [vips] Accept `:quality` saver option as an alias to `:Q` (@janko-m)

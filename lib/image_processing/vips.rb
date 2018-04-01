@@ -61,7 +61,7 @@ module ImageProcessing
           image = ::Vips::Image.new_from_file(source_path, fail: true, **options)
         end
 
-        image = image.autorot if autorot
+        image = image.autorot if autorot && !options.key?(:autorotate)
         image
       end
 
