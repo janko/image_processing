@@ -11,6 +11,12 @@ gem "ruby-vips", "~> 2.0"
 Note that you'll need to have [libvips] 8.6 or higher installed; see the
 [installation instructions] for more details.
 
+This processor does some useful things by default:
+
+* images are automatically oriented on load to make them upright (see [`vips_autorot()`])
+* `#resize_*` operations will automatically sharpen the resized images (see [Sharpening](#sharpening) section)
+* operations will automatically raise `Vips::Error` on corrupted images (using `fail: true` on load)
+
 ## Methods
 
 #### `.valid_image?`

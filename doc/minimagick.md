@@ -11,6 +11,12 @@ gem "mini_magick", "~> 4.0"
 You'll need to have [ImageMagick] installed, see the [installation
 instructions] for more details.
 
+This processor does some useful things by default:
+
+* images are automatically oriented on load to make them upright (using [`-auto-orient`])
+* `#resize_*` operations will automatically sharpen the resized images (using [`-sharpen`])
+* operations will automatically raise `MiniMagick::Error` on corrupted images (using [`-regard-warnings`])
+
 ## Methods
 
 #### `.valid_image?`
@@ -328,3 +334,5 @@ ImageProcessing::MiniMagick
 [`-limit`]: https://www.imagemagick.org/script/command-line-options.php#limit
 [Architecture]: https://www.imagemagick.org/script/architecture.php#cache
 [`-sharpen`]: https://www.imagemagick.org/script/command-line-options.php#sharpen
+[`-auto-orient`]: https://www.imagemagick.org/script/command-line-options.php#auto-orient
+[`-regard-warnings`]: https://www.imagemagick.org/script/command-line-options.php#regard-warnings
