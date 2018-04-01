@@ -11,20 +11,6 @@ gem "mini_magick", "~> 4.0"
 You'll need to have [ImageMagick] installed, see the [installation
 instructions] for more details.
 
-When generating thumbnails from JPEG images, it's recommended to tell the JPEG
-image library the maximum dimensions that need to be loaded, so that it can
-avoid loading the whole image into memory.
-
-```rb
-pipeline = ImageProcessing::MiniMagick
-  .source(image)
-  .loader(define: { jpeg: { size: "800x800" } }) # avoids loading the whole JPEG into memory
-
-size_800 = pipeline.resize_to_limit!(800, 800)
-size_500 = pipeline.resize_to_limit!(500, 500)
-size_300 = pipeline.resize_to_limit!(300, 300)
-```
-
 ## Methods
 
 #### `.valid_image?`
