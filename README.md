@@ -118,9 +118,8 @@ $ bundle exec rake test
 ## Credits
 
 The `ImageProcessing::MiniMagick` functionality was extracted from
-[refile-mini_magick].
-
-The chainable interface was heavily inspired by [HTTP.rb].
+[refile-mini_magick]. The chainable interface was heavily inspired by
+[HTTP.rb].
 
 ## License
 
