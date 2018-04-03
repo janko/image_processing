@@ -9,7 +9,7 @@ describe "ImageProcessing::Pipeline" do
 
   it "accepts source" do
     pipeline = ImageProcessing::Vips.source(@portrait)
-    assert_equal @portrait, pipeline.default_options[:source]
+    assert_equal @portrait, pipeline.options[:source]
   end
 
   it "accepts File, Tempfile, String, and Pathname objects as source" do
@@ -21,7 +21,7 @@ describe "ImageProcessing::Pipeline" do
 
   it "accepts format" do
     pipeline = ImageProcessing::Vips.convert("png")
-    assert_equal "png", pipeline.default_options[:format]
+    assert_equal "png", pipeline.options[:format]
   end
 
   it "retains original format if format was not specified" do
@@ -68,26 +68,26 @@ describe "ImageProcessing::Pipeline" do
 
   it "accepts loader options" do
     pipeline = ImageProcessing::Vips.loader(shrink: 2)
-    assert_equal Hash[shrink: 2], pipeline.default_options[:loader]
+    assert_equal Hash[shrink: 2], pipeline.options[:loader]
 
     pipeline = pipeline.loader(autorotate: true)
-    assert_equal Hash[shrink: 2, autorotate: true], pipeline.default_options[:loader]
+    assert_equal Hash[shrink: 2, autorotate: true], pipeline.options[:loader]
   end
 
   it "accepts saver options" do
     pipeline = ImageProcessing::Vips.saver(strip: true)
-    assert_equal Hash[strip: true], pipeline.default_options[:saver]
+    assert_equal Hash[strip: true], pipeline.options[:saver]
 
     pipeline = pipeline.saver(Q: 100)
-    assert_equal Hash[strip: true, Q: 100], pipeline.default_options[:saver]
+    assert_equal Hash[strip: true, Q: 100], pipeline.options[:saver]
   end
 
   it "accepts operations" do
     pipeline = ImageProcessing::Vips.shrink(2, 2)
-    assert_equal [[:shrink, [2, 2]]], pipeline.default_options[:operations]
+    assert_equal [[:shrink, [2, 2]]], pipeline.options[:operations]
 
     pipeline = pipeline.invert
-    assert_equal [[:shrink, [2, 2]], [:invert, []]], pipeline.default_options[:operations]
+    assert_equal [[:shrink, [2, 2]], [:invert, []]], pipeline.options[:operations]
   end
 
   it "accepts a custom block" do
@@ -108,16 +108,16 @@ describe "ImageProcessing::Pipeline" do
       .resize_to_fill(400, 400)
       .convert("png")
 
-    assert_equal [[:resize_to_fill, [400, 400]]], pipeline.default_options[:operations]
-    assert_equal "png", pipeline.default_options[:format]
+    assert_equal [[:resize_to_fill, [400, 400]]], pipeline.options[:operations]
+    assert_equal "png", pipeline.options[:format]
   end
 
   it "doesn't mutate the receiver when branching" do
     pipeline_jpg = ImageProcessing::Vips.convert("jpg")
     pipeline_png = pipeline_jpg.convert("png")
 
-    assert_equal "jpg", pipeline_jpg.default_options[:format]
-    assert_equal "png", pipeline_png.default_options[:format]
+    assert_equal "jpg", pipeline_jpg.options[:format]
+    assert_equal "png", pipeline_png.options[:format]
   end
 
   it "executes processing on #call with source" do

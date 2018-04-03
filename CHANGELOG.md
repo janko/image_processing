@@ -1,5 +1,7 @@
 ## HEAD
 
+* [core] Rename `Builder#default_options` to `Builder#options` (@janko-m)
+
 * [minimagick] Remove `:fail` loader option in favor of the existing `:regard_warnings` (@janko-m)
 
 * [vips, minimagick] Don't fail on warnings when loading the image (@janko-m)

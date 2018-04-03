@@ -70,6 +70,25 @@ processed = ImageProcessing::MiniMagick
   .resize_to_limit!(400, 400) # bang method
 ```
 
+You can inspect the pipeline options at any point before executing it:
+
+```rb
+pipeline = ImageProcessing::MiniMagick
+  .source(image)
+  .loader(page: 1)
+  .convert("png")
+  .resize_to_limit(400, 400)
+  .strip
+
+pipeline.options
+# => {:source=>#<File:/path/to/source.jpg>,
+#     :loader=>{:page=>1},
+#     :saver=>{},
+#     :format=>"png",
+#     :operations=>[[:resize_to_limit, [400, 400]], [:strip, []]],
+#     :processor_class=>ImageProcessing::MiniMagick::Processor}
+```
+
 The source object needs to responds to `#path`, or be a String, a Pathname, or
 a `Vips::Image`/`MiniMagick::Tool` object.
 
@@ -80,10 +99,10 @@ ImageProcessing::Vips.source(Pathname.new("source.jpg"))
 ImageProcessing::Vips.source(Vips::Image.new_from_file("source.jpg"))
 ```
 
-Without any call options the result of processing is a newly created `Tempfile`
-object. You can save processing result to a specific location by passing
-`:destination` to `#call`. You can also pass `save: false` to `#call` to
-retrieve the raw `Vips::Image`/`MiniMagick::Tool` object.
+By default the result of processing is a `Tempfile` object. You can save the
+processing result to a specific location by passing `:destination` to `#call`,
+or pass `save: false` to retrieve the raw `Vips::Image`/`MiniMagick::Tool`
+object.
 
 ```rb
 pipeline = ImageProcessing::Vips.source(image)

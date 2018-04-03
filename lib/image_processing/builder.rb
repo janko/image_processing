@@ -2,12 +2,14 @@ module ImageProcessing
   class Builder
     include Chainable
 
+    attr_reader :options
+
     def initialize(options)
-      @default_options = options
+      @options = options
     end
 
     def call!(**options)
-      Pipeline.new(default_options).call(**options)
+      Pipeline.new(self.options).call(**options)
     end
   end
 end

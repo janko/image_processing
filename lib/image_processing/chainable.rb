@@ -1,26 +1,23 @@
 module ImageProcessing
   module Chainable
     def source(file)
-      branch default_options.merge(source: file)
+      branch source: file
     end
 
     def convert(format)
-      branch default_options.merge(format: format)
+      branch format: format
     end
 
     def loader(**options)
-      loader = default_options[:loader].merge(options)
-      branch default_options.merge(loader: loader)
+      branch loader: options
     end
 
     def saver(**options)
-      saver = default_options[:saver].merge(options)
-      branch default_options.merge(saver: saver)
+      branch saver: options
     end
 
     def operation(name, *args)
-      operations = default_options[:operations] + [[name, args]]
-      branch default_options.merge(operations: operations)
+      branch operations: [[name, args]]
     end
 
     def custom(&block)
@@ -38,28 +35,34 @@ module ImageProcessing
     end
 
     def call(file = nil, destination: nil, **call_options)
-      options = default_options
+      options = {}
       options = options.merge(source: file) if file
       options = options.merge(destination: destination) if destination
 
       branch(options).call!(**call_options)
     end
 
-    def branch(options)
+    def branch(loader: nil, saver: nil, operations: nil, **other_options)
+      options = respond_to?(:options) ? self.options : DEFAULT_OPTIONS
+
+      options = options.merge(loader: options[:loader].merge(loader)) if loader
+      options = options.merge(saver: options[:saver].merge(saver)) if saver
+      options = options.merge(operations: options[:operations] + operations) if operations
       options = options.merge(processor_class: self::Processor) unless self.is_a?(Builder)
+      options = options.merge(other_options)
+
+      options.freeze
 
       Builder.new(options)
     end
 
-    def default_options
-      @default_options ||= {
-        source:          nil,
-        loader:          {},
-        saver:           {},
-        format:          nil,
-        operations:      [],
-        processor_class: nil,
-      }
-    end
+    DEFAULT_OPTIONS = {
+      source:          nil,
+      loader:          {},
+      saver:           {},
+      format:          nil,
+      operations:      [],
+      processor_class: nil,
+    }.freeze
   end
 end
