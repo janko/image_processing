@@ -136,17 +136,17 @@ describe "ImageProcessing::MiniMagick" do
       assert ImageProcessing::MiniMagick.valid_image?(copy_to_tempfile(@portrait)) # no extension
     end
 
-    it "returns false for corrupted images" do
-      refute ImageProcessing::MiniMagick.valid_image?(fixture_image("corrupted.jpg"))
-      refute ImageProcessing::MiniMagick.valid_image?(copy_to_tempfile(fixture_image("corrupted.jpg"))) # no extension
+    it "returns false for invalid images" do
+      refute ImageProcessing::MiniMagick.valid_image?(fixture_image("invalid.jpg"))
+      refute ImageProcessing::MiniMagick.valid_image?(copy_to_tempfile(fixture_image("invalid.jpg"))) # no extension
     end
 
     deprecated "still supports the legacy API" do
       assert corrupted?(@portrait)
-      refute corrupted?(fixture_image("corrupted.jpg"))
+      refute corrupted?(fixture_image("invalid.jpg"))
 
       assert ImageProcessing::MiniMagick.corrupted?(@portrait)
-      refute ImageProcessing::MiniMagick.corrupted?(fixture_image("corrupted.jpg"))
+      refute ImageProcessing::MiniMagick.corrupted?(fixture_image("invalid.jpg"))
     end
   end
 

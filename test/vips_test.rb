@@ -105,9 +105,9 @@ describe "ImageProcessing::Vips" do
       assert ImageProcessing::Vips.valid_image?(copy_to_tempfile(@portrait)) # no extension
     end
 
-    it "returns false for corrupted images" do
-      refute ImageProcessing::Vips.valid_image?(fixture_image("corrupted.jpg"))
-      refute ImageProcessing::Vips.valid_image?(copy_to_tempfile(fixture_image("corrupted.jpg"))) # no extension
+    it "returns false for incorrect images" do
+      refute ImageProcessing::Vips.valid_image?(fixture_image("invalid.jpg"))
+      refute ImageProcessing::Vips.valid_image?(copy_to_tempfile(fixture_image("invalid.jpg"))) # no extension
     end
   end
 

@@ -20,11 +20,12 @@ This processor does some useful things by default:
 
 #### `.valid_image?`
 
-Returns true if the image is processable.
+Tries to recompress the image, and returns `true` if no exception was raised,
+otherwise returns `false`.
 
 ```rb
-ImageProcessing::MiniMagick.valid_image?(normal_image)    #=> true
-ImageProcessing::MiniMagick.valid_image?(corrupted_image) #=> false
+ImageProcessing::MiniMagick.valid_image?(normal_image)  #=> true
+ImageProcessing::MiniMagick.valid_image?(invalid_image) #=> false
 ```
 
 #### `#resize_to_limit`

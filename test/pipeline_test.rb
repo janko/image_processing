@@ -48,14 +48,14 @@ describe "ImageProcessing::Pipeline" do
 
   it "makes sure the destination file is deleted on processing errors" do
     destination_path = Dir::Tmpname.create(["destination", ".jpg"]) {}
-    pipeline = ImageProcessing::MiniMagick.source(fixture_image("corrupted.jpg"))
+    pipeline = ImageProcessing::MiniMagick.source(fixture_image("invalid.jpg"))
     assert_raises(MiniMagick::Error) { pipeline.call(destination: destination_path) }
     refute File.exist?(destination_path)
   end
 
   it "doesn't delete the destination file if it has already existed" do
     destination = Tempfile.new(["destination", ".jpg"])
-    pipeline = ImageProcessing::MiniMagick.source(fixture_image("corrupted.jpg"))
+    pipeline = ImageProcessing::MiniMagick.source(fixture_image("invalid.jpg"))
     assert_raises(MiniMagick::Error) { pipeline.call(destination: destination.path) }
     assert File.exist?(destination.path)
   end
