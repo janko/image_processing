@@ -1,5 +1,7 @@
 ## HEAD
 
+* [vips, minimagick] Don't fail on warnings when loading the image (@janko-m)
+
 * [vips] Don't apply `Vips::Image#autorot` if `:autorotate` loader option was passed in (@janko-m)
 
 * [minimagick] Allow using value `nil` to add ImageMagick options that don't have a value (@janko-m)

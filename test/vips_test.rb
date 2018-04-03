@@ -99,18 +99,6 @@ describe "ImageProcessing::Vips" do
     assert_includes error.message, "No known saver"
   end
 
-  it "fails for corrupted files" do
-    corrupted = fixture_image("corrupted.jpg")
-    pipeline = ImageProcessing::Vips.source(corrupted).shrink(2, 2)
-    assert_raises(Vips::Error) { pipeline.call }
-  end
-
-  it "allows ignoring processing warnings" do
-    corrupted = fixture_image("corrupted.jpg")
-    pipeline = ImageProcessing::Vips.source(corrupted).shrink(2, 2)
-    pipeline.loader(fail: false).call
-  end
-
   describe ".valid_image?" do
     it "returns true for correct images" do
       assert ImageProcessing::Vips.valid_image?(@portrait)

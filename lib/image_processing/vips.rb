@@ -8,7 +8,7 @@ fail "image_processing/vips requires libvips 8.6+" unless Vips.at_least_libvips?
 module ImageProcessing
   module Vips
     def self.valid_image?(file)
-      ::Vips::Image.new_from_file(file.path, access: :sequential, fail: true).avg
+      ::Vips::Image.new_from_file(file.path, access: :sequential).avg
       true
     rescue ::Vips::Error
       false
@@ -58,7 +58,7 @@ module ImageProcessing
           source_path = path_or_image
           options     = select_valid_loader_options(source_path, options)
 
-          image = ::Vips::Image.new_from_file(source_path, fail: true, **options)
+          image = ::Vips::Image.new_from_file(source_path, **options)
         end
 
         image = image.autorot if autorot && !options.key?(:autorotate)

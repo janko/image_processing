@@ -8,7 +8,6 @@ module ImageProcessing
   module MiniMagick
     def self.valid_image?(file)
       ::MiniMagick::Tool::Convert.new do |convert|
-        convert.regard_warnings
         convert << file.path
         convert << "null:"
       end
@@ -55,7 +54,7 @@ module ImageProcessing
         magick.merge! args
       end
 
-      def load_image(path_or_magick, page: nil, geometry: nil, fail: true, auto_orient: true, define: {}, **options)
+      def load_image(path_or_magick, page: nil, geometry: nil, auto_orient: true, define: {}, **options)
         if path_or_magick.is_a?(::MiniMagick::Tool)
           magick = path_or_magick
         else
@@ -72,9 +71,7 @@ module ImageProcessing
           magick << input_path
         end
 
-        magick.regard_warnings if fail
         magick.auto_orient if auto_orient
-
         magick
       end
 

@@ -15,14 +15,12 @@ This processor does some useful things by default:
 
 * images are automatically oriented on load to make them upright (using [`-auto-orient`])
 * `#resize_*` operations will automatically sharpen the resized images (using [`-sharpen`])
-* operations will automatically raise `MiniMagick::Error` on corrupted images (using [`-regard-warnings`])
 
 ## Methods
 
 #### `.valid_image?`
 
-Returns true if the image is processable, and false if it's corrupted or not
-supported by imagemagick.
+Returns true if the image is processable.
 
 ```rb
 ImageProcessing::MiniMagick.valid_image?(normal_image)    #=> true

@@ -15,14 +15,12 @@ This processor does some useful things by default:
 
 * images are automatically oriented on load to make them upright (see [`vips_autorot()`])
 * `#resize_*` operations will automatically sharpen the resized images (see [Sharpening](#sharpening) section)
-* operations will automatically raise `Vips::Error` on corrupted images (using `fail: true` on load)
 
 ## Methods
 
 #### `.valid_image?`
 
-Returns true if the image is processable, and false if it's corrupted or not
-supported by libvips.
+Returns true if the image is processable.
 
 ```rb
 ImageProcessing::Vips.valid_image?(normal_image)    #=> true
@@ -224,8 +222,8 @@ ImageProcessing::Vips
 ```
 
 See [`vips_jpegload()`], [`vips_pngload()`] etc. for more details on
-format-specific load options. Note that `:fail` is set to `true` by default.
-Any provided options that are not defined for a specific loader will be ignored.
+format-specific load options. Any provided options that are not defined for a
+specific loader will be ignored.
 
 An additional `:autorot` option is accepted to specify whether
 [`vips_autorot()`] should be automatically called after the image is loaded

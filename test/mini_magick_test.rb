@@ -130,18 +130,6 @@ describe "ImageProcessing::MiniMagick" do
     assert_dimensions [600, 800], result
   end
 
-  it "fails for corrupted files" do
-    corrupted = fixture_image("corrupted.jpg")
-    pipeline = ImageProcessing::MiniMagick.source(corrupted)
-    assert_raises(MiniMagick::Error) { pipeline.resize_to_limit!(400, 400) }
-  end
-
-  it "allows ignoring processing warnings" do
-    corrupted = fixture_image("corrupted.jpg")
-    pipeline = ImageProcessing::MiniMagick.source(corrupted).loader(fail: false)
-    pipeline.resize_to_limit!(400, 400)
-  end
-
   describe ".valid_image?" do
     it "returns true for correct images" do
       assert ImageProcessing::MiniMagick.valid_image?(@portrait)
