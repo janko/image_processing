@@ -183,7 +183,6 @@ It accepts the following special options:
 
 * `:page` -- specific page(s) that should be loaded
 * `:geometry` -- geometry that should be applied when loading
-* `:fail` -- whether processing should fail on warnings (defaults to `true`)
 * `:auto_orient` -- whether the image should be automatically oriented after it's loaded (defaults to `true`)
 * `:define` -- creates definitions that coders and decoders use for reading and writing image data
 
@@ -193,9 +192,6 @@ ImageProcessing::MiniMagick.loader(page: 0).convert("png").call(pdf)
 
 ImageProcessing::MiniMagick.loader(geometry: "300x300").call(image)
 # convert input.jpg[300x300] -regard-warnings -auto-orient output.jpg
-
-ImageProcessing::MiniMagick.loader(fail: false).call(image)
-# convert input.jpg -auto-orient output.jpg
 
 ImageProcessing::MiniMagick.loader(auto_orient: false).call(image)
 # convert input.jpg -regard-warnings output.jpg

@@ -1,5 +1,7 @@
 ## HEAD
 
+* [minimagick] Remove `:fail` loader option in favor of the existing `:regard_warnings` (@janko-m)
+
 * [vips, minimagick] Don't fail on warnings when loading the image (@janko-m)
 
 * [vips] Don't apply `Vips::Image#autorot` if `:autorotate` loader option was passed in (@janko-m)
