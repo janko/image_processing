@@ -13,7 +13,7 @@ module ImageProcessing
     end
 
     def custom(image, block)
-      block.call(image) || image
+      (block && block.call(image)) || image
     end
 
     private

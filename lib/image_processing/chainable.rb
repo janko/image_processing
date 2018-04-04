@@ -16,12 +16,8 @@ module ImageProcessing
       branch saver: options
     end
 
-    def operation(name, *args)
-      branch operations: [[name, args]]
-    end
-
     def custom(&block)
-      block ? operation(:custom, block) : self
+      operation :custom, block
     end
 
     def method_missing(name, *args)
@@ -32,6 +28,10 @@ module ImageProcessing
       else
         operation(name, *args)
       end
+    end
+
+    def operation(name, *args)
+      branch operations: [[name, args]]
     end
 
     def call(file = nil, destination: nil, **call_options)
