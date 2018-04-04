@@ -1,6 +1,4 @@
-gem "ruby-vips", ">= 2.0.10", "< 3"
 require "vips"
-
 require "image_processing"
 
 fail "image_processing/vips requires libvips 8.6+" unless Vips.at_least_libvips?(8, 6)

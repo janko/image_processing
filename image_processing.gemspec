@@ -16,11 +16,12 @@ Gem::Specification.new do |spec|
   spec.files         = Dir["README.md", "LICENSE.txt", "CHANGELOG.md", "lib/**/*.rb", "*.gemspec"]
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "mini_magick", "~> 4.0"
+  spec.add_dependency "ruby-vips", ">= 2.0.10", "< 3"
+
   spec.add_development_dependency "rake"
   spec.add_development_dependency "minitest", "~> 5.8"
   spec.add_development_dependency "minitest-hooks", ">= 1.4.2"
   spec.add_development_dependency "minispec-metadata"
-  spec.add_development_dependency "mini_magick", ">= 4.3.5"
-  spec.add_development_dependency "ruby-vips", ">= 2.0.10", "< 3"
   spec.add_development_dependency "phashion" unless RUBY_ENGINE == "jruby"
 end

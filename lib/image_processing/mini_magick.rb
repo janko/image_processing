@@ -1,6 +1,4 @@
-gem "mini_magick", "~> 4.0"
 require "mini_magick"
-
 require "image_processing"
 
 module ImageProcessing
