@@ -1,4 +1,4 @@
-gem "ruby-vips", "~> 2.0"
+gem "ruby-vips", ">= 2.0.10", "< 3"
 require "vips"
 
 require "image_processing"
@@ -16,8 +16,6 @@ module ImageProcessing
 
     class Processor < ImageProcessing::Processor
       IMAGE_CLASS  = ::Vips::Image
-      # maximum coordinate that libvips accepts
-      MAX_COORD    = 10_000_000
       # default sharpening mask that provides a fast and mild sharpen
       SHARPEN_MASK = ::Vips::Image.new_from_array [[-1, -1, -1],
                                                    [-1, 32, -1],
@@ -96,7 +94,7 @@ module ImageProcessing
       def default_dimensions(width, height)
         raise Error, "either width or height must be specified" unless width || height
 
-        [width || MAX_COORD, height || MAX_COORD]
+        [width || ::Vips::MAX_COORD, height || ::Vips::MAX_COORD]
       end
 
       def select_valid_loader_options(source_path, options)
