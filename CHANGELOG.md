@@ -1,5 +1,7 @@
 ## HEAD
 
+* [minimagick] Remove deprecated API in favor of the chainable API (@janko-m)
+
 * [core] Rename `Builder#default_options` to `Builder#options` (@janko-m)
 
 * [minimagick] Remove `:fail` loader option in favor of the existing `:regard_warnings` (@janko-m)

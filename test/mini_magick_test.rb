@@ -3,8 +3,6 @@ require "image_processing/mini_magick"
 require "stringio"
 
 describe "ImageProcessing::MiniMagick" do
-  include ImageProcessing::MiniMagick
-
   before do
     @portrait  = fixture_image("portrait.jpg")
     @landscape = fixture_image("landscape.jpg")
@@ -140,14 +138,6 @@ describe "ImageProcessing::MiniMagick" do
       refute ImageProcessing::MiniMagick.valid_image?(fixture_image("invalid.jpg"))
       refute ImageProcessing::MiniMagick.valid_image?(copy_to_tempfile(fixture_image("invalid.jpg"))) # no extension
     end
-
-    deprecated "still supports the legacy API" do
-      assert corrupted?(@portrait)
-      refute corrupted?(fixture_image("invalid.jpg"))
-
-      assert ImageProcessing::MiniMagick.corrupted?(@portrait)
-      refute ImageProcessing::MiniMagick.corrupted?(fixture_image("invalid.jpg"))
-    end
   end
 
   describe "#resize_to_limit" do
@@ -180,18 +170,6 @@ describe "ImageProcessing::MiniMagick" do
       sharpened = @pipeline.resize_to_limit!(400, 400, sharpen: { sigma: 1 })
       normal    = @pipeline.resize_to_limit!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
-    end
-
-    deprecated "still supports the legacy API" do
-      expected = @pipeline.resize_to_limit!(400, 400)
-
-      assert_similar expected, resize_to_limit(@portrait, 400, 400)
-      assert_similar expected, resize_to_limit!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      assert_similar expected, resize_to_limit(StringIO.new(File.binread(@portrait.path)), 400, 400)
-
-      assert_similar expected, ImageProcessing::MiniMagick.resize_to_limit(@portrait, 400, 400)
-      assert_similar expected, ImageProcessing::MiniMagick.resize_to_limit!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      assert_similar expected, ImageProcessing::MiniMagick.resize_to_limit(StringIO.new(File.binread(@portrait.path)), 400, 400)
     end
   end
 
@@ -226,18 +204,6 @@ describe "ImageProcessing::MiniMagick" do
       normal    = @pipeline.resize_to_fit!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
-
-    deprecated "still supports the legacy API" do
-      expected = @pipeline.resize_to_fit!(400, 400)
-
-      assert_similar expected, resize_to_fit(@portrait, 400, 400)
-      assert_similar expected, resize_to_fit!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      assert_similar expected, resize_to_fit(StringIO.new(File.binread(@portrait.path)), 400, 400)
-
-      assert_similar expected, ImageProcessing::MiniMagick.resize_to_fit(@portrait, 400, 400)
-      assert_similar expected, ImageProcessing::MiniMagick.resize_to_fit!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      assert_similar expected, ImageProcessing::MiniMagick.resize_to_fit(StringIO.new(File.binread(@portrait.path)), 400, 400)
-    end
   end
 
   describe "#resize_to_fill" do
@@ -268,18 +234,6 @@ describe "ImageProcessing::MiniMagick" do
       sharpened = @pipeline.resize_to_fill!(400, 400, sharpen: { sigma: 1 })
       normal    = @pipeline.resize_to_fill!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
-    end
-
-    deprecated "still supports the legacy API" do
-      expected = @pipeline.resize_to_fill!(400, 400)
-
-      assert_similar expected, resize_to_fill(@portrait, 400, 400)
-      assert_similar expected, resize_to_fill!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      assert_similar expected, resize_to_fill(StringIO.new(File.binread(@portrait.path)), 400, 400)
-
-      assert_similar expected, ImageProcessing::MiniMagick.resize_to_fill(@portrait, 400, 400)
-      assert_similar expected, ImageProcessing::MiniMagick.resize_to_fill!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      assert_similar expected, ImageProcessing::MiniMagick.resize_to_fill(StringIO.new(File.binread(@portrait.path)), 400, 400)
     end
   end
 
@@ -327,18 +281,6 @@ describe "ImageProcessing::MiniMagick" do
       normal    = @pipeline.resize_and_pad!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
-
-    deprecated "still supports the legacy API" do
-      expected = @pipeline.resize_and_pad!(400, 400)
-
-      assert_similar expected, resize_and_pad(@portrait, 400, 400)
-      assert_similar expected, resize_and_pad!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      assert_similar expected, resize_and_pad(StringIO.new(File.binread(@portrait.path)), 400, 400)
-
-      assert_similar expected, ImageProcessing::MiniMagick.resize_and_pad(@portrait, 400, 400)
-      assert_similar expected, ImageProcessing::MiniMagick.resize_and_pad!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      assert_similar expected, ImageProcessing::MiniMagick.resize_and_pad(StringIO.new(File.binread(@portrait.path)), 400, 400)
-    end
   end
 
   describe "#limits" do
@@ -346,52 +288,6 @@ describe "ImageProcessing::MiniMagick" do
       pipeline = ImageProcessing::MiniMagick.limits(time: 0.001).source(@portrait)
       exception = assert_raises(MiniMagick::Error) { pipeline.call }
       assert_includes exception.message, "time limit exceeded"
-    end
-  end
-
-  describe "#auto_orient" do
-    deprecated "still supports the legacy API" do
-      auto_orient(@portrait)
-      auto_orient!(copy_to_tempfile(@portrait, ".jpg"))
-      auto_orient(StringIO.new(File.binread(@portrait.path)))
-
-      ImageProcessing::MiniMagick.auto_orient(@portrait)
-      ImageProcessing::MiniMagick.auto_orient!(copy_to_tempfile(@portrait, ".jpg"))
-      ImageProcessing::MiniMagick.auto_orient(StringIO.new(File.binread(@portrait.path)))
-    end
-  end
-
-  describe "#resample" do
-    deprecated "still supports the legacy API" do
-      resample(@portrait, 400, 400)
-      resample!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      resample(StringIO.new(File.binread(@portrait.path)), 400, 400)
-
-      ImageProcessing::MiniMagick.resample(@portrait, 400, 400)
-      ImageProcessing::MiniMagick.resample!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      ImageProcessing::MiniMagick.resample(StringIO.new(File.binread(@portrait.path)), 400, 400)
-    end
-  end
-
-  describe "#crop" do
-    deprecated "still supports the legacy API" do
-      crop(@portrait, 400, 400)
-      crop!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      crop(StringIO.new(File.binread(@portrait.path)), 400, 400)
-
-      ImageProcessing::MiniMagick.crop(@portrait, 400, 400)
-      ImageProcessing::MiniMagick.crop!(copy_to_tempfile(@portrait, ".jpg"), 400, 400)
-      ImageProcessing::MiniMagick.crop(StringIO.new(File.binread(@portrait.path)), 400, 400)
-    end
-  end
-
-  describe "#convert" do
-    deprecated "still supports the legacy API" do
-      assert_type "PNG", convert(@portrait, "png")
-      assert_type "PNG", convert(StringIO.new(File.binread(@portrait.path)), "png")
-
-      assert_type "PNG", ImageProcessing::MiniMagick.convert(@portrait, "png")
-      assert_type "PNG", ImageProcessing::MiniMagick.convert(StringIO.new(File.binread(@portrait.path)), "png")
     end
   end
 end

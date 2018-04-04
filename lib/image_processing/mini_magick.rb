@@ -2,7 +2,6 @@ gem "mini_magick", "~> 4.0"
 require "mini_magick"
 
 require "image_processing"
-require "image_processing/mini_magick/deprecated_api"
 
 module ImageProcessing
   module MiniMagick
@@ -123,7 +122,5 @@ module ImageProcessing
     end
 
     extend Chainable
-
-    include DeprecatedApi
   end
 end
