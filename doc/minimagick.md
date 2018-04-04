@@ -1,20 +1,16 @@
 # ImageProcessing::MiniMagick
 
 The `ImageProcessing::MiniMagick` module contains processing methods that use
-the [MiniMagick] gem.
+the [MiniMagick] gem (which is installed when you install image_processing).
 
 ## Installation
 
-1. Install ImageMagick first:
+You will need to install ImageMagick before using this module:
 
 `$ brew install imagemagick`
 
-2. Add the mini_magick gem to your Gemfile:
-
-`gem 'mini_magick', '~> 4.0'`
-
 If you would prefer to not use Homebrew when installing [ImageMagick], 
-see the [installation instructions] for more details.
+see the [installation instructions] for other options.
 
 This processor does some useful things by default:
 
