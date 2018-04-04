@@ -3,34 +3,32 @@
 Provides higher-level image processing helpers that are commonly needed
 when handling image uploads.
 
-This gem can process images with either [libvips] and [ImageMagick] libraries.
+This gem can process images with either [ImageMagick] or [libvips] libraries.
 ImageMagick is a good default choice, especially if you are migrating from
-another attachment gem that uses ImageMagick. Livips is a very fast alternative
-that works best with JPEGs and PNGs. Support for GIFs is limited in libvips.
+another gem or library that uses ImageMagick. libvips is a newer library
+that can process images very rapidly (up to 10x faster than ImageMagick).
 
 
 ## Goal
 
 The goal of this project is to have a single gem that contains all the
-helper methods needed to resize and process images. Currently, existing
-attachment gems (like Paperclip, CarrierWave, Refile, Dragonfly, 
-ActiveStorage, and others) implement their own custom image helper methods.
-But why?
+helper methods needed to resize and process images.
+
+Currently, existing attachment gems (like Paperclip, CarrierWave, Refile, 
+Dragonfly, ActiveStorage, and others) implement their own custom image 
+helper methods. But why? That's not very DRY, is it?
 
 Let's be honest. Image processing is a dark, mysterious art. So we want to 
-combine everything bit of best practice from all of these gems into a single, 
-awesome library that is constantly updated with best-practice thinking about 
+combine every great idea from all of these separate gems into a single awesome 
+library that is constantly updated with best-practice thinking about 
 how to resize and process images.
 
 
 ## Installation
 
-1. Install ImageMagick and Libvips:
+1. Install ImageMagick and libvips:
 
 `$ brew install imagemagick vips`
-
-Note: if you're not on macOS or don't want to use Homebrew, check the project
-pages for ImageMagick and Libvips for other ways to install these libraries.
 
 2. Add the gem to your Gemfile:
 
@@ -146,8 +144,7 @@ See the **[wiki]** for additional "How To" guides for common scenarios.
 
 ## Contributing
 
-Our test suite requires `imagemagick` and `libvips` to be installed. On macOS,
-you can install them with Homebrew:
+Our test suite requires both `imagemagick` and `libvips` libraries to be installed.
 
 ```
 $ brew install imagemagick vips
