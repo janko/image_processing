@@ -20,7 +20,7 @@ But why?
 Let's be honest. Image processing is a dark, mysterious art. So we want to 
 combine everything bit of best practice from all of these gems into a single, 
 awesome library that is constantly updated with best-practice thinking about 
-how to resize images.
+how to resize and process images.
 
 
 ## Installation
