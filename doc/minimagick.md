@@ -14,6 +14,20 @@ $ brew install imagemagick
 If you're using something other than Homebrew, see the [installation
 instructions] for more details.
 
+## Usage
+
+```rb
+require "image_processing/mini_magick"
+
+processed = ImageProcessing::MiniMagick
+  .source(image)
+  .resize_to_limit(400, 400)
+  .strip
+  .call
+
+processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6.png>
+```
+
 ## Methods
 
 #### `.valid_image?`

@@ -16,6 +16,20 @@ instructions] for more details.
 
 NOTE: libvips 8.6 or higher is required.
 
+## Usage
+
+```rb
+require "image_processing/vips"
+
+processed = ImageProcessing::Vips
+  .source(image)
+  .resize_to_limit(400, 400)
+  .saver(strip: true)
+  .call
+
+processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6.png>
+```
+
 ## Methods
 
 #### `.valid_image?`

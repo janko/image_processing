@@ -55,7 +55,7 @@ processed = ImageProcessing::MiniMagick
   .convert("png")
   .call
 
-processed #=> #<File:/var/folders/.../image_processing20180316-18446-1j247h6.png>
+processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6.png>
 ```
 
 This allows easy branching when generating multiple derivates:
