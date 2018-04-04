@@ -1,17 +1,39 @@
 # ImageProcessing
 
-Provides higher-level image processing functionality that is commonly needed
-when accepting user uploads. Supports processing with [libvips] and [ImageMagick].
+Provides higher-level image processing helpers that are commonly needed
+when handling image uploads.
 
-The goal of this project is to have a single place where common image
-processing helper methods are maintained, instead of Paperclip, CarrierWave,
-Refile, Dragonfly and ActiveStorage each implementing their own versions.
+This gem can process images with either [ImageMagick] or [libvips] libraries.
+ImageMagick is a good default choice, especially if you are migrating from
+another gem or library that uses ImageMagick. libvips is a newer library
+that can process images very rapidly (up to 10x faster than ImageMagick).
+
+
+## Goal
+
+The goal of this project is to have a single gem that contains all the
+helper methods needed to resize and process images.
+
+Currently, existing attachment gems (like Paperclip, CarrierWave, Refile, 
+Dragonfly, ActiveStorage, and others) implement their own custom image 
+helper methods. But why? That's not very DRY, is it?
+
+Let's be honest. Image processing is a dark, mysterious art. So we want to 
+combine every great idea from all of these separate gems into a single awesome 
+library that is constantly updated with best-practice thinking about 
+how to resize and process images.
+
 
 ## Installation
 
-```rb
-gem "image_processing", "~> 0.11"
-```
+1. Install ImageMagick and libvips:
+
+`$ brew install imagemagick vips`
+
+2. Add the gem to your Gemfile:
+
+`gem 'image_processing', '~> 0.11'`
+
 
 ## Usage
 
@@ -119,10 +141,10 @@ You can continue reading the API documentation for specific modules:
 
 See the **[wiki]** for additional "How To" guides for common scenarios.
 
+
 ## Contributing
 
-Test suite requires `imagemagick` and `libvips` to be installed. On Mac OS you
-can install them with Homebrew:
+Our test suite requires both `imagemagick` and `libvips` libraries to be installed.
 
 ```
 $ brew install imagemagick vips
@@ -134,11 +156,19 @@ Afterwards you can run tests with
 $ bundle exec rake test
 ```
 
+
+## Feedback
+
+We welcome your feedback! What would you like to see added to image_processing?
+How can we improve this gem? Open an issue and let us know!
+
+
 ## Credits
 
 The `ImageProcessing::MiniMagick` functionality was extracted from
 [refile-mini_magick]. The chainable interface was heavily inspired by
 [HTTP.rb].
+
 
 ## License
 
