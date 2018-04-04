@@ -21,6 +21,11 @@ describe "ImageProcessing::MiniMagick" do
     assert_similar expected, actual
   end
 
+  it "applies thumbnail operation" do
+    magick = ImageProcessing::MiniMagick.thumbnail("400x400").call(@portrait, save: false)
+    assert_includes magick.args, "-thumbnail"
+  end
+
   it "applies macro operations" do
     actual = ImageProcessing::MiniMagick.resize_to_limit(400, 400).call(@portrait)
     expected = Tempfile.new(["result", ".jpg"], binmode: true).tap do |tempfile|

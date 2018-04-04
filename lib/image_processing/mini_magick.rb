@@ -20,15 +20,15 @@ module ImageProcessing
       SHARPEN_PARAMETERS = { radius: 0, sigma: 1 }
 
       def resize_to_limit(magick, width, height, **options)
-        generate_thumbnail(magick, "#{width}x#{height}>", **options)
+        thumbnail(magick, "#{width}x#{height}>", **options)
       end
 
       def resize_to_fit(magick, width, height, **options)
-        generate_thumbnail(magick, "#{width}x#{height}", **options)
+        thumbnail(magick, "#{width}x#{height}", **options)
       end
 
       def resize_to_fill(magick, width, height, gravity: "Center", **options)
-        generate_thumbnail(magick, "#{width}x#{height}^", **options)
+        thumbnail(magick, "#{width}x#{height}^", **options)
         magick.gravity gravity
         magick.background "rgba(255,255,255,0.0)" # transparent
         magick.extent "#{width}x#{height}"
@@ -37,7 +37,7 @@ module ImageProcessing
       def resize_and_pad(magick, width, height, background: :transparent, gravity: "Center", **options)
         background = "rgba(255,255,255,0.0)" if background.to_s == "transparent"
 
-        generate_thumbnail(magick, "#{width}x#{height}", **options)
+        thumbnail(magick, "#{width}x#{height}", **options)
         magick.background background
         magick.gravity gravity
         magick.extent "#{width}x#{height}"
@@ -84,7 +84,7 @@ module ImageProcessing
 
       private
 
-      def generate_thumbnail(magick, geometry, sharpen: {})
+      def thumbnail(magick, geometry, sharpen: {})
         magick.resize(geometry)
         magick.sharpen(sharpen_value(sharpen)) if sharpen
         magick
