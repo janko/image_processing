@@ -45,8 +45,7 @@ module ImageProcessing
 
       def limits(magick, options)
         limit_args = options.flat_map { |type, value| %W[-limit #{type} #{value}] }
-        magick.args.replace limit_args + magick.args
-        magick
+        prepend_args(magick, limit_args)
       end
 
       def append(magick, *args)
@@ -118,6 +117,11 @@ module ImageProcessing
           else                magick.send(option, *value)
           end
         end
+      end
+
+      def prepend_args(magick, args)
+        magick.args.replace args + magick.args
+        magick
       end
     end
 
