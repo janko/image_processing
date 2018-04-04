@@ -1,23 +1,20 @@
 # ImageProcessing::Vips
 
 The `ImageProcessing::Vips` module contains processing macros that use the
-[ruby-vips] gem (which is installed when you install the image_processing gem).
+[ruby-vips] gem (which is installed with the image_processing gem).
 
 ## Installation
 
-You will need to install libvips before using this module:
+You will need to install [libvips] before using this module:
 
-`$ brew install vips`
+```sh
+$ brew install vips
+```
 
-If you would prefer to not use Homebrew when installing [libvips], 
-see the [installation instructions] for other options.
+If you're using something other than Homebrew, see the [installation
+instructions] for more details.
 
-Note: [libvips] 8.6 or higher is required.
-
-This processor does some useful things by default:
-
-* images are automatically oriented on load to make them upright (see [`vips_autorot()`])
-* `#resize_*` operations will automatically sharpen the resized images (see [Sharpening](#sharpening) section)
+Note: libvips 8.6 or higher is required.
 
 ## Methods
 
@@ -173,9 +170,10 @@ File.extname(result.path)
 
 By default the original format is retained when writing the image to a file. If
 the source file doesn't have a file extension, the format will default to JPEG.
+
 Note: GIF support in ImageProcessing::Vips is limited. You can read GIF files
 (and convert them to other formats), but you can't save GIF files. If you need
-full GIF support, we recommend using ImageProcessing::MiniMagick instead.
+full GIF support, we recommend using `ImageProcessing::MiniMagick` instead.
 
 #### `#method_missing`
 

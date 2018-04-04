@@ -5,8 +5,9 @@ when handling image uploads.
 
 This gem can process images with either [ImageMagick] or [libvips] libraries.
 ImageMagick is a good default choice, especially if you are migrating from
-another gem or library that uses ImageMagick. libvips is a newer library
-that can process images very rapidly (up to 10x faster than ImageMagick).
+another gem or library that uses ImageMagick. libvips is a newer library that
+can process images [very rapidly][libvips performance] (up to 10x faster than
+ImageMagick).
 
 
 ## Goal
@@ -14,25 +15,29 @@ that can process images very rapidly (up to 10x faster than ImageMagick).
 The goal of this project is to have a single gem that contains all the
 helper methods needed to resize and process images.
 
-Currently, existing attachment gems (like Paperclip, CarrierWave, Refile, 
-Dragonfly, ActiveStorage, and others) implement their own custom image 
+Currently, existing attachment gems (like Paperclip, CarrierWave, Refile,
+Dragonfly, ActiveStorage, and others) implement their own custom image
 helper methods. But why? That's not very DRY, is it?
 
-Let's be honest. Image processing is a dark, mysterious art. So we want to 
-combine every great idea from all of these separate gems into a single awesome 
-library that is constantly updated with best-practice thinking about 
+Let's be honest. Image processing is a dark, mysterious art. So we want to
+combine every great idea from all of these separate gems into a single awesome
+library that is constantly updated with best-practice thinking about
 how to resize and process images.
 
 
 ## Installation
 
-1. Install ImageMagick and libvips:
+1. Install ImageMagick and/or libvips:
 
-`$ brew install imagemagick vips`
+  ```sh
+  $ brew install imagemagick vips
+  ```
 
 2. Add the gem to your Gemfile:
 
-`gem 'image_processing', '~> 0.11'`
+  ```rb
+  gem "image_processing", "~> 0.11"
+  ```
 
 
 ## Usage
@@ -53,7 +58,7 @@ processed = ImageProcessing::MiniMagick
 processed #=> #<File:/var/folders/.../image_processing20180316-18446-1j247h6.png>
 ```
 
-This allows easy branching when generating multiple derivatives:
+This allows easy branching when generating multiple derivates:
 
 ```rb
 require "image_processing/vips"
@@ -121,10 +126,10 @@ ImageProcessing::Vips.source(Pathname.new("source.jpg"))
 ImageProcessing::Vips.source(Vips::Image.new_from_file("source.jpg"))
 ```
 
-By default the result of processing is a `Tempfile` object. You can save the
-processing result to a specific location by passing `:destination` to `#call`,
-or pass `save: false` to retrieve the raw `Vips::Image`/`MiniMagick::Tool`
-object.
+When `#call` is called without options, the result of processing is a
+`Tempfile` object. You can save the processing result to a specific location by
+passing `:destination` to `#call`, or pass `save: false` to retrieve the raw
+`Vips::Image`/`MiniMagick::Tool` object.
 
 ```rb
 pipeline = ImageProcessing::Vips.source(image)
@@ -181,3 +186,4 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick
 [wiki]: https://github.com/janko-m/image_processing/wiki
 [HTTP.rb]: https://github.com/httprb/http
+[libvips performance]: https://github.com/jcupitt/libvips/wiki/Speed-and-memory-use

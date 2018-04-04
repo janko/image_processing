@@ -1,21 +1,18 @@
 # ImageProcessing::MiniMagick
 
 The `ImageProcessing::MiniMagick` module contains processing methods that use
-the [MiniMagick] gem (which is installed when you install the image_processing gem).
+the [MiniMagick] gem (which is installed with the image_processing gem).
 
 ## Installation
 
-You will need to install ImageMagick before using this module:
+You will need to install [ImageMagick] before using this module:
 
-`$ brew install imagemagick`
+```sh
+$ brew install imagemagick
+```
 
-If you would prefer to not use Homebrew when installing [ImageMagick], 
-see the [installation instructions] for other options.
-
-This processor does some useful things by default:
-
-* images are automatically oriented on load to make them upright (using [`-auto-orient`])
-* `#resize_*` operations will automatically sharpen the resized images (using [`-sharpen`])
+If you're using something other than Homebrew, see the [installation
+instructions] for more details.
 
 ## Methods
 
@@ -115,8 +112,8 @@ It accepts `:background` for specifying the background [color] that will be
 used for padding (defaults to transparent/white).
 
 ```rb
-pipeline.resize_and_pad!(400, 400, background: "RoyalBlue")
 pipeline.resize_and_pad!(400, 400, background: :transparent) # default
+pipeline.resize_and_pad!(400, 400, background: "RoyalBlue")
 ```
 
 It accepts `:gravity` for specifying the [gravity] to apply while cropping
@@ -284,7 +281,8 @@ ImageProcessing::MiniMagick
 # convert -limit memory 50MiB -limit width 10MP -limit time 30 input.jpg ... output.jpg
 ```
 
-See the [`-limit`] documentation and the [Architecture] article.
+See the [`-limit`] documentation and the [Architecture] article for more
+details.
 
 ## Sharpening
 
@@ -330,5 +328,3 @@ ImageProcessing::MiniMagick
 [`-limit`]: https://www.imagemagick.org/script/command-line-options.php#limit
 [Architecture]: https://www.imagemagick.org/script/architecture.php#cache
 [`-sharpen`]: https://www.imagemagick.org/script/command-line-options.php#sharpen
-[`-auto-orient`]: https://www.imagemagick.org/script/command-line-options.php#auto-orient
-[`-regard-warnings`]: https://www.imagemagick.org/script/command-line-options.php#regard-warnings
