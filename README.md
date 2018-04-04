@@ -3,15 +3,25 @@
 Provides higher-level image processing helpers that are commonly needed
 when handling image uploads.
 
-The goal of this project is to have a single gem that contains all the
-helper methods needed to resize and process images -- instead of Paperclip,
-CarrierWave, Refile, Dragonfly, ActiveStorage, and others implementing 
-their own custom helper methods.
-
 This gem can process images with either [libvips] and [ImageMagick] libraries.
 ImageMagick is a good default choice, especially if you are migrating from
 another attachment gem that uses ImageMagick. Livips is a very fast alternative
 that works best with JPEGs and PNGs. Support for GIFs is limited in libvips.
+
+
+## Goal
+
+The goal of this project is to have a single gem that contains all the
+helper methods needed to resize and process images. Currently, existing
+attachment gems (like Paperclip, CarrierWave, Refile, Dragonfly, 
+ActiveStorage, and others) implement their own custom image helper methods.
+But why?
+
+Let's be honest. Image processing is a dark, mysterious art. So we want to 
+combine everything bit of best practice from all of these gems into a single, 
+awesome library that is constantly updated with best-practice thinking about 
+how to resize images.
+
 
 ## Installation
 
