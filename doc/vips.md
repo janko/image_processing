@@ -1,15 +1,21 @@
 # ImageProcessing::Vips
 
 The `ImageProcessing::Vips` module contains processing macros that use the
-[ruby-vips] gem, which you need to install:
+[ruby-vips] gem.
 
-```rb
-# Gemfile
-gem "ruby-vips", "~> 2.0"
-```
+## Installation
 
-Note that you'll need to have [libvips] 8.6 or higher installed; see the
-[installation instructions] for more details.
+1. Install libvips first:
+
+`$ brew install vips`
+
+2. Add the ruby-vips gem to your Gemfile:
+
+`gem 'ruby-vips', '~> 0.11'`
+
+Note that you'll need to have [libvips] 8.6 or higher installed. Also, 
+if you would prefer to not use Homebrew when installing [libvips], 
+see the [installation instructions] for more details.
 
 This processor does some useful things by default:
 
