@@ -1,7 +1,7 @@
 # ImageProcessing::MiniMagick
 
 The `ImageProcessing::MiniMagick` module contains processing methods that use
-the [MiniMagick] gem (which is installed when you install image_processing).
+the [MiniMagick] gem (which is installed when you install the image_processing gem).
 
 ## Installation
 
