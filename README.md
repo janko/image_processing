@@ -36,7 +36,7 @@ how to resize and process images.
 2. Add the gem to your Gemfile:
 
   ```rb
-  gem "image_processing", "~> 0.11"
+  gem "image_processing", "~> 1.0"
   ```
 
 
