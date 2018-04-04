@@ -50,14 +50,13 @@ module ImageProcessing
         magick.merge! args
       end
 
-      def load_image(path_or_magick, page: nil, geometry: nil, auto_orient: true, define: {}, **options)
+      def load_image(path_or_magick, page: nil, geometry: nil, auto_orient: true, **options)
         if path_or_magick.is_a?(::MiniMagick::Tool)
           magick = path_or_magick
         else
           source_path = path_or_magick
           magick = ::MiniMagick::Tool::Convert.new
 
-          apply_define(magick, define)
           apply_options(magick, options)
 
           input_path  = source_path
@@ -71,8 +70,7 @@ module ImageProcessing
         magick
       end
 
-      def save_image(magick, destination_path, define: {}, **options)
-        apply_define(magick, define)
+      def save_image(magick, destination_path, **options)
         apply_options(magick, options)
 
         magick << destination_path
@@ -95,6 +93,18 @@ module ImageProcessing
         "#{radius}x#{sigma}"
       end
 
+      def apply_options(magick, define: {}, **options)
+        options.each do |option, value|
+          case value
+          when true, nil then magick.send(option)
+          when false     then magick.send(option).+
+          else                magick.send(option, *value)
+          end
+        end
+
+        apply_define(magick, define)
+      end
+
       def apply_define(magick, define)
         define.each do |namespace, options|
           namespace = namespace.to_s.gsub("_", "-")
@@ -103,16 +113,6 @@ module ImageProcessing
             key = key.to_s.gsub("_", "-")
 
             magick.define "#{namespace}:#{key}=#{value}"
-          end
-        end
-      end
-
-      def apply_options(magick, options)
-        options.each do |option, value|
-          case value
-          when true, nil then magick.send(option)
-          when false     then magick.send(option).+
-          else                magick.send(option, *value)
           end
         end
       end
