@@ -214,6 +214,17 @@ ImageProcessing::Vips
   # ...
 ```
 
+#### `#apply`
+
+Applies a given hash/array of operations. The values can be a single argument,
+an array of arguments, or `true`/`nil` which means no arguments.
+
+```rb
+ImageProcessing::Vips
+  .apply(resize_to_limit: [400, 400], invert: true, smartcrop: [200, 200])
+  # ...
+```
+
 #### `#loader`
 
 Specifies options that will be forwarded to [`Vips::Image.new_from_file`].

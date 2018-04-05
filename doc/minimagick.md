@@ -178,6 +178,17 @@ ImagePocessing::MiniMagick
   # ...
 ```
 
+#### `#apply`
+
+Applies a given hash/array of operations. The values can be a single argument,
+an array of arguments, or `true`/`nil` which means no arguments.
+
+```rb
+ImageProcessing::MiniMagick
+  .apply(resize_to_limit: [400, 400], strip: true, crop: "200x200+0+0")
+  # ...
+```
+
 #### `#append`
 
 Appends given values directly as arguments to the `convert` command.

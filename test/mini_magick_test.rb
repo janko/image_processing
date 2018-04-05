@@ -96,9 +96,6 @@ describe "ImageProcessing::MiniMagick" do
     result = ImageProcessing::MiniMagick.loader(strip: nil).call(@portrait)
     assert_empty MiniMagick::Image.new(result.path).exif
 
-    result = ImageProcessing::MiniMagick.loader(strip: false).call(@portrait)
-    assert_empty MiniMagick::Image.new(result.path).exif
-
     result = ImageProcessing::MiniMagick.loader(colorspace: "Gray").call(@portrait)
     assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"]
 
@@ -114,9 +111,6 @@ describe "ImageProcessing::MiniMagick" do
     assert_empty MiniMagick::Image.new(result.path).exif
 
     result = ImageProcessing::MiniMagick.saver(strip: nil).call(@portrait)
-    assert_empty MiniMagick::Image.new(result.path).exif
-
-    result = ImageProcessing::MiniMagick.saver(strip: false).call(@portrait)
     assert_empty MiniMagick::Image.new(result.path).exif
 
     result = ImageProcessing::MiniMagick.saver(colorspace: "Gray").call(@portrait)

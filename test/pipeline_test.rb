@@ -90,7 +90,41 @@ describe "ImageProcessing::Pipeline" do
     assert_equal [[:shrink, [2, 2]], [:invert, []]], pipeline.options[:operations]
   end
 
-  it "accepts a custom block" do
+  it "applies a list of operations" do
+    pipeline = ImageProcessing::Vips.source(@portrait)
+
+    # hash
+    actual1 = pipeline
+      .apply(
+        resize_to_fit: [400, 400],
+        invert:        true,
+        rot90:         nil,
+        rot:           :d90,
+      )
+      .call
+
+    # array
+    actual2 = pipeline
+      .apply([
+        [:resize_to_fit, [400, 400]],
+        [:invert,        true],
+        [:rot90,         nil],
+        [:rot,           :d90],
+      ])
+      .call
+
+    expected = pipeline
+      .resize_to_fit(400, 400)
+      .invert
+      .rot90
+      .rot(:d90)
+      .call
+
+    assert_similar expected, actual1
+    assert_similar expected, actual2
+  end
+
+  it "applies a custom block" do
     actual   = ImageProcessing::Vips.custom(&:invert).call(@portrait)
     expected = ImageProcessing::Vips.invert.call(@portrait)
     assert_similar expected, actual

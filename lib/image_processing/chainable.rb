@@ -16,6 +16,10 @@ module ImageProcessing
       branch saver: options
     end
 
+    def apply(operations)
+      operation :apply, operations
+    end
+
     def custom(&block)
       operation :custom, block
     end
