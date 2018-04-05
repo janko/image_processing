@@ -73,6 +73,25 @@ describe "ImageProcessing::MiniMagick" do
     refute_equal 0, processed.size
   end
 
+  it "disallows split layers by default" do
+    tiff = Tempfile.new(["file", ".tiff"])
+    MiniMagick::Tool::Convert.new do |convert|
+      convert.merge! [@portrait.path, @portrait.path, @portrait.path]
+      convert << tiff.path
+    end
+
+    pipeline = ImageProcessing::MiniMagick.source(tiff).convert("jpg")
+
+    assert_raises(ImageProcessing::Error) { pipeline.call }
+
+    tempfile = pipeline.saver(allow_splitting: true).call
+    assert_equal 0, tempfile.size
+    Dir[tempfile.path.sub(/\.\w+/, '-*\0')].each do |path|
+      refute_equal 0, File.size(path)
+      File.delete(path)
+    end
+  end
+
   it "accepts geometry" do
     pipeline = ImageProcessing::MiniMagick.source(@portrait)
     assert_dimensions [300, 400], pipeline.loader(geometry: "400x400").call
