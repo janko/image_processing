@@ -1,4 +1,4 @@
-## HEAD
+## 1.1.0 (2018-04-05)
 
 * [minimagick] Disallow splitting multi-layer images into multiple single-layer
   images by default to avoid unexpected behaviour, but can be re-enabled with
