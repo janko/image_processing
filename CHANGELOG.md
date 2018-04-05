@@ -1,5 +1,7 @@
 ## HEAD
 
+* [minimagick] Disallow splitting multi-layer images into multiple single-layer images (@janko-m)
+
 * [core] Add `#apply` for applying a list of operations (@janko-m)
 
 ## 1.0.0 (2018-04-04)

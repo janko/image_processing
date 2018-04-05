@@ -263,10 +263,17 @@ ImageProcessing::MiniMagick
 It accepts the following special options:
 
 * `:define` -- definitions that coders and decoders use for reading and writing image data
+* `:allow_splitting` -- allow splitting multi-layer image into multiple single-layer images (defaults to `false`)
 
 ```rb
 ImageProcessing::MiniMagick.saver(define: { jpeg: { optimize_coding: false } }).call(image)
 # convert input.jpg -regard-warnings -auto-orient -define jpeg:optimize-coding=false output.jpg
+
+ImageProcessing::MiniMagick.convert("png").call(pdf_document)
+# raises ImageProcessing::Error
+
+ImageProcessing::MiniMagick.convert("png").saver(allow_splitting: true).call(pdf_document)
+# lets ImageMagick generate a "*-{idx}.png" image for each page
 ```
 
 All other options given will be interpreted as direct options to be applied

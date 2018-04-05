@@ -70,12 +70,13 @@ module ImageProcessing
         magick
       end
 
-      def save_image(magick, destination_path, **options)
+      def save_image(magick, destination_path, allow_splitting: false, **options)
         apply_options(magick, options)
 
         magick << destination_path
-
         magick.call
+
+        disallow_split_layers!(destination_path) unless allow_splitting
       end
 
       private
@@ -113,6 +114,15 @@ module ImageProcessing
       def prepend_args(magick, args)
         magick.args.replace args + magick.args
         magick
+      end
+
+      def disallow_split_layers!(destination_path)
+        layers = Dir[destination_path.sub(/\.\w+$/, '-*\0')]
+
+        if layers.any?
+          layers.each { |path| File.delete(path) }
+          raise Error, "Multi-layer image is being converted into a single-layer format. You should either process individual layers or set :allow_splitting to true. See https://github.com/janko-m/image_processing/wiki/Splitting-a-PDF-into-multiple-images for how to process each layer individually."
+        end
       end
     end
 
