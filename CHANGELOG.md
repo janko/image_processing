@@ -1,6 +1,8 @@
 ## HEAD
 
-* [minimagick] Disallow splitting multi-layer images into multiple single-layer images (@janko-m)
+* [minimagick] Disallow splitting multi-layer images into multiple single-layer
+  images by default to avoid unexpected behaviour, but can be re-enabled with
+  the `:allow_splitting` saver option (@janko-m)
 
 * [core] Add `#apply` for applying a list of operations (@janko-m)
 
