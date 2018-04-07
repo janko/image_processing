@@ -25,13 +25,10 @@ module ImageProcessing
     end
 
     def method_missing(name, *args)
-      if name.to_s.end_with?("!")
-        send(name.to_s.chomp("!"), *args).call
-      elsif name.to_s.end_with?("?")
-        super
-      else
-        operation(name, *args)
-      end
+      return super if name.to_s.end_with?("?")
+      return send(name.to_s.chomp("!"), *args).call if name.to_s.end_with?("!")
+
+      operation name, *args
     end
 
     def operation(name, *args)
