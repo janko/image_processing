@@ -20,8 +20,14 @@ describe "ImageProcessing::Pipeline" do
   end
 
   it "accepts format" do
-    pipeline = ImageProcessing::Vips.convert("png")
-    assert_equal "png", pipeline.options[:format]
+    pipeline = ImageProcessing::Vips.source(@portrait)
+
+    result = pipeline.convert!("png")
+    assert_equal ".png", File.extname(result.path)
+
+    result = pipeline.convert!(nil)
+    assert_equal ".jpg", File.extname(result.path)
+    assert_similar @portrait, result
   end
 
   it "retains original format if format was not specified" do
