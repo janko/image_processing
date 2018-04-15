@@ -26,23 +26,23 @@ module ImageProcessing
 
       def resize_to_limit(image, width, height, **options)
         width, height = default_dimensions(width, height)
-        generate_thumbnail(image, width, height, size: :down, **options)
+        thumbnail(image, width, height, size: :down, **options)
       end
 
       def resize_to_fit(image, width, height, **options)
         width, height = default_dimensions(width, height)
-        generate_thumbnail(image, width, height, **options)
+        thumbnail(image, width, height, **options)
       end
 
       def resize_to_fill(image, width, height, **options)
-        generate_thumbnail(image, width, height, crop: :centre, **options)
+        thumbnail(image, width, height, crop: :centre, **options)
       end
 
       def resize_and_pad(image, width, height, gravity: "centre", extend: nil, background: nil, alpha: nil, **options)
         embed_options = { extend: extend, background: background }
         embed_options.reject! { |name, value| value.nil? }
 
-        image = generate_thumbnail(image, width, height, **options)
+        image = thumbnail(image, width, height, **options)
         image = add_alpha(image) if alpha && !has_alpha?(image)
         image.gravity(gravity, width, height, **embed_options)
       end
@@ -70,7 +70,7 @@ module ImageProcessing
 
       private
 
-      def generate_thumbnail(image, width, height, sharpen: SHARPEN_MASK, **options)
+      def thumbnail(image, width, height, sharpen: SHARPEN_MASK, **options)
         image = image.thumbnail_image(width, height: height, **options)
         image = image.conv(sharpen) if sharpen
         image
