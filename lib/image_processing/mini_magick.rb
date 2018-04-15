@@ -3,6 +3,8 @@ require "image_processing"
 
 module ImageProcessing
   module MiniMagick
+    extend Chainable
+
     def self.valid_image?(file)
       ::MiniMagick::Tool::Convert.new do |convert|
         convert << file.path
@@ -125,7 +127,5 @@ module ImageProcessing
         end
       end
     end
-
-    extend Chainable
   end
 end

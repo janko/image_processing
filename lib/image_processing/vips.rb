@@ -5,6 +5,8 @@ fail "image_processing/vips requires libvips 8.6+" unless Vips.at_least_libvips?
 
 module ImageProcessing
   module Vips
+    extend Chainable
+
     def self.valid_image?(file)
       ::Vips::Image.new_from_file(file.path, access: :sequential).avg
       true
@@ -116,7 +118,5 @@ module ImageProcessing
         options.select { |name, value| operation_options.include?(name) }
       end
     end
-
-    extend Chainable
   end
 end
