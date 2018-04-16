@@ -39,19 +39,6 @@ describe "ImageProcessing::MiniMagick" do
     assert_similar expected, actual
   end
 
-  it "applies appended options" do
-    actual = ImageProcessing::MiniMagick.append("-resize", "400x400").call(@portrait)
-    expected = Tempfile.new(["result", ".jpg"], binmode: true).tap do |tempfile|
-      MiniMagick::Tool::Convert.new do |cmd|
-        cmd << @portrait.path
-        cmd.resize("400x400")
-        cmd << tempfile.path
-      end
-    end
-
-    assert_similar expected, actual
-  end
-
   it "applies format" do
     result = ImageProcessing::MiniMagick.convert("png").call(@portrait)
     assert_equal ".png", File.extname(result.path)
@@ -301,11 +288,46 @@ describe "ImageProcessing::MiniMagick" do
     end
   end
 
+  describe "#define" do
+    it "adds -define options from a Hash" do
+      magick = ImageProcessing::MiniMagick
+        .source(@portrait)
+        .define(png: { compression_level: 8, format: "png8" })
+        .call(save: false)
+
+      assert_equal %W[-define png:compression-level=8 -define png:format=png8], magick.args[2..-1]
+    end
+
+    it "adds -define options from a String" do
+      magick = ImageProcessing::MiniMagick
+        .source(@portrait)
+        .define("png:compression-level=8")
+        .call(save: false)
+
+      assert_equal %W[-define png:compression-level=8], magick.args[2..-1]
+    end
+  end
+
   describe "#limits" do
     it "adds resource limits" do
       pipeline = ImageProcessing::MiniMagick.limits(time: 0.001).source(@portrait)
       exception = assert_raises(MiniMagick::Error) { pipeline.call }
       assert_includes exception.message, "time limit exceeded"
+    end
+  end
+
+  describe "#append" do
+    it "appends CLI arguments" do
+      actual = ImageProcessing::MiniMagick.append("-resize", "400x400").call(@portrait)
+      expected = Tempfile.new(["result", ".jpg"], binmode: true).tap do |tempfile|
+        MiniMagick::Tool::Convert.new do |cmd|
+          cmd << @portrait.path
+          cmd.resize("400x400")
+          cmd << tempfile.path
+        end
+      end
+
+      assert_similar expected, actual
     end
   end
 end

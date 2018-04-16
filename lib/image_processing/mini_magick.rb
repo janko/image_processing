@@ -43,6 +43,22 @@ module ImageProcessing
         magick.extent "#{width}x#{height}"
       end
 
+      def define(magick, options)
+        return magick.define(options) if options.is_a?(String)
+
+        options.each do |namespace, options|
+          namespace = namespace.to_s.gsub("_", "-")
+
+          options.each do |key, value|
+            key = key.to_s.gsub("_", "-")
+
+            magick.define "#{namespace}:#{key}=#{value}"
+          end
+        end
+
+        magick
+      end
+
       def limits(magick, options)
         limit_args = options.flat_map { |type, value| %W[-limit #{type} #{value}] }
         prepend_args(magick, limit_args)
@@ -98,19 +114,7 @@ module ImageProcessing
 
       def apply_options(magick, define: {}, **options)
         apply(magick, options)
-        apply_define(magick, define)
-      end
-
-      def apply_define(magick, define)
-        define.each do |namespace, options|
-          namespace = namespace.to_s.gsub("_", "-")
-
-          options.each do |key, value|
-            key = key.to_s.gsub("_", "-")
-
-            magick.define "#{namespace}:#{key}=#{value}"
-          end
-        end
+        define(magick, define)
       end
 
       def prepend_args(magick, args)

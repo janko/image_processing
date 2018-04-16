@@ -153,6 +153,16 @@ File.extname(result.path)
 By default the original format is retained when writing the image to a file. If
 the source file doesn't have a file extension, the format will default to JPEG.
 
+#### `#define`
+
+Adds coder/decoder options with [`-define`] from the specified Hash.
+
+```rb
+ImageProcessing::MiniMagick
+  .define(png: { compression_level: 8, format: "png8" }) # -define png:compression-level=8 -define png:format=png8
+  # ...
+```
+
 #### `#method_missing`
 
 Any unknown methods will be delegated to [`MiniMagick::Tool::Convert`].

@@ -1,3 +1,7 @@
+## HEAD
+
+* [minimagick] Add `#define` as a wrapper around `-define` (@janko-m)
+
 ## 1.1.0 (2018-04-05)
 
 * [minimagick] Disallow splitting multi-layer images into multiple single-layer
