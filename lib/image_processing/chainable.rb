@@ -16,12 +16,20 @@ module ImageProcessing
       branch saver: options
     end
 
-    def apply(operations)
-      operation :apply, operations
-    end
-
     def custom(&block)
       operation :custom, block
+    end
+
+    def apply(operations)
+      operations.inject(self) do |builder, (name, argument)|
+        if argument == true || argument == nil
+          builder.send(name)
+        elsif argument.is_a?(Array)
+          builder.send(name, *argument)
+        else
+          builder.send(name, argument)
+        end
+      end
     end
 
     def method_missing(name, *args)

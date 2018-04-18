@@ -1,5 +1,11 @@
 ## HEAD
 
+* [minimagick] Allow appending "+" operators in `#loader` and `#saver` using the value `false` (@janko-m)
+
+* [core] Fix `#apply` not accepting a Hash as an argument (@janko-m)
+
+* [core] Allow sending any builder commands via `#apply`, not just operations (@janko-m)
+
 * [minimagick] Add `#define` as a wrapper around `-define` (@janko-m)
 
 ## 1.1.0 (2018-04-05)

@@ -4,16 +4,6 @@ module ImageProcessing
       @pipeline = pipeline
     end
 
-    def apply(image, operations)
-      operations.inject(image) do |result, (name, args)|
-        if args == true || args.nil?
-          apply_operation(name, result)
-        else
-          apply_operation(name, result, *args)
-        end
-      end
-    end
-
     def apply_operation(name, image, *args)
       if respond_to?(name)
         public_send(name, image, *args)

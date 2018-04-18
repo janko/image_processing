@@ -214,17 +214,6 @@ ImageProcessing::Vips
   # ...
 ```
 
-#### `#apply`
-
-Applies a given hash/array of operations. The values can be a single argument,
-an array of arguments, or `true`/`nil` which means no arguments.
-
-```rb
-ImageProcessing::Vips
-  .apply(resize_to_limit: [400, 400], invert: true, smartcrop: [200, 200])
-  # ...
-```
-
 #### `#loader`
 
 Specifies options that will be forwarded to [`Vips::Image.new_from_file`].
@@ -312,6 +301,26 @@ vips_image = ImageProcessing::Vips
 vips_image #=> #<Vips::Image ...>
 
 vips_image.write_to_file("/path/to/destination", **options)
+```
+
+#### `#apply`
+
+This is a convenience method for sending multiple commands to the builder using
+a hash. Hash keys can be any method that the builder responds to. Hash values
+can be either a single argument, an array of arguments, or `true`/`nil`
+indicating no arguments. Instead of a hash you can also use an array if you
+want to send multiple commands with the same name.
+
+```rb
+ImageProcessing::Vips
+  .apply(
+    invert: true,
+    smartcrop: [200, 200],
+    resize_to_limit: [400, 400],
+    convert: "jpg",
+    saver: { quality: 100 },
+  )
+  # ...
 ```
 
 ## Sharpening

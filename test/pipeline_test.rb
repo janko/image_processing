@@ -96,34 +96,40 @@ describe "ImageProcessing::Pipeline" do
     assert_equal [[:shrink, [2, 2]], [:invert, []]], pipeline.options[:operations]
   end
 
-  it "applies a list of operations" do
-    pipeline = ImageProcessing::Vips.source(@portrait)
+  it "accepts a list of commands" do
+    pipeline = ImageProcessing::Vips.source(fixture_image("rotated.jpg"))
 
     # hash
     actual1 = pipeline
       .apply(
+        loader:        { autorotate: true },
         resize_to_fit: [400, 400],
         invert:        true,
         rot90:         nil,
         rot:           :d90,
+        convert:       "png",
       )
       .call
 
     # array
     actual2 = pipeline
       .apply([
+        [:loader,        { autorotate: true }],
         [:resize_to_fit, [400, 400]],
         [:invert,        true],
         [:rot90,         nil],
         [:rot,           :d90],
+        [:convert,       "png"],
       ])
       .call
 
     expected = pipeline
+      .loader(autorotate: true)
       .resize_to_fit(400, 400)
       .invert
       .rot90
       .rot(:d90)
+      .convert("png")
       .call
 
     assert_similar expected, actual1

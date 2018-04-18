@@ -188,17 +188,6 @@ ImagePocessing::MiniMagick
   # ...
 ```
 
-#### `#apply`
-
-Applies a given hash/array of operations. The values can be a single argument,
-an array of arguments, or `true`/`nil` which means no arguments.
-
-```rb
-ImageProcessing::MiniMagick
-  .apply(resize_to_limit: [400, 400], strip: true, crop: "200x200+0+0")
-  # ...
-```
-
 #### `#append`
 
 Appends given values directly as arguments to the `convert` command.
@@ -233,9 +222,11 @@ ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "300x300" } }).call(i
 # convert -define jpeg:size=300x300 input.jpg -regard-warnings -auto-orient output.jpg
 ```
 
-All other options given will be interpreted as direct options to be applied
-before the image is loaded (see [Reading JPEG Control Options] for some
-examples).
+All other options given will be interpreted as ImageMagick operations to be
+applied before the image is loaded. Operation values can be either a single
+argument, an array of arguments, `true`/`nil` indicating no arguments, or
+`false` indicating the operator should be a "+" operator. See [Reading JPEG
+Control Options] for some examples.
 
 ```rb
 ImageProcessing::MiniMagick
@@ -286,9 +277,12 @@ ImageProcessing::MiniMagick.convert("png").saver(allow_splitting: true).call(pdf
 # lets ImageMagick generate a "*-{idx}.png" image for each page
 ```
 
-All other options given will be interpreted as direct options to be applied
-before the image is saved (see [Writing JPEG Control Options] for some
-examples). This is the same as applying the options via the chainable API.
+All other options given will be interpreted as ImageMagick operations to be
+applied before the image is saved. Operation values can be either a single
+argument, an array of arguments, `true`/`nil` indicating no arguments, or
+`false` indicating the operator should be a "+" operator. See [Writing JPEG
+Control Options] for some examples. Note that is just syntax sugar over
+applying the operations via the chainable API.
 
 ```rb
 ImageProcessing::MiniMagick
@@ -325,6 +319,26 @@ ImageProcessing::MiniMagick
 
 See the [`-limit`] documentation and the [Architecture] article for more
 details.
+
+#### `#apply`
+
+This is a convenience method for sending multiple commands to the builder using
+a hash. Hash keys can be any method that the builder responds to. Hash values
+can be either a single argument, an array of arguments, or `true`/`nil`
+indicating no arguments. Instead of a hash you can also use an array if you
+want to send multiple commands with the same name.
+
+```rb
+ImageProcessing::MiniMagick
+  .apply(
+    strip: true,
+    crop: "200x200+0+0",
+    resize_to_limit: [400, 400],
+    convert: "jpg",
+    saver: { quality: 100 },
+  )
+  # ...
+```
 
 ## Sharpening
 
