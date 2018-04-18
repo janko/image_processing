@@ -165,7 +165,9 @@ ImageProcessing::MiniMagick
 
 #### `#method_missing`
 
-Any unknown methods will be delegated to [`MiniMagick::Tool::Convert`].
+Any unknown methods will be delegated to [`MiniMagick::Tool::Convert`]. See the
+list of all available options by running `convert -help` and visiting the
+[ImageMagick reference].
 
 ```rb
 ImageProcessing::MiniMagick
@@ -378,9 +380,11 @@ ImageProcessing::MiniMagick
 [pad]: http://www.imagemagick.org/Usage/thumbnails/#pad
 [gravity]: https://www.imagemagick.org/script/command-line-options.php#gravity
 [color]: https://www.imagemagick.org/script/color.php
+[ImageMagick reference]: https://www.imagemagick.org/script/command-line-options.php
 [`MiniMagick::Tool::Convert`]: https://github.com/minimagick/minimagick#metal
 [Reading JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_read
 [Writing JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_write
 [`-limit`]: https://www.imagemagick.org/script/command-line-options.php#limit
 [Architecture]: https://www.imagemagick.org/script/architecture.php#cache
 [`-sharpen`]: https://www.imagemagick.org/script/command-line-options.php#sharpen
+[`-define`]: https://www.imagemagick.org/script/command-line-options.php#define
