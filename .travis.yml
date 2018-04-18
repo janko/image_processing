@@ -1,27 +1,11 @@
-sudo: false
+language: ruby
 
-addons:
-  apt:
-    packages:
-      # libvips
-      - gobject-introspection
-      - libglib2.0-dev
-      - libgirepository1.0-dev
-      - libpoppler-glib-dev
-      - libvips-tools
-
-cache:
-  directories:
-    - $HOME/libvips
-    - $HOME/ImageMagick
+sudo: required
+dist: trusty
 
 before_install:
-  - bash install/libvips.sh --without-python
+  - bash install/libvips.sh
   - bash install/imagemagick.sh
-  - vips --version
-  - magick --version
-
-language: ruby
 
 rvm:
   - 2.2
