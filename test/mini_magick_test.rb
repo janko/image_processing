@@ -201,7 +201,7 @@ describe "ImageProcessing::MiniMagick" do
 
     it "doesn't require both dimensions" do
       assert_dimensions [300, 400],  @pipeline.resize_to_fit!(300, nil)
-      assert_dimensions [750, 1000], @pipeline.resize_to_fit!(750, nil)
+      assert_dimensions [750, 1000], @pipeline.resize_to_fit!(750, nil) unless ENV["GM"]
 
       assert_dimensions [300, 400],  @pipeline.resize_to_fit!(nil, 400)
       assert_dimensions [750, 1000], @pipeline.resize_to_fit!(nil, 1000) unless ENV["GM"]
