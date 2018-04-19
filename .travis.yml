@@ -3,6 +3,11 @@ language: ruby
 sudo: required
 dist: trusty
 
+addons:
+  apt:
+    packages:
+      - graphicsmagick
+
 before_install:
   - bash install/libvips.sh
   - bash install/imagemagick.sh
@@ -17,4 +22,6 @@ rvm:
 # Doesn't currently work with MRI 2.5.1: https://github.com/travis-ci/travis-ci/issues/8978
 # cache: bundler
 
-script: bundle exec rake test
+script:
+  - bundle exec rake test
+  - bundle exec rake test TEST=test/mini_magick_test.rb GM=1

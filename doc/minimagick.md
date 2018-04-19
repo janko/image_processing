@@ -5,16 +5,21 @@ the [MiniMagick] gem (which is installed with the image_processing gem).
 
 ## Installation
 
-You will need to install [ImageMagick] before using this module:
+You will need to install [ImageMagick]/[GraphicsMagick] before using this
+module:
 
 ```sh
 $ brew install imagemagick
+# or
+$ brew install graphicsmagick
 ```
 
 If you're using something other than Homebrew, see the [installation
 instructions] for more details.
 
 ## Usage
+
+### ImageMagick
 
 ```rb
 require "image_processing/mini_magick"
@@ -24,6 +29,25 @@ processed = ImageProcessing::MiniMagick
   .resize_to_limit(400, 400)
   .strip
   .call
+
+processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6.png>
+```
+
+### GraphicsMagick
+
+The MiniMagick gem supports [GraphicsMagick] as well, you just need to specify
+that you want to use it:
+
+```rb
+require "image_processing/mini_magick"
+
+MiniMagick.cli = :graphicsmagick
+
+processed = ImageProcessing::MiniMagick
+  .source(image)
+  .resize_to_limit(400, 400)
+  .strip
+  .call # will use `gm convert` instead of `convert`
 
 processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6.png>
 ```
@@ -374,6 +398,7 @@ ImageProcessing::MiniMagick
 
 [MiniMagick]: https://github.com/minimagick/minimagick
 [ImageMagick]: https://www.imagemagick.org
+[GraphicsMagick]: http://www.graphicsmagick.org
 [installation instructions]: https://www.imagemagick.org/script/download.php
 [fit]: http://www.imagemagick.org/Usage/thumbnails/#fit
 [fill]: http://www.imagemagick.org/Usage/thumbnails/#cut

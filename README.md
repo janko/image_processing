@@ -3,11 +3,11 @@
 Provides higher-level image processing helpers that are commonly needed
 when handling image uploads.
 
-This gem can process images with either [ImageMagick] or [libvips] libraries.
-ImageMagick is a good default choice, especially if you are migrating from
-another gem or library that uses ImageMagick. Libvips is a newer library that
-can process images [very rapidly][libvips performance] (up to 10x faster than
-ImageMagick).
+This gem can process images with either [ImageMagick]/[GraphicsMagick] or
+[libvips] libraries. ImageMagick is a good default choice, especially if you
+are migrating from another gem or library that uses ImageMagick. Libvips is a
+newer library that can process images [very rapidly][libvips performance] (up
+to 10x faster than ImageMagick).
 
 
 ## Goal
@@ -183,6 +183,7 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 
 [libvips]: http://jcupitt.github.io/libvips/
 [ImageMagick]: https://www.imagemagick.org
+[GraphicsMagick]: http://www.graphicsmagick.org
 [`ImageProcessing::Vips`]: /doc/vips.md#imageprocessingvips
 [`ImageProcessing::MiniMagick`]: /doc/minimagick.md#imageprocessingminimagick
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick

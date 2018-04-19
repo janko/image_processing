@@ -2,6 +2,8 @@ require "test_helper"
 require "image_processing/mini_magick"
 require "stringio"
 
+MiniMagick.cli = :graphicsmagick if ENV["GM"]
+
 describe "ImageProcessing::MiniMagick" do
   before do
     @portrait  = fixture_image("portrait.jpg")
@@ -77,12 +79,12 @@ describe "ImageProcessing::MiniMagick" do
       refute_equal 0, File.size(path)
       File.delete(path)
     end
-  end
+  end unless ENV["GM"]
 
   it "accepts geometry" do
     pipeline = ImageProcessing::MiniMagick.source(@portrait)
     assert_dimensions [300, 400], pipeline.loader(geometry: "400x400").call
-  end
+  end unless ENV["GM"]
 
   it "auto orients by default" do
     result = ImageProcessing::MiniMagick.call(fixture_image("rotated.jpg"))
@@ -94,7 +96,7 @@ describe "ImageProcessing::MiniMagick" do
 
   it "applies loader options" do
     result = ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "100x100" } }).call(@portrait)
-    assert_dimensions [150, 200], result
+    assert_dimensions [150, 200], result unless ENV["GM"]
 
     result = ImageProcessing::MiniMagick.loader(strip: true).call(@portrait)
     assert_empty MiniMagick::Image.new(result.path).exif
@@ -106,15 +108,15 @@ describe "ImageProcessing::MiniMagick" do
     assert_empty MiniMagick::Image.new(result.path).exif
 
     result = ImageProcessing::MiniMagick.loader(colorspace: "Gray").call(@portrait)
-    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"]
+    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"] unless ENV["GM"]
 
     result = ImageProcessing::MiniMagick.loader(set: ["comment", "This is a comment"]).call(@portrait)
-    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"]
+    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"] unless ENV["GM"]
   end
 
   it "applies saver options" do
     result = ImageProcessing::MiniMagick.saver(define: { jpeg: { fancy_unsampling: "off", extent: "20KB" } }).call(@portrait)
-    assert_operator result.size, :<, 20*1024
+    assert_operator result.size, :<, 20*1024 unless ENV["GM"]
 
     result = ImageProcessing::MiniMagick.saver(strip: true).call(@portrait)
     assert_empty MiniMagick::Image.new(result.path).exif
@@ -126,10 +128,10 @@ describe "ImageProcessing::MiniMagick" do
     assert_empty MiniMagick::Image.new(result.path).exif
 
     result = ImageProcessing::MiniMagick.saver(colorspace: "Gray").call(@portrait)
-    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"]
+    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"] unless ENV["GM"]
 
     result = ImageProcessing::MiniMagick.saver(set: ["comment", "This is a comment"]).call(@portrait)
-    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"]
+    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"] unless ENV["GM"]
   end
 
   it "accepts magick object as source" do
@@ -316,9 +318,9 @@ describe "ImageProcessing::MiniMagick" do
 
   describe "#limits" do
     it "adds resource limits" do
-      pipeline = ImageProcessing::MiniMagick.limits(time: 0.001).source(@portrait)
+      pipeline = ImageProcessing::MiniMagick.limits(width: 1).source(@portrait)
       exception = assert_raises(MiniMagick::Error) { pipeline.call }
-      assert_includes exception.message, "time limit exceeded"
+      assert_includes exception.message, "limit"
     end
   end
 
