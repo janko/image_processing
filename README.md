@@ -144,7 +144,8 @@ You can continue reading the API documentation for specific modules:
 * **[`ImageProcessing::Vips`]**
 * **[`ImageProcessing::MiniMagick`]**
 
-See the **[wiki]** for additional "How To" guides for common scenarios.
+See the **[wiki]** for additional "How To" guides for common scenarios. The wiki
+is publicly editable, so you're encouraged to add your own guides.
 
 
 ## Contributing
