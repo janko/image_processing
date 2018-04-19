@@ -117,7 +117,8 @@ pipeline.options
 ```
 
 The source object needs to responds to `#path`, or be a String, a Pathname, or
-a `Vips::Image`/`MiniMagick::Tool` object.
+a `Vips::Image`/`MiniMagick::Tool` object. Note that the processed file is
+always saved to a new location, in-place processing is not supported.
 
 ```rb
 ImageProcessing::Vips.source(File.open("source.jpg"))
