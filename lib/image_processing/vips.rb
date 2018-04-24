@@ -45,7 +45,7 @@ module ImageProcessing
         embed_options.reject! { |name, value| value.nil? }
 
         image = thumbnail(image, width, height, **options)
-        image = add_alpha(image) if alpha && !has_alpha?(image)
+        image = image.add_alpha if alpha && !image.has_alpha?
         image.gravity(gravity, width, height, **embed_options)
       end
 
@@ -76,19 +76,6 @@ module ImageProcessing
         image = image.thumbnail_image(width, height: height, **options)
         image = image.conv(sharpen) if sharpen
         image
-      end
-
-      # Port of libvips' vips_addalpha().
-      def add_alpha(image)
-        max_alpha = (image.interpretation == :grey16 || image.interpretation == :rgb16) ? 65535 : 255
-        image.bandjoin(max_alpha)
-      end
-
-      # Port of libvips' vips_hasalpha().
-      def has_alpha?(image)
-        image.bands == 2 ||
-        (image.bands == 4 && image.interpretation != :cmyk) ||
-        image.bands > 4
       end
 
       def default_dimensions(width, height)

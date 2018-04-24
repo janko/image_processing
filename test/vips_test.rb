@@ -242,11 +242,14 @@ describe "ImageProcessing::Vips" do
     end
 
     it "produces correct image when shrinking" do
-      expected = fixture_image("pad.png")
-      assert_similar expected, @pipeline.convert("png").resize_and_pad!(400, 400, alpha: true)
+      result = @pipeline.convert("png").resize_and_pad!(400, 400, alpha: true)
+      assert_similar fixture_image("pad.png"), result
+      assert_equal 4, Vips::Image.new_from_file(result.path).bands
 
-      png = @pipeline.bandjoin(255).convert!("png")
-      assert_similar expected, @pipeline.source(png).resize_and_pad!(400, 400, alpha: true)
+      transparent_png = @pipeline.add_alpha.convert!("png")
+      result = @pipeline.source(transparent_png).resize_and_pad!(400, 400, alpha: true)
+      assert_similar fixture_image("pad.png"), result
+      assert_equal 4, Vips::Image.new_from_file(result.path).bands
     end
 
     it "produces correct image when enlarging" do
