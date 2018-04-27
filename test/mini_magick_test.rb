@@ -1,6 +1,5 @@
 require "test_helper"
 require "image_processing/mini_magick"
-require "stringio"
 
 MiniMagick.cli = :graphicsmagick if ENV["GM"]
 
