@@ -46,10 +46,10 @@ module ImageProcessing
       def define(magick, options)
         return magick.define(options) if options.is_a?(String)
 
-        options.each do |namespace, magick_options|
+        options.each do |namespace, settings|
           namespace = namespace.to_s.gsub("_", "-")
 
-          magick_options.each do |key, value|
+          settings.each do |key, value|
             key = key.to_s.gsub("_", "-")
 
             magick.define "#{namespace}:#{key}=#{value}"
