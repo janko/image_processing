@@ -276,4 +276,31 @@ describe "ImageProcessing::Vips" do
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
   end
+
+  describe "#rotate" do
+    before do
+      @pipeline = ImageProcessing::Vips.source(@portrait)
+    end
+
+    it "rotates by muliples of 90" do
+      assert_dimensions [600, 800], @pipeline.rotate!(0)
+      assert_dimensions [800, 600], @pipeline.rotate!(90)
+      assert_dimensions [600, 800], @pipeline.rotate!(180)
+      assert_dimensions [800, 600], @pipeline.rotate!(270)
+    end
+
+    it "works for angles outside of 0-360 degrees" do
+      assert_dimensions [600, 800], @pipeline.rotate!(360)
+      assert_dimensions [800, 600], @pipeline.rotate!(450)
+      assert_dimensions [800, 600], @pipeline.rotate!(-90)
+    end
+
+    it "rotates by arbitrary angle" do
+      assert_dimensions [990, 990], @pipeline.rotate!(45)
+    end
+
+    it "accepts background color" do
+      assert_dimensions [990, 990], @pipeline.rotate!(45, background: [0, 0, 0])
+    end
+  end
 end

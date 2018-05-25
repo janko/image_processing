@@ -169,6 +169,25 @@ pipeline.resize_to_fill!(400, 400, linear: true)
 
 See [`vips_thumbnail()`] and [`vips_gravity()`] for more details.
 
+#### `#rotate`
+
+Rotates the image by the specified angle.
+
+```rb
+ImageProcessing::Vips
+  .rotate(90)
+  # ...
+```
+
+For degrees that are not a multiple of 90, you can also specify a background
+color for the empty triangles in the corners, left over from rotating the image.
+
+```rb
+ImageProcessing::Vips
+  .rotate(45, background: [0, 0, 0])
+  # ...
+```
+
 #### `#convert`
 
 Specifies the output format.
