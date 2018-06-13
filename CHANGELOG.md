@@ -1,4 +1,4 @@
-## HEAD
+## 1.3.0 (2018-06-13)
 
 * [minimagick, vips] Add `#rotate` function (@janko-m)
 
