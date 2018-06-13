@@ -2,6 +2,8 @@
 
 * [minimagick, vips] Add `#rotate` function (@janko-m)
 
+* [vips] Use native `vips_image_hasalpha()` and `vips_addalpha()` functions in `#resize_and_pad` (@janko-m)
+
 ## 1.2.0 (2018-04-18)
 
 * [minimagick] Allow appending "+" operators in `#loader` and `#saver` using the value `false` (@janko-m)
