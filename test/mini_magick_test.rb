@@ -282,7 +282,7 @@ describe "ImageProcessing::MiniMagick" do
       refute_similar centre, northwest
     end
 
-    it "accepts transparent color" do
+    it "defaults background color to transparent" do
       transparent = @pipeline.resize_and_pad!(400, 400, background: :transparent)
       default     = @pipeline.resize_and_pad!(400, 400)
       assert_similar transparent, default
@@ -292,6 +292,29 @@ describe "ImageProcessing::MiniMagick" do
       sharpened = @pipeline.resize_and_pad!(400, 400, sharpen: { sigma: 1 })
       normal    = @pipeline.resize_and_pad!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
+  end
+
+  describe "#rotate" do
+    before do
+      @pipeline = ImageProcessing::MiniMagick.source(@portrait)
+    end
+
+    it "rotates the image by specifed number of degrees" do
+      assert_dimensions [600, 800], @pipeline.rotate!(0)
+      assert_dimensions [800, 600], @pipeline.rotate!(90)
+      assert_dimensions [600, 800], @pipeline.rotate!("180")
+      assert_dimensions [800, 600], @pipeline.rotate!(-90)
+    end
+
+    it "accepts background color" do
+      @pipeline.rotate!(45, background: "red")
+    end
+
+    it "accepts transparent background color" do
+      transparent = @pipeline.rotate!(45, background: :transparent)
+      default     = @pipeline.rotate!(45, background: "rgba(255,255,255,0.0)")
+      assert_similar transparent, default
     end
   end
 

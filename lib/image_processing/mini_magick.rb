@@ -43,6 +43,13 @@ module ImageProcessing
         magick.extent "#{width}x#{height}"
       end
 
+      def rotate(magick, degrees, background: nil)
+        background = "rgba(255,255,255,0.0)" if background.to_s == "transparent"
+
+        magick.background background
+        magick.rotate(degrees)
+      end
+
       def define(magick, options)
         return magick.define(options) if options.is_a?(String)
 

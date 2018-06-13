@@ -161,6 +161,27 @@ It accepts `:gravity` for specifying the [gravity] to apply while cropping
 pipeline.resize_and_pad!(400, 400, gravity: "NorthWest")
 ```
 
+#### `#rotate`
+
+Rotates the image by the specified angle. Accepts any value that [`-rotate`]
+accepts.
+
+```rb
+ImageProcessing::MiniMagick
+  .rotate(90)
+  # ...
+```
+
+For degrees that are not a multiple of 90, you can also specify a background
+[color] for the empty triangles in the corners, left over from rotating the
+image.
+
+```rb
+ImageProcessing::Vips
+  .rotate(45, background: :transparent)
+  # ...
+```
+
 #### `#convert`
 
 Specifies the output format.
@@ -413,3 +434,4 @@ ImageProcessing::MiniMagick
 [Architecture]: https://www.imagemagick.org/script/architecture.php#cache
 [`-sharpen`]: https://www.imagemagick.org/script/command-line-options.php#sharpen
 [`-define`]: https://www.imagemagick.org/script/command-line-options.php#define
+[`-rotate`]: https://www.imagemagick.org/script/command-line-options.php#rotate
