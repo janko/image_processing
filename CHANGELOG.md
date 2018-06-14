@@ -1,4 +1,4 @@
-## HEAD
+## 1.4.0 (2018-06-14)
 
 * [minimagick] Accept RGB(A) arrays for color names for `:background` (@janko-m)
 
