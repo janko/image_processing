@@ -30,23 +30,19 @@ module ImageProcessing
       def resize_to_fill(magick, width, height, gravity: "Center", **options)
         thumbnail(magick, "#{width}x#{height}^", **options)
         magick.gravity gravity
-        magick.background "rgba(255,255,255,0.0)" # transparent
+        magick.background color(:transparent)
         magick.extent "#{width}x#{height}"
       end
 
       def resize_and_pad(magick, width, height, background: :transparent, gravity: "Center", **options)
-        background = "rgba(255,255,255,0.0)" if background.to_s == "transparent"
-
         thumbnail(magick, "#{width}x#{height}", **options)
-        magick.background background
+        magick.background color(background)
         magick.gravity gravity
         magick.extent "#{width}x#{height}"
       end
 
       def rotate(magick, degrees, background: nil)
-        background = "rgba(255,255,255,0.0)" if background.to_s == "transparent"
-
-        magick.background background if background
+        magick.background color(background) if background
         magick.rotate(degrees)
       end
 
@@ -105,6 +101,15 @@ module ImageProcessing
       end
 
       private
+
+      def color(value)
+        return "rgba(255,255,255,0.0)" if value.to_s == "transparent"
+        return value.to_s if value.is_a?(String) || value.is_a?(Symbol)
+        return "rgb(#{value.join(",")})" if value.is_a?(Array) && value.count == 3
+        return "rgba(#{value.join(",")})" if value.is_a?(Array) && value.count == 4
+
+        raise ArgumentError, "unrecognized color format: #{value.inspect} (must be one of: symbol, string, 3-element RGB array, 4-element RGBA array)"
+      end
 
       def thumbnail(magick, geometry, sharpen: {})
         magick.resize(geometry)

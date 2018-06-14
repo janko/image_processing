@@ -282,6 +282,25 @@ describe "ImageProcessing::MiniMagick" do
       refute_similar centre, northwest
     end
 
+    it "accepts background color" do
+      variants = [
+        @pipeline.resize_and_pad!(400, 400, background: "SpringGreen"),
+        @pipeline.resize_and_pad!(400, 400, background: :SpringGreen),
+        @pipeline.resize_and_pad!(400, 400, background: [0, 255, 127]),
+        @pipeline.resize_and_pad!(400, 400, background: [0, 255, 127, 1.0]),
+      ]
+
+      variants.combination(2).each do |image1, image2|
+        assert_similar image1, image2
+      end
+    end
+
+    it "raises ArgumentError on invalid :background values" do
+      assert_raises(ArgumentError) { @pipeline.resize_and_pad!(400, 400, background: 1) }
+      assert_raises(ArgumentError) { @pipeline.resize_and_pad!(400, 400, background: [0, 0]) }
+      assert_raises(ArgumentError) { @pipeline.resize_and_pad!(400, 400, background: [1, 1, 1, 1, 1]) }
+    end
+
     it "defaults background color to transparent" do
       transparent = @pipeline.resize_and_pad!(400, 400, background: :transparent)
       default     = @pipeline.resize_and_pad!(400, 400)
@@ -308,7 +327,22 @@ describe "ImageProcessing::MiniMagick" do
     end
 
     it "accepts background color" do
-      @pipeline.rotate!(45, background: "red")
+      variants = [
+        @pipeline.rotate!(45, background: "SpringGreen"),
+        @pipeline.rotate!(45, background: :SpringGreen),
+        @pipeline.rotate!(45, background: [0, 255, 127]),
+        @pipeline.rotate!(45, background: [0, 255, 127, 1.0]),
+      ]
+
+      variants.combination(2).each do |image1, image2|
+        assert_similar image1, image2
+      end
+    end
+
+    it "raises ArgumentError on invalid :background values" do
+      assert_raises(ArgumentError) { @pipeline.rotate!(45, background: 1) }
+      assert_raises(ArgumentError) { @pipeline.rotate!(45, background: [0, 0]) }
+      assert_raises(ArgumentError) { @pipeline.rotate!(45, background: [1, 1, 1, 1, 1]) }
     end
 
     it "accepts transparent background color" do

@@ -150,8 +150,11 @@ It accepts `:background` for specifying the background [color] that will be
 used for padding (defaults to transparent/white).
 
 ```rb
-pipeline.resize_and_pad!(400, 400, background: :transparent) # default
-pipeline.resize_and_pad!(400, 400, background: "RoyalBlue")
+pipeline.resize_and_pad!(400, 400, background: :transparent)        # default
+pipeline.resize_and_pad!(400, 400, background: :RoyalBlue)          # color name
+pipeline.resize_and_pad!(400, 400, background: [65, 105, 225])      # RGB value
+pipeline.resize_and_pad!(400, 400, background: [65, 105, 225, 1.0]) # RGBA value
+pipeline.resize_and_pad!(400, 400, background: "...")               # any supported color value
 ```
 
 It accepts `:gravity` for specifying the [gravity] to apply while cropping
@@ -177,9 +180,12 @@ For degrees that are not a multiple of 90, you can also specify a background
 image.
 
 ```rb
-ImageProcessing::Vips
-  .rotate(45, background: :transparent)
-  # ...
+rotate(45)                                  # default color
+rotate(45, background: :transparent)        # transparent
+rotate(45, background: :RoyalBlue)          # color name
+rotate(45, background: [65, 105, 225])      # RGB value
+rotate(45, background: [65, 105, 225, 1.0]) # RGBA value
+rotate(45, background: "...")               # any supported color value
 ```
 
 #### `#convert`
