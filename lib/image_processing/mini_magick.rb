@@ -46,7 +46,7 @@ module ImageProcessing
       def rotate(magick, degrees, background: nil)
         background = "rgba(255,255,255,0.0)" if background.to_s == "transparent"
 
-        magick.background background
+        magick.background background if background
         magick.rotate(degrees)
       end
 
