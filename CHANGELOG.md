@@ -1,3 +1,7 @@
+## HEAD
+
+* [vips] Modify `#rotate` to accept only `:background` and not other `vips_similarity()` options (@janko-m)
+
 ## 1.3.0 (2018-06-13)
 
 * [minimagick, vips] Add `#rotate` function (@janko-m)

@@ -49,11 +49,14 @@ module ImageProcessing
         image.gravity(gravity, width, height, **embed_options)
       end
 
-      def rotate(image, degrees, **options)
+      def rotate(image, degrees, background: nil)
         if degrees % 90 == 0
           image.rot(:"d#{degrees % 360}")
         else
-          image.similarity(angle: degrees, **options)
+          options = { angle: degrees }
+          options[:background] = background if background
+
+          image.similarity(**options)
         end
       end
 
