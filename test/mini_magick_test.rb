@@ -284,10 +284,9 @@ describe "ImageProcessing::MiniMagick" do
 
     it "accepts background color" do
       variants = [
-        @pipeline.resize_and_pad!(400, 400, background: "SpringGreen"),
-        @pipeline.resize_and_pad!(400, 400, background: :SpringGreen),
         @pipeline.resize_and_pad!(400, 400, background: [0, 255, 127]),
         @pipeline.resize_and_pad!(400, 400, background: [0, 255, 127, 1.0]),
+        @pipeline.resize_and_pad!(400, 400, background: "SpringGreen"),
       ]
 
       variants.combination(2).each do |image1, image2|
@@ -296,9 +295,9 @@ describe "ImageProcessing::MiniMagick" do
     end
 
     it "raises ArgumentError on invalid :background values" do
-      assert_raises(ArgumentError) { @pipeline.resize_and_pad!(400, 400, background: 1) }
       assert_raises(ArgumentError) { @pipeline.resize_and_pad!(400, 400, background: [0, 0]) }
       assert_raises(ArgumentError) { @pipeline.resize_and_pad!(400, 400, background: [1, 1, 1, 1, 1]) }
+      assert_raises(ArgumentError) { @pipeline.resize_and_pad!(400, 400, background: 1) }
     end
 
     it "defaults background color to transparent" do
@@ -328,10 +327,9 @@ describe "ImageProcessing::MiniMagick" do
 
     it "accepts background color" do
       variants = [
-        @pipeline.rotate!(45, background: "SpringGreen"),
-        @pipeline.rotate!(45, background: :SpringGreen),
         @pipeline.rotate!(45, background: [0, 255, 127]),
         @pipeline.rotate!(45, background: [0, 255, 127, 1.0]),
+        @pipeline.rotate!(45, background: "SpringGreen"),
       ]
 
       variants.combination(2).each do |image1, image2|
@@ -340,9 +338,9 @@ describe "ImageProcessing::MiniMagick" do
     end
 
     it "raises ArgumentError on invalid :background values" do
-      assert_raises(ArgumentError) { @pipeline.rotate!(45, background: 1) }
       assert_raises(ArgumentError) { @pipeline.rotate!(45, background: [0, 0]) }
       assert_raises(ArgumentError) { @pipeline.rotate!(45, background: [1, 1, 1, 1, 1]) }
+      assert_raises(ArgumentError) { @pipeline.rotate!(45, background: 1) }
     end
 
     it "accepts transparent background color" do

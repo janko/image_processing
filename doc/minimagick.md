@@ -151,10 +151,9 @@ used for padding (defaults to transparent/white).
 
 ```rb
 pipeline.resize_and_pad!(400, 400, background: :transparent)        # default
-pipeline.resize_and_pad!(400, 400, background: :RoyalBlue)          # color name
 pipeline.resize_and_pad!(400, 400, background: [65, 105, 225])      # RGB value
 pipeline.resize_and_pad!(400, 400, background: [65, 105, 225, 1.0]) # RGBA value
-pipeline.resize_and_pad!(400, 400, background: "...")               # any supported color value
+pipeline.resize_and_pad!(400, 400, background: "...")               # any supported ImageMagick color value
 ```
 
 It accepts `:gravity` for specifying the [gravity] to apply while cropping
@@ -182,10 +181,9 @@ image.
 ```rb
 rotate(45)                                  # default color
 rotate(45, background: :transparent)        # transparent
-rotate(45, background: :RoyalBlue)          # color name
 rotate(45, background: [65, 105, 225])      # RGB value
 rotate(45, background: [65, 105, 225, 1.0]) # RGBA value
-rotate(45, background: "...")               # any supported color value
+rotate(45, background: "...")               # any supported ImageMagick color value
 ```
 
 #### `#convert`

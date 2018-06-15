@@ -1,6 +1,6 @@
 ## HEAD
 
-* [minimagick] Accept RGB(A) arrays and symbols for color names for `:background` (@janko-m)
+* [minimagick] Accept RGB(A) arrays for color names for `:background` (@janko-m)
 
 * [minimagick] Don't add empty `-background` option in `#rotate` when `:background` is not given (@janko-m)
 

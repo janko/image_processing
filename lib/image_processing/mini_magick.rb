@@ -104,11 +104,11 @@ module ImageProcessing
 
       def color(value)
         return "rgba(255,255,255,0.0)" if value.to_s == "transparent"
-        return value.to_s if value.is_a?(String) || value.is_a?(Symbol)
         return "rgb(#{value.join(",")})" if value.is_a?(Array) && value.count == 3
         return "rgba(#{value.join(",")})" if value.is_a?(Array) && value.count == 4
+        return value if value.is_a?(String)
 
-        raise ArgumentError, "unrecognized color format: #{value.inspect} (must be one of: symbol, string, 3-element RGB array, 4-element RGBA array)"
+        raise ArgumentError, "unrecognized color format: #{value.inspect} (must be one of: string, 3-element RGB array, 4-element RGBA array)"
       end
 
       def thumbnail(magick, geometry, sharpen: {})
