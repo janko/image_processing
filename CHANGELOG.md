@@ -1,3 +1,7 @@
+## HEAD
+
+* [minimagick, vips] Allow operations to accept blocks (janko-m)
+
 ## 1.4.0 (2018-06-14)
 
 * [minimagick] Accept RGB(A) arrays for color names for `:background` (@janko-m)

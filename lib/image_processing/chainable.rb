@@ -32,15 +32,15 @@ module ImageProcessing
       end
     end
 
-    def method_missing(name, *args)
+    def method_missing(name, *args, &block)
       return super if name.to_s.end_with?("?")
-      return send(name.to_s.chomp("!"), *args).call if name.to_s.end_with?("!")
+      return send(name.to_s.chomp("!"), *args, &block).call if name.to_s.end_with?("!")
 
-      operation name, *args
+      operation(name, *args, &block)
     end
 
-    def operation(name, *args)
-      branch operations: [[name, args]]
+    def operation(name, *args, &block)
+      branch operations: [[name, args, *block]]
     end
 
     def call(file = nil, destination: nil, **call_options)

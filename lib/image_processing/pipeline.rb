@@ -17,8 +17,8 @@ module ImageProcessing
       processor = processor_class.new(self)
       image     = processor.load_image(source, **loader)
 
-      operations.each do |name, args|
-        image = processor.apply_operation(name, image, *args)
+      operations.each do |name, args, block|
+        image = processor.apply_operation(name, image, *args, &block)
       end
 
       if save == false

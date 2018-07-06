@@ -220,9 +220,10 @@ list of all available options by running `convert -help` and visiting the
 
 ```rb
 ImageProcessing::MiniMagick
-  .quality(100)
-  .crop("300x300+0+0")
-  .resample("300x300")
+  .quality(100)        # -quality 100
+  .crop("300x300+0+0") # -crop 300x300+0+0
+  .resample("300x300") # -resample 300x300
+  .stack { |cmd| ... } # ( ... )
   # ...
 ```
 

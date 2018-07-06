@@ -133,6 +133,15 @@ describe "ImageProcessing::MiniMagick" do
     assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"] unless ENV["GM"]
   end
 
+  it "applies blocks to operations" do
+    magick = ImageProcessing::MiniMagick
+      .source(@portrait)
+      .stack { |stack| stack.foo("bar") }
+      .call(save: false)
+
+    assert_equal %W[#{@portrait.path} -auto-orient ( -foo bar )], magick.args
+  end
+
   it "accepts magick object as source" do
     magick = MiniMagick::Tool::Convert.new
     magick << fixture_image("rotated.jpg").path

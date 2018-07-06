@@ -4,11 +4,11 @@ module ImageProcessing
       @pipeline = pipeline
     end
 
-    def apply_operation(name, image, *args)
+    def apply_operation(name, image, *args, &block)
       if respond_to?(name)
-        public_send(name, image, *args)
+        public_send(name, image, *args, &block)
       else
-        image.send(name, *args)
+        image.send(name, *args, &block)
       end
     end
 

@@ -96,6 +96,13 @@ describe "ImageProcessing::Pipeline" do
     assert_equal [[:shrink, [2, 2]], [:invert, []]], pipeline.options[:operations]
   end
 
+  it "saves blocks passed to operations" do
+    pipeline = ImageProcessing::MiniMagick.stack { |stack| stack.foo("bar") }
+    assert_equal :stack,     pipeline.options[:operations].first[0]
+    assert_equal [],         pipeline.options[:operations].first[1]
+    assert_instance_of Proc, pipeline.options[:operations].first[2]
+  end
+
   it "accepts a list of commands" do
     pipeline = ImageProcessing::Vips.source(fixture_image("rotated.jpg"))
 
