@@ -16,10 +16,6 @@ module ImageProcessing
       branch saver: options
     end
 
-    def custom(&block)
-      operation :custom, block
-    end
-
     def apply(operations)
       operations.inject(self) do |builder, (name, argument)|
         if argument == true || argument == nil
