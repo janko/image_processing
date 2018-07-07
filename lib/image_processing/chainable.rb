@@ -53,7 +53,7 @@ module ImageProcessing
       options = options.merge(loader: options[:loader].merge(loader)) if loader
       options = options.merge(saver: options[:saver].merge(saver)) if saver
       options = options.merge(operations: options[:operations] + operations) if operations
-      options = options.merge(processor_class: self::Processor) unless self.is_a?(Builder)
+      options = options.merge(processor: self::Processor) unless self.is_a?(Builder)
       options = options.merge(other_options)
 
       options.freeze
@@ -62,12 +62,12 @@ module ImageProcessing
     end
 
     DEFAULT_OPTIONS = {
-      source:          nil,
-      loader:          {},
-      saver:           {},
-      format:          nil,
-      operations:      [],
-      processor_class: nil,
+      source:     nil,
+      loader:     {},
+      saver:      {},
+      format:     nil,
+      operations: [],
+      processor:  nil,
     }.freeze
   end
 end

@@ -27,6 +27,11 @@ describe "ImageProcessing::MiniMagick" do
     assert_includes magick.args, "-thumbnail"
   end
 
+  it "applies operations named as Object methods" do
+    magick = ImageProcessing::MiniMagick.custom(&:clone).call(@portrait, save: false)
+    assert_includes magick.args, "-clone"
+  end
+
   it "applies macro operations" do
     actual = ImageProcessing::MiniMagick.resize_to_limit(400, 400).call(@portrait)
     expected = Tempfile.new(["result", ".jpg"], binmode: true).tap do |tempfile|

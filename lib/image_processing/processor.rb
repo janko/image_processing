@@ -1,23 +1,26 @@
 module ImageProcessing
   class Processor
-    def initialize(pipeline)
-      @pipeline = pipeline
+    def self.accumulator(name, klass)
+      define_method(name) { @accumulator }
+      protected(name)
+      const_set(:ACCUMULATOR_CLASS, klass)
     end
 
-    def apply_operation(name, image, *args, &block)
-      if respond_to?(name)
-        public_send(name, image, *args, &block)
+    def self.apply_operation(accumulator, name, *args, &block)
+      if (instance_methods - Object.instance_methods).include?(name)
+        instance = new(accumulator)
+        instance.public_send(name, *args, &block)
       else
-        image.send(name, *args, &block)
+        accumulator.send(name, *args, &block)
       end
     end
 
-    def custom(image, block)
-      (block && block.call(image)) || image
+    def initialize(accumulator = nil)
+      @accumulator = accumulator
     end
 
-    private
-
-    attr_reader :pipeline
+    def custom(&block)
+      (block && block.call(@accumulator)) || @accumulator
+    end
   end
 end

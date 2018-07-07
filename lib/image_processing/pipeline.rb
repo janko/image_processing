@@ -4,7 +4,7 @@ module ImageProcessing
   class Pipeline
     DEFAULT_FORMAT = "jpg"
 
-    attr_reader :source, :loader, :saver, :format, :operations, :processor_class, :destination
+    attr_reader :source, :loader, :saver, :format, :operations, :processor, :destination
 
     def initialize(options)
       options.each do |name, value|
@@ -14,22 +14,21 @@ module ImageProcessing
     end
 
     def call(save: true)
-      processor = processor_class.new(self)
-      image     = processor.load_image(source, **loader)
+      accumulator = processor.load_image(source, **loader)
 
       operations.each do |name, args, block|
-        image = processor.apply_operation(name, image, *args, &block)
+        accumulator = processor.apply_operation(accumulator, name, *args, &block)
       end
 
       if save == false
-        image
+        accumulator
       elsif destination
         handle_destination do
-          processor.save_image(image, destination, **saver)
+          processor.save_image(accumulator, destination, **saver)
         end
       else
         create_tempfile do |tempfile|
-          processor.save_image(image, tempfile.path, **saver)
+          processor.save_image(accumulator, tempfile.path, **saver)
         end
       end
     end
@@ -74,9 +73,9 @@ module ImageProcessing
     def normalize_source(source, options)
       fail Error, "source file is not provided" unless source
 
-      image_class = options[:processor_class]::IMAGE_CLASS
+      accumulator_class = options[:processor]::ACCUMULATOR_CLASS
 
-      if source.is_a?(image_class)
+      if source.is_a?(accumulator_class)
         source
       elsif source.is_a?(String)
         source
@@ -85,7 +84,7 @@ module ImageProcessing
       elsif source.respond_to?(:to_path)
         source.to_path
       else
-        fail Error, "source file needs to respond to #path, or be a String, a Pathname, or a #{image_class} object"
+        fail Error, "source file needs to respond to #path, or be a String, a Pathname, or a #{accumulator_class} object"
       end
     end
   end
