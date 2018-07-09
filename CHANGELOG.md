@@ -1,4 +1,4 @@
-## HEAD
+## 1.5.0 (2018-07-10)
 
 * [minimagick, vips] Add `#composite` method (@janko-m)
 
