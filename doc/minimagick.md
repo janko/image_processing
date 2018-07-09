@@ -125,8 +125,8 @@ result = pipeline.resize_to_fill!(400, 400)
 MiniMagick.new(result.path).dimensions #=> [400, 400]
 ```
 
-It accepts `:gravity` for specifying the [gravity] to apply while cropping
-(defaults to `"Center"`).
+You can specify the [direction] of the image via the `:gravity` option
+(defaults to `"Center"`)
 
 ```rb
 pipeline.resize_to_fill!(400, 400, gravity: "NorthWest")
@@ -185,6 +185,47 @@ rotate(45, background: [65, 105, 225])      # RGB value
 rotate(45, background: [65, 105, 225, 1.0]) # RGBA value
 rotate(45, background: "...")               # any supported ImageMagick color value
 ```
+
+#### `#composite`
+
+Composes the image with the specified image and an optional mask. One use case
+for this can be applying a [watermark].
+
+```rb
+composite(overlay)
+composite(overlay, mask: mask)
+```
+
+The overlay and mask image can be a `String`, `Pathname`, or an object that
+responds to `#path`.
+
+The type of [image composition] can be specified via the `:compose` option (see
+[Compose Tables] for a visual representation of the available methods), and
+additional arguments for the compose method can be specified via `:args`:
+
+```rb
+composite(overlay, compose: "src")
+composite(overlay, compose: "blend", args: "50,50")
+```
+
+The [direction] and [position] of the source or overlay image can be controlled
+via `:gravity` and `:geometry` options:
+
+```rb
+composite(overlay, gravity: "SouthEast", geometry: "+55+55")
+```
+
+Any additional options can be specified via a block:
+
+```rb
+composite(overlay) do |cmd|
+  cmd.define("compose:outside-overlay=false")
+  cmd.background("none")
+  cmd.swap.+
+end
+```
+
+See [`-composite`] for more details.
 
 #### `#convert`
 
@@ -429,7 +470,7 @@ ImageProcessing::MiniMagick
 [fit]: http://www.imagemagick.org/Usage/thumbnails/#fit
 [fill]: http://www.imagemagick.org/Usage/thumbnails/#cut
 [pad]: http://www.imagemagick.org/Usage/thumbnails/#pad
-[gravity]: https://www.imagemagick.org/script/command-line-options.php#gravity
+[direction]: https://www.imagemagick.org/script/command-line-options.php#gravity
 [color]: https://www.imagemagick.org/script/color.php
 [ImageMagick reference]: https://www.imagemagick.org/script/command-line-options.php
 [`MiniMagick::Tool::Convert`]: https://github.com/minimagick/minimagick#metal
@@ -440,3 +481,8 @@ ImageProcessing::MiniMagick
 [`-sharpen`]: https://www.imagemagick.org/script/command-line-options.php#sharpen
 [`-define`]: https://www.imagemagick.org/script/command-line-options.php#define
 [`-rotate`]: https://www.imagemagick.org/script/command-line-options.php#rotate
+[watermark]: https://en.wikipedia.org/wiki/Watermark
+[image composition]: https://www.imagemagick.org/script/compose.php
+[Compose Tables]: http://www.imagemagick.org/Usage/compose/tables/
+[position]: https://www.imagemagick.org/script/command-line-processing.php#geometry
+[`-composite`]: https://www.imagemagick.org/script/command-line-options.php#composite

@@ -1,6 +1,8 @@
 ## HEAD
 
-* [minimagick, vips] Allow operations to accept blocks (janko-m)
+* [minimagick, vips] Add `#composite` method (@janko-m)
+
+* [core] Allow operations to accept blocks (janko-m)
 
 ## 1.4.0 (2018-06-14)
 
@@ -12,7 +14,7 @@
 
 ## 1.3.0 (2018-06-13)
 
-* [minimagick, vips] Add `#rotate` function (@janko-m)
+* [minimagick, vips] Add `#rotate` method (@janko-m)
 
 * [vips] Use native `vips_image_hasalpha()` and `vips_addalpha()` functions in `#resize_and_pad` (@janko-m)
 

@@ -1,5 +1,6 @@
 require "test_helper"
 require "image_processing/vips"
+require "pathname"
 
 describe "ImageProcessing::Vips" do
   before do
@@ -301,6 +302,41 @@ describe "ImageProcessing::Vips" do
 
     it "accepts background color" do
       assert_dimensions [990, 990], @pipeline.rotate!(45, background: [0, 0, 0])
+    end
+  end
+
+  describe "#composite" do
+    before do
+      @pipeline = ImageProcessing::Vips.source(@portrait)
+    end
+
+    it "accepts String, Pathname, and File objects" do
+      vips_image = ::Vips::Image.new_from_file(@portrait.path)
+      original   = @pipeline.custom! { |image| image.composite(vips_image, :over) }
+
+      assert_similar original, @pipeline.composite!(@portrait,                :over)
+      assert_similar original, @pipeline.composite!(@portrait.path,           :over)
+      assert_similar original, @pipeline.composite!(Pathname(@portrait.path), :over)
+
+      assert_similar original, @pipeline.composite!([@portrait],                :over)
+      assert_similar original, @pipeline.composite!([@portrait.path],           :over)
+      assert_similar original, @pipeline.composite!([Pathname(@portrait.path)], :over)
+    end
+
+    it "accepts Vips::Image objects" do
+      vips_image = ::Vips::Image.new_from_file(@portrait.path)
+      original   = @pipeline.custom! { |image| image.composite(vips_image, :over) }
+
+      assert_similar original, @pipeline.composite!(vips_image, :over)
+      assert_similar original, @pipeline.composite!([vips_image], :over)
+    end
+
+    it "accepts additional options" do
+      @pipeline.composite!(@landscape, :over, compositing_space: :grey16)
+
+      assert_raises(Vips::Error) do
+        @pipeline.composite!(@landscape, :over, compositing_space: :foo)
+      end
     end
   end
 end

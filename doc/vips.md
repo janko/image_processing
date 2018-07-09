@@ -188,6 +188,24 @@ ImageProcessing::Vips
   # ...
 ```
 
+#### `#composite`
+
+Composites the image with given image(s) using the specified blend mode(s).
+One use case for this can be applying a [watermark].
+
+```rb
+ImageProcessing::Vips
+  .composite(overlay, :over)
+  # ...
+```
+
+The overlay can be a `String`, `Pathname`, object that responds to `#path`,
+`Vips::Image`, or an array of the mentioned. The second argument should be a
+valid [blend mode]. Any additional options are forwarded to
+[`Vips::Image#composite`].
+
+See [`vips_composite()`] for more details.
+
 #### `#convert`
 
 Specifies the output format.
@@ -383,12 +401,16 @@ ImageProcessing::Vips
 [`Vips::Image#write_to_file`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#write_to_file-instance_method
 [`Vips::Image#thumbnail_image`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
 [`Vips::Image#gravity`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#gravity-instance_method
+[`Vips::Image#composite`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#composite-instance_method
 [`vips_thumbnail()`]: https://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
 [`vips_gravity()`]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-gravity
+[`vips_composite()`]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-composite
 [`vips_autorot()`]: https://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
 [`vips_jpegload()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegload
 [`vips_pngload()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngload
 [`vips_jpegsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
 [`vips_pngsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngsave
 [direction]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#VipsCompassDirection
+[blend mode]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
 [convolution mask]: https://en.wikipedia.org/wiki/Kernel_(image_processing)
+[watermark]: https://en.wikipedia.org/wiki/Watermark

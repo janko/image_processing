@@ -76,6 +76,26 @@ module ImageProcessing
         magick.rotate(degrees)
       end
 
+      def composite(overlay = :none, mask: nil, compose: nil, gravity: nil, geometry: nil, args: nil, &block)
+        return magick.composite if overlay == :none
+
+        overlay_path = convert_to_path(overlay, "overlay")
+        mask_path    = convert_to_path(mask, "mask") if mask
+
+        magick << overlay_path
+        magick << mask_path if mask_path
+
+        magick.compose(compose) if compose
+        define(compose: { args: args }) if args
+
+        magick.gravity(gravity) if gravity
+        magick.geometry(geometry) if geometry
+
+        yield magick if block_given?
+
+        magick.composite
+      end
+
       def define(options)
         return magick.define(options) if options.is_a?(String)
         Utils.apply_define(magick, options)
@@ -110,6 +130,18 @@ module ImageProcessing
         end
 
         magick
+      end
+
+      def convert_to_path(file, name)
+        if file.is_a?(String)
+          file
+        elsif file.respond_to?(:to_path)
+          file.to_path
+        elsif file.respond_to?(:path)
+          file.path
+        else
+          raise ArgumentError, "#{name} must be a String, Pathname, or respond to #path"
+        end
       end
 
       module Utils

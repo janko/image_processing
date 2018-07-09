@@ -78,6 +78,24 @@ module ImageProcessing
         end
       end
 
+      def composite(other, mode, **options)
+        other = [other] unless other.is_a?(Array)
+
+        other = other.map do |object|
+          if object.is_a?(String)
+            ::Vips::Image.new_from_file(object)
+          elsif object.respond_to?(:to_path)
+            ::Vips::Image.new_from_file(object.to_path)
+          elsif object.respond_to?(:path)
+            ::Vips::Image.new_from_file(object.path)
+          else
+            object
+          end
+        end
+
+        image.composite(other, mode, **options)
+      end
+
       # make Vips::Image#set, #set_type, and #set_value chainable
       def set(*args)       image.tap { |img| img.set(*args) }       end
       def set_type(*args)  image.tap { |img| img.set_type(*args) }  end

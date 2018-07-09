@@ -1,5 +1,6 @@
 require "test_helper"
 require "image_processing/mini_magick"
+require "pathname"
 
 MiniMagick.cli = :graphicsmagick if ENV["GM"]
 
@@ -363,6 +364,74 @@ describe "ImageProcessing::MiniMagick" do
       assert_similar transparent, default
     end
   end
+
+  describe "#composite" do
+    before do
+      @pipeline = ImageProcessing::MiniMagick.source(@portrait)
+    end
+
+    it "generates the correct composite command" do
+      @pipeline.composite!(@landscape, mask: @landscape, compose: "Over", gravity: "Center", geometry: "+0+0")
+    end
+
+    it "accepts String, Pathname and #path object for overlay" do
+      magick = @pipeline.composite(@landscape).call(save: false)
+      assert_includes magick.args, @landscape.path
+
+      magick = @pipeline.composite(@landscape.path).call(save: false)
+      assert_includes magick.args, @landscape.path
+
+      magick = @pipeline.composite(Pathname(@landscape.path)).call(save: false)
+      assert_includes magick.args, @landscape.path
+
+      assert_raises(ArgumentError) { @pipeline.composite!(nil) }
+    end
+
+    it "accepts String, Pathname and #path object for mask" do
+      magick = @pipeline.composite(@landscape, mask: @landscape).call(save: false)
+      assert_includes magick.args, @portrait.path
+
+      magick = @pipeline.composite(@landscape, mask: @landscape.path).call(save: false)
+      assert_includes magick.args, @landscape.path
+
+      magick = @pipeline.composite(@landscape, mask: Pathname(@landscape.path)).call(save: false)
+      assert_includes magick.args, @landscape.path
+
+      assert_raises(ArgumentError) { @pipeline.composite!(@landscape, mask: :invalid) }
+    end
+
+    it "accepts :compose" do
+      magick = @pipeline.composite(@landscape, compose: "Over").call(save: false)
+      assert_equal %W[-compose Over -composite], magick.args[3..-1]
+    end
+
+    it "accepts :gravity" do
+      magick = @pipeline.composite(@landscape, gravity: "Center").call(save: false)
+      assert_equal %W[-gravity Center -composite], magick.args[3..-1]
+    end
+
+    it "accepts :geometry" do
+      magick = @pipeline.composite(@landscape, geometry: "+0+0").call(save: false)
+      assert_equal %W[-geometry +0+0 -composite], magick.args[3..-1]
+    end
+
+    it "accepts :args" do
+      magick = @pipeline.composite(@landscape, compose: "blend", args: "50,50").call(save: false)
+      assert_equal %W[-compose blend -define compose:args=50,50 -composite], magick.args[3..-1]
+    end
+
+    it "accepts a block" do
+      magick = @pipeline.composite(@landscape, &:negate).call(save: false)
+      assert_equal %W[-negate -composite], magick.args[3..-1]
+    end
+
+    it "has default behaviour without arguments" do
+      result1 = @pipeline.append(@landscape.path).composite!
+      result2 = @pipeline.composite!(@landscape.path)
+
+      assert_similar result1, result2
+    end
+  end unless ENV["GM"]
 
   describe "#define" do
     it "adds -define options from a Hash" do
