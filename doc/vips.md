@@ -202,10 +202,10 @@ ImageProcessing::Vips
 The overlay can be a `String`, `Pathname`, object that responds to `#path`, or
 a `Vips::Image`.
 
-The [blend mode] can be specified via the `:blend` option (defaults to `:over`).
+The [blend mode] can be specified via the `:blend` option (defaults to `"over"`).
 
 ```rb
-composite(overlay, mode: :atop)
+composite(overlay, mode: "atop")
 ```
 
 The [direction] and position of the overlayed image can be controlled via the

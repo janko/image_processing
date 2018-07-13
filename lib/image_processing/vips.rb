@@ -78,7 +78,7 @@ module ImageProcessing
         end
       end
 
-      def composite(overlay, _mode = nil, mode: :over, gravity: :"north-west", offset: nil, **options)
+      def composite(overlay, _mode = nil, mode: "over", gravity: "north-west", offset: nil, **options)
         if _mode
           overlay = [overlay] unless overlay.is_a?(Array)
           overlay = overlay.map { |object| convert_to_image(object, "overlay") }

@@ -129,7 +129,7 @@ You can specify the [direction] of the image via the `:gravity` option
 (defaults to `"Center"`)
 
 ```rb
-pipeline.resize_to_fill!(400, 400, gravity: "NorthWest")
+pipeline.resize_to_fill!(400, 400, gravity: "north-west")
 ```
 
 #### `#resize_and_pad`
@@ -160,7 +160,7 @@ It accepts `:gravity` for specifying the [gravity] to apply while cropping
 (defaults to `"Center"`).
 
 ```rb
-pipeline.resize_and_pad!(400, 400, gravity: "NorthWest")
+pipeline.resize_and_pad!(400, 400, gravity: "north-west")
 ```
 
 #### `#rotate`
@@ -212,8 +212,8 @@ The [direction] and [position] of the source or overlay image can be controlled
 via `:gravity` and `:offset` options:
 
 ```rb
-composite(overlay, gravity: "SouthEast")
-composite(overlay, gravity: "NorthWest", offset: [55, 55])
+composite(overlay, gravity: "south-east")
+composite(overlay, gravity: "north-west", offset: [55, 55])
 ```
 
 Any additional options can be specified via a block:

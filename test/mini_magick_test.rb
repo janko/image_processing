@@ -371,7 +371,7 @@ describe "ImageProcessing::MiniMagick" do
     end
 
     it "generates the correct composite command" do
-      result = @pipeline.composite!(@landscape, mode: "Over", gravity: "NorthWest", offset: [0, 0])
+      result = @pipeline.composite!(@landscape, mode: :over, gravity: "north-west", offset: [0, 0])
       assert_similar fixture_image("composited.jpg"), result
     end
 

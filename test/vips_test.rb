@@ -322,7 +322,7 @@ describe "ImageProcessing::Vips" do
     end
 
     it "accepts :mode" do
-      refute_similar fixture_image("composited.jpg"), @pipeline.composite!(@landscape, mode: :clear)
+      refute_similar fixture_image("composited.jpg"), @pipeline.composite!(@landscape, mode: "clear")
     end
 
     it "accepts :gravity" do
