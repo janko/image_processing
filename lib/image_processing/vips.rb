@@ -78,22 +78,25 @@ module ImageProcessing
         end
       end
 
-      def composite(other, mode, **options)
-        other = [other] unless other.is_a?(Array)
+      def composite(overlay, _mode = nil, mode: :over, gravity: :"north-west", offset: nil, **options)
+        if _mode
+          overlay = [overlay] unless overlay.is_a?(Array)
+          overlay = overlay.map { |object| convert_to_image(object, "overlay") }
 
-        other = other.map do |object|
-          if object.is_a?(String)
-            ::Vips::Image.new_from_file(object)
-          elsif object.respond_to?(:to_path)
-            ::Vips::Image.new_from_file(object.to_path)
-          elsif object.respond_to?(:path)
-            ::Vips::Image.new_from_file(object.path)
-          else
-            object
-          end
+          return image.composite(overlay, _mode, **options)
         end
 
-        image.composite(other, mode, **options)
+        overlay = convert_to_image(overlay, "overlay")
+        overlay = overlay.add_alpha unless overlay.has_alpha? # so that #gravity can use transparent background
+
+        if offset
+          opposite_gravity = gravity.to_s.gsub(/\w+/, "north"=>"south", "south"=>"north", "east"=>"west", "west"=>"east")
+          overlay = overlay.gravity(opposite_gravity, overlay.width + offset.first, overlay.height + offset.last)
+        end
+
+        overlay = overlay.gravity(gravity, image.width, image.height)
+
+        image.composite(overlay, mode, **options)
       end
 
       # make Vips::Image#set, #set_type, and #set_value chainable
@@ -114,6 +117,22 @@ module ImageProcessing
         raise Error, "either width or height must be specified" unless width || height
 
         [width || ::Vips::MAX_COORD, height || ::Vips::MAX_COORD]
+      end
+
+      def convert_to_image(object, name)
+        return object if object.is_a?(::Vips::Image)
+
+        if object.is_a?(String)
+          path = object
+        elsif object.respond_to?(:to_path)
+          path = object.to_path
+        elsif object.respond_to?(:path)
+          path = object.path
+        else
+          raise ArgumentError, "#{name} must be a Vips::Image, String, Pathname, or respond to #path"
+        end
+
+        ::Vips::Image.new_from_file(path)
       end
 
       module Utils

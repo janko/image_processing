@@ -1,3 +1,15 @@
+## HEAD
+
+* [vips] In `#composite` accept `:offset` option for the position of the overlay image (@janko-m)
+
+* [vips] In `#composite` accept `:gravity` option for the direction of the overlay image (@janko-m)
+
+* [vips] In `#composite` accept blend mode as an optional `:mode` parameter which defaults to `:over` (@janko-m)
+
+* [minimagick] In `#composite` rename `:compose` option to `:mode` (@janko-m)
+
+* [minimagick] In `#composite` replace `:geometry` option with `:offset` which accepts an array (@janko-m)
+
 ## 1.5.0 (2018-07-10)
 
 * [minimagick, vips] Add `#composite` method (@janko-m)

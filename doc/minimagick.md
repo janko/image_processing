@@ -188,7 +188,7 @@ rotate(45, background: "...")               # any supported ImageMagick color va
 
 #### `#composite`
 
-Composes the image with the specified image and an optional mask. One use case
+Blends the image with the specified image and an optional mask. One use case
 for this can be applying a [watermark].
 
 ```rb
@@ -199,20 +199,21 @@ composite(overlay, mask: mask)
 The overlay and mask image can be a `String`, `Pathname`, or an object that
 responds to `#path`.
 
-The type of [image composition] can be specified via the `:compose` option (see
+The method of [image composition] can be specified via the `:mode` option (see
 [Compose Tables] for a visual representation of the available methods), and
 additional arguments for the compose method can be specified via `:args`:
 
 ```rb
-composite(overlay, compose: "src")
-composite(overlay, compose: "blend", args: "50,50")
+composite(overlay, mode: "src")
+composite(overlay, mode: "blend", args: "50,50")
 ```
 
 The [direction] and [position] of the source or overlay image can be controlled
-via `:gravity` and `:geometry` options:
+via `:gravity` and `:offset` options:
 
 ```rb
-composite(overlay, gravity: "SouthEast", geometry: "+55+55")
+composite(overlay, gravity: "SouthEast")
+composite(overlay, gravity: "NorthWest", offset: [55, 55])
 ```
 
 Any additional options can be specified via a block:

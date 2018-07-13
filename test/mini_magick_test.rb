@@ -371,7 +371,8 @@ describe "ImageProcessing::MiniMagick" do
     end
 
     it "generates the correct composite command" do
-      @pipeline.composite!(@landscape, mask: @landscape, compose: "Over", gravity: "Center", geometry: "+0+0")
+      result = @pipeline.composite!(@landscape, mode: "Over", gravity: "NorthWest", offset: [0, 0])
+      assert_similar fixture_image("composited.jpg"), result
     end
 
     it "accepts String, Pathname and #path object for overlay" do
@@ -400,9 +401,16 @@ describe "ImageProcessing::MiniMagick" do
       assert_raises(ArgumentError) { @pipeline.composite!(@landscape, mask: :invalid) }
     end
 
-    it "accepts :compose" do
-      magick = @pipeline.composite(@landscape, compose: "Over").call(save: false)
+    it "accepts :mode" do
+      magick = @pipeline.composite(@landscape, mode: "Over").call(save: false)
       assert_equal %W[-compose Over -composite], magick.args[3..-1]
+    end
+
+    it "accepts deprecated :compose" do
+      assert_output nil, /renamed/ do
+        magick = @pipeline.composite(@landscape, compose: "Over").call(save: false)
+        assert_equal %W[-compose Over -composite], magick.args[3..-1]
+      end
     end
 
     it "accepts :gravity" do
@@ -410,13 +418,20 @@ describe "ImageProcessing::MiniMagick" do
       assert_equal %W[-gravity Center -composite], magick.args[3..-1]
     end
 
-    it "accepts :geometry" do
-      magick = @pipeline.composite(@landscape, geometry: "+0+0").call(save: false)
-      assert_equal %W[-geometry +0+0 -composite], magick.args[3..-1]
+    it "accepts :offset" do
+      magick = @pipeline.composite(@landscape, offset: [5, -15]).call(save: false)
+      assert_equal %W[-geometry +5-15 -composite], magick.args[3..-1]
+    end
+
+    it "accepts deprecated :geometry" do
+      assert_output nil, /deprecated/ do
+        magick = @pipeline.composite(@landscape, geometry: "+0+0").call(save: false)
+        assert_equal %W[-geometry +0+0 -composite], magick.args[3..-1]
+      end
     end
 
     it "accepts :args" do
-      magick = @pipeline.composite(@landscape, compose: "blend", args: "50,50").call(save: false)
+      magick = @pipeline.composite(@landscape, mode: "blend", args: "50,50").call(save: false)
       assert_equal %W[-compose blend -define compose:args=50,50 -composite], magick.args[3..-1]
     end
 

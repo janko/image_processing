@@ -76,8 +76,19 @@ module ImageProcessing
         magick.rotate(degrees)
       end
 
-      def composite(overlay = :none, mask: nil, compose: nil, gravity: nil, geometry: nil, args: nil, &block)
+      def composite(overlay = :none, mask: nil, mode: nil, gravity: nil, offset: nil, args: nil, **options, &block)
         return magick.composite if overlay == :none
+
+        if options.key?(:compose)
+          warn "[IMAGE_PROCESSING] The :compose parameter in #composite has been renamed to :mode, the :compose alias will be removed in ImageProcessing 2."
+          mode = options[:compose]
+        end
+
+        if options.key?(:geometry)
+          warn "[IMAGE_PROCESSING] The :geometry parameter in #composite has been deprecated and will be removed in ImageProcessing 2. Use :offset instead, e.g. `geometry: \"+10+15\"` should be replaced with `offset: [10, 15]`."
+          geometry = options[:geometry]
+        end
+        geometry = "%+d%+d" % offset if offset
 
         overlay_path = convert_to_path(overlay, "overlay")
         mask_path    = convert_to_path(mask, "mask") if mask
@@ -85,7 +96,7 @@ module ImageProcessing
         magick << overlay_path
         magick << mask_path if mask_path
 
-        magick.compose(compose) if compose
+        magick.compose(mode) if mode
         define(compose: { args: args }) if args
 
         magick.gravity(gravity) if gravity

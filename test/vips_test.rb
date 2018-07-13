@@ -310,33 +310,54 @@ describe "ImageProcessing::Vips" do
       @pipeline = ImageProcessing::Vips.source(@portrait)
     end
 
-    it "accepts String, Pathname, and File objects" do
-      vips_image = ::Vips::Image.new_from_file(@portrait.path)
-      original   = @pipeline.custom! { |image| image.composite(vips_image, :over) }
-
-      assert_similar original, @pipeline.composite!(@portrait,                :over)
-      assert_similar original, @pipeline.composite!(@portrait.path,           :over)
-      assert_similar original, @pipeline.composite!(Pathname(@portrait.path), :over)
-
-      assert_similar original, @pipeline.composite!([@portrait],                :over)
-      assert_similar original, @pipeline.composite!([@portrait.path],           :over)
-      assert_similar original, @pipeline.composite!([Pathname(@portrait.path)], :over)
+    it "accepts String, Pathname, and File object" do
+      assert_similar fixture_image("composited.jpg"), @pipeline.composite!(@landscape)
+      assert_similar fixture_image("composited.jpg"), @pipeline.composite!(@landscape.path)
+      assert_similar fixture_image("composited.jpg"), @pipeline.composite!(Pathname(@landscape.path))
     end
 
-    it "accepts Vips::Image objects" do
-      vips_image = ::Vips::Image.new_from_file(@portrait.path)
-      original   = @pipeline.custom! { |image| image.composite(vips_image, :over) }
+    it "accepts Vips::Image object" do
+      overlay = Vips::Image.new_from_file(@landscape.path)
+      assert_similar fixture_image("composited.jpg"), @pipeline.composite!(overlay)
+    end
 
-      assert_similar original, @pipeline.composite!(vips_image, :over)
-      assert_similar original, @pipeline.composite!([vips_image], :over)
+    it "accepts :mode" do
+      refute_similar fixture_image("composited.jpg"), @pipeline.composite!(@landscape, mode: :clear)
+    end
+
+    it "accepts :gravity" do
+      result = @pipeline.composite!(@landscape, gravity: "centre")
+      refute_similar fixture_image("composited.jpg"), result
+      assert_dimensions [600, 800], result
+
+      assert_raises(Vips::Error) { @pipeline.composite!(@landscape, gravity: "foo") }
+    end
+
+    it "accepts :offset" do
+      result = @pipeline.composite!(@landscape, offset: [50, -50])
+      refute_similar fixture_image("composited.jpg"), result
+      assert_dimensions [600, 800], result
     end
 
     it "accepts additional options" do
-      @pipeline.composite!(@landscape, :over, compositing_space: :grey16)
+      @pipeline.composite!(@landscape, compositing_space: :grey16)
 
-      assert_raises(Vips::Error) do
-        @pipeline.composite!(@landscape, :over, compositing_space: :foo)
-      end
+      assert_raises(Vips::Error) { @pipeline.composite!(@landscape, compositing_space: :foo) }
+    end
+
+    it "accepts Vips::Image#composite parameters" do
+      overlay  = Vips::Image.new_from_file(@landscape.path)
+      original = @pipeline.custom! { |image| image.composite(overlay, :over) }
+
+      assert_similar original, @pipeline.composite!(overlay, :over)
+      assert_similar original, @pipeline.composite!(@landscape, :over)
+      assert_similar original, @pipeline.composite!(@landscape.path, :over)
+      assert_similar original, @pipeline.composite!(Pathname(@landscape.path), :over)
+
+      assert_similar original, @pipeline.composite!([overlay], :over)
+      assert_similar original, @pipeline.composite!([@landscape], :over)
+      assert_similar original, @pipeline.composite!([@landscape.path], :over)
+      assert_similar original, @pipeline.composite!([Pathname(@landscape.path)], :over)
     end
   end
 end

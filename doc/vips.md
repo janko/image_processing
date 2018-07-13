@@ -190,19 +190,44 @@ ImageProcessing::Vips
 
 #### `#composite`
 
-Composites the image with given image(s) using the specified blend mode(s).
-One use case for this can be applying a [watermark].
+Blends the image with the specified image. One use case for this can be
+applying a [watermark].
 
 ```rb
 ImageProcessing::Vips
-  .composite(overlay, :over)
+  .composite(overlay)
   # ...
 ```
 
-The overlay can be a `String`, `Pathname`, object that responds to `#path`,
-`Vips::Image`, or an array of the mentioned. The second argument should be a
-valid [blend mode]. Any additional options are forwarded to
-[`Vips::Image#composite`].
+The overlay can be a `String`, `Pathname`, object that responds to `#path`, or
+a `Vips::Image`.
+
+The [blend mode] can be specified via the `:blend` option (defaults to `:over`).
+
+```rb
+composite(overlay, mode: :atop)
+```
+
+The [direction] and position of the overlayed image can be controlled via the
+`:gravity` and `:offset` options:
+
+```rb
+composite(overlay, gravity: "south-east")
+composite(overlay, gravity: "north-west", offset: [55, 55])
+```
+
+Any additional options are forwarded to [`Vips::Image#composite`].
+
+```rb
+composite(overlay, premultiplied: true)
+```
+
+You can still invoke `Vips::Image#composite` directly by passing the blend mode
+as the second argument:
+
+```rb
+composite(overlay, :over) # calls Vips::Image#composite
+```
 
 See [`vips_composite()`] for more details.
 
