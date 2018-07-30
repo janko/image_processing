@@ -1,4 +1,4 @@
-## HEAD
+## 1.6.0 (2018-07-13)
 
 * [vips] In `#composite` accept `:offset` option for the position of the overlay image (@janko-m)
 
