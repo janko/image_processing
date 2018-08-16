@@ -181,10 +181,10 @@ module ImageProcessing
 
         def apply_define(magick, options)
           options.each do |namespace, settings|
-            namespace = namespace.to_s.gsub("_", "-")
+            namespace = namespace.to_s.tr("_", "-")
 
             settings.each do |key, value|
-              key = key.to_s.gsub("_", "-")
+              key = key.to_s.tr("_", "-")
 
               magick.define "#{namespace}:#{key}=#{value}"
             end
