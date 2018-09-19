@@ -59,22 +59,16 @@ module ImageProcessing
       end
 
       def resize_and_pad(width, height, gravity: "centre", extend: nil, background: nil, alpha: nil, **options)
-        embed_options = { extend: extend, background: background }
-        embed_options.reject! { |name, value| value.nil? }
-
         image = thumbnail(width, height, **options)
         image = image.add_alpha if alpha && !image.has_alpha?
-        image.gravity(gravity, width, height, **embed_options)
+        image.gravity(gravity, width, height, extend: extend, background: background)
       end
 
       def rotate(degrees, background: nil)
         if degrees % 90 == 0
           image.rot(:"d#{degrees % 360}")
         else
-          options = { angle: degrees }
-          options[:background] = background if background
-
-          image.similarity(**options)
+          image.similarity(angle: degrees, background: background)
         end
       end
 
