@@ -250,9 +250,10 @@ File.extname(result.path)
 By default the original format is retained when writing the image to a file. If
 the source file doesn't have a file extension, the format will default to JPEG.
 
-NOTE: GIF support in `ImageProcessing::Vips` is limited. You can read GIF files
-(and convert them to other formats), but you can't save GIF files. If you need
-full GIF support, we recommend using `ImageProcessing::MiniMagick` instead.
+NOTE: libvips 8.6 is able to normally read GIF images (and convert them to
+other formats), but it's not able to *save* to GIF format. If you need full GIF
+support, you need to use libvips 8.7+ compiled with ImageMagick support
+(`--with-imagemagick` for Homebrew).
 
 #### `#method_missing`
 
