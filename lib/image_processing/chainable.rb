@@ -1,21 +1,31 @@
 module ImageProcessing
+  # Implements a chainable interface for building processing options.
   module Chainable
+    # Specify the source image file.
     def source(file)
       branch source: file
     end
 
+    # Specify the output format.
     def convert(format)
       branch format: format
     end
 
+    # Specify processor options applied when loading the image.
     def loader(**options)
       branch loader: options
     end
 
+    # Specify processor options applied when saving the image.
     def saver(**options)
       branch saver: options
     end
 
+    # Add multiple operations as a hash or an array.
+    #
+    #   .apply(resize_to_limit: [400, 400], strip: true)
+    #   # or
+    #   .apply([[:resize_to_limit, [400, 400]], [:strip, true])
     def apply(operations)
       operations.inject(self) do |builder, (name, argument)|
         if argument == true || argument == nil
@@ -28,6 +38,8 @@ module ImageProcessing
       end
     end
 
+    # Assume that any unknown method names an operation supported by the
+    # processor. Add a bang ("!") if you want processing to be performed.
     def method_missing(name, *args, &block)
       return super if name.to_s.end_with?("?")
       return send(name.to_s.chomp("!"), *args, &block).call if name.to_s.end_with?("!")
@@ -35,10 +47,13 @@ module ImageProcessing
       operation(name, *args, &block)
     end
 
+    # Add an operation defined by the processor.
     def operation(name, *args, &block)
       branch operations: [[name, args, *block]]
     end
 
+    # Call the defined processing and get the result. Allows specifying
+    # the source file and destination.
     def call(file = nil, destination: nil, **call_options)
       options = {}
       options = options.merge(source: file) if file
@@ -47,6 +62,7 @@ module ImageProcessing
       branch(options).call!(**call_options)
     end
 
+    # Creates a new builder object, merging current options with new options.
     def branch(loader: nil, saver: nil, operations: nil, **other_options)
       options = respond_to?(:options) ? self.options : DEFAULT_OPTIONS
 
@@ -61,6 +77,7 @@ module ImageProcessing
       Builder.new(options)
     end
 
+    # Empty options which the builder starts with.
     DEFAULT_OPTIONS = {
       source:     nil,
       loader:     {},

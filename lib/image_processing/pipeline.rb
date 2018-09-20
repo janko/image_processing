@@ -6,6 +6,7 @@ module ImageProcessing
 
     attr_reader :source, :loader, :saver, :format, :operations, :processor, :destination
 
+    # Initializes the pipeline with all the processing options.
     def initialize(options)
       options.each do |name, value|
         value = normalize_source(value, options) if name == :source
@@ -13,6 +14,10 @@ module ImageProcessing
       end
     end
 
+    # Performs the defined series of operations, and saves the result in a new
+    # tempfile or a specified path on disk, or if `save: false` was passed in
+    # returns the unsaved accumulator object that can be used for further
+    # processing.
     def call(save: true)
       accumulator = processor.load_image(source, **loader)
 
@@ -33,10 +38,12 @@ module ImageProcessing
       end
     end
 
+    # Retrieves the source path on disk.
     def source_path
       source if source.is_a?(String)
     end
 
+    # Determines the appropriate destination image format.
     def destination_format
       format   = File.extname(destination)[1..-1] if destination
       format ||= self.format
@@ -47,6 +54,8 @@ module ImageProcessing
 
     private
 
+    # Creates a new tempfile for the destination file, yields it, and refreshes
+    # the file descriptor to get the updated file.
     def create_tempfile
       tempfile = Tempfile.new(["image_processing", ".#{destination_format}"], binmode: true)
 
@@ -70,6 +79,7 @@ module ImageProcessing
       raise
     end
 
+    # Converts the source image object into a path or the accumulator object.
     def normalize_source(source, options)
       fail Error, "source file is not provided" unless source
 
