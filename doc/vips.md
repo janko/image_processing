@@ -188,6 +188,9 @@ ImageProcessing::Vips
   # ...
 ```
 
+All other options are forwarded to [`Vips::Image#similarity`]. See
+[`vips_similarity()`] for more details.
+
 #### `#composite`
 
 Blends the image with the specified image. One use case for this can be
@@ -427,10 +430,12 @@ ImageProcessing::Vips
 [`Vips::Image#thumbnail_image`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
 [`Vips::Image#gravity`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#gravity-instance_method
 [`Vips::Image#composite`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#composite-instance_method
+[`Vips::Image#similarity`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#similarity-instance_method
 [`vips_thumbnail()`]: https://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
 [`vips_gravity()`]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-gravity
 [`vips_composite()`]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-composite
 [`vips_autorot()`]: https://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
+[`vips_similarity()`]: http://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-similarity
 [`vips_jpegload()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegload
 [`vips_pngload()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngload
 [`vips_jpegsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave

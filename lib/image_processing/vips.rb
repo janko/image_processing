@@ -77,15 +77,11 @@ module ImageProcessing
         image.gravity(gravity, width, height, extend: extend, background: background)
       end
 
-      # Rotates the image by an arbitrary angle. For angles that are not
-      # multiple of 90 degrees an optional background color can be specified to
-      # fill in the gaps.
-      def rotate(degrees, background: nil)
-        if degrees % 90 == 0
-          image.rot(:"d#{degrees % 360}")
-        else
-          image.similarity(angle: degrees, background: background)
-        end
+      # Rotates the image by an arbitrary angle. Additional options can be
+      # specified, such as background colors to fill in the gaps when rotating
+      # with an angle which is not a multiple of 90 degrees.
+      def rotate(degrees, **options)
+        image.similarity(angle: degrees, **options)
       end
 
       # Overlays the specified image over the current one. Supports specifying
