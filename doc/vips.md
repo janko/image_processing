@@ -433,16 +433,16 @@ ImageProcessing::Vips
 [`Vips::Image#gravity`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#gravity-instance_method
 [`Vips::Image#composite`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#composite-instance_method
 [`Vips::Image#similarity`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#similarity-instance_method
-[`vips_thumbnail()`]: https://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
-[`vips_gravity()`]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-gravity
-[`vips_composite()`]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-composite
-[`vips_autorot()`]: https://jcupitt.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
-[`vips_similarity()`]: http://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-similarity
-[`vips_jpegload()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegload
-[`vips_pngload()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngload
-[`vips_jpegsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
-[`vips_pngsave()`]: https://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-pngsave
-[direction]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#VipsCompassDirection
-[blend mode]: http://jcupitt.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+[`vips_thumbnail()`]: https://libvips.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
+[`vips_gravity()`]: http://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-gravity
+[`vips_composite()`]: http://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-composite
+[`vips_autorot()`]: https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
+[`vips_similarity()`]: http://libvips.github.io/libvips/API/current/libvips-resample.html#vips-similarity
+[`vips_jpegload()`]: https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegload
+[`vips_pngload()`]: https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-pngload
+[`vips_jpegsave()`]: https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
+[`vips_pngsave()`]: https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-pngsave
+[direction]: http://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsCompassDirection
+[blend mode]: http://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
 [convolution mask]: https://en.wikipedia.org/wiki/Kernel_(image_processing)
 [watermark]: https://en.wikipedia.org/wiki/Watermark

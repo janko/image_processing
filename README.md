@@ -181,7 +181,7 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 
 [MIT](LICENSE.txt)
 
-[libvips]: http://jcupitt.github.io/libvips/
+[libvips]: http://libvips.github.io/libvips/
 [ImageMagick]: https://www.imagemagick.org
 [GraphicsMagick]: http://www.graphicsmagick.org
 [`ImageProcessing::Vips`]: /doc/vips.md#imageprocessingvips
