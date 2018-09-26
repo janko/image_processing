@@ -1,4 +1,4 @@
-## HEAD
+## 1.7.1 (2018-09-27)
 
 * [vips] Make `#remove` that's used for removing image metadata chainable (@janko-m)
 
