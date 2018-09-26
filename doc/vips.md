@@ -264,6 +264,7 @@ ImageProcessing::Vips
   .crop(0, 0, 300, 300)
   .invert
   .set("icc-profile-data", custom_profile)
+  .remove("xmp-data")
   .gaussblur(2)
   # ...
 ```

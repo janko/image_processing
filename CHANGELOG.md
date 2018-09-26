@@ -1,3 +1,7 @@
+## HEAD
+
+* [vips] Make `#remove` that's used for removing image metadata chainable (@janko-m)
+
 ## 1.7.0 (2018-09-20)
 
 * [vips] `#rotate` now always calls `vips_similarity()` and forwards all options to it (@janko-m)

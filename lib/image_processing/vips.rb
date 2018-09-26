@@ -112,10 +112,11 @@ module ImageProcessing
         image.composite(overlay, mode, **options)
       end
 
-      # make Vips::Image#set, #set_type, and #set_value chainable
+      # make Vips::Image#set, #set_type, #set_value, and #move chainable
       def set(*args)       image.tap { |img| img.set(*args) }       end
       def set_type(*args)  image.tap { |img| img.set_type(*args) }  end
       def set_value(*args) image.tap { |img| img.set_value(*args) } end
+      def remove(*args)    image.tap { |img| img.remove(*args) }    end
 
       private
 

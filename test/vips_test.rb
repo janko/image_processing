@@ -30,13 +30,18 @@ describe "ImageProcessing::Vips" do
     assert_similar expected, actual
   end
 
-  it "applies setting metadata" do
+  it "allows changing metadata" do
     image = ImageProcessing::Vips
       .copy
       .set("icc-profile-data", "foobar")
+      .set_type(Vips::BLOB_TYPE, "foo", "bar")
+      .remove("exif-data")
       .call(@portrait, save: false)
 
     assert_equal "foobar", image.get("icc-profile-data")
+    assert_equal "bar",    image.get("foo")
+
+    assert_raises(Vips::Error) { image.get("exif-data") }
   end
 
   it "applies format" do
