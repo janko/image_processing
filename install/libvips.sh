@@ -1,4 +1,4 @@
-vips_site=https://github.com/jcupitt/libvips/releases/download
+vips_site=https://github.com/libvips/libvips/releases/download
 version=8.6.3
 
 sudo apt-get install -y gobject-introspection libgirepository1.0-dev libglib2.0-dev libpoppler-glib-dev

@@ -189,4 +189,4 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick
 [wiki]: https://github.com/janko-m/image_processing/wiki
 [HTTP.rb]: https://github.com/httprb/http
-[libvips performance]: https://github.com/jcupitt/libvips/wiki/Speed-and-memory-use
+[libvips performance]: https://github.com/libvips/libvips/wiki/Speed-and-memory-use

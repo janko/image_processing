@@ -423,9 +423,9 @@ ImageProcessing::Vips
   .resize_to_limit!(400, 400, sharpen: false)
 ```
 
-[ruby-vips]: https://github.com/jcupitt/ruby-vips
-[libvips]: https://github.com/jcupitt/libvips
-[installation instructions]: https://github.com/jcupitt/libvips/wiki#building-and-installing
+[ruby-vips]: https://github.com/libvips/ruby-vips
+[libvips]: https://github.com/libvips/libvips
+[installation instructions]: https://github.com/libvips/libvips/wiki#building-and-installing
 [`Vips::Image`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image
 [`Vips::Image.new_from_file`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#new_from_file-class_method
 [`Vips::Image#write_to_file`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#write_to_file-instance_method
