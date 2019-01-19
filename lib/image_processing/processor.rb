@@ -2,7 +2,7 @@ module ImageProcessing
   # Abstract class inherited by individual processors.
   class Processor
     # Use for processor subclasses to specify the name and the class of their
-    # accumulator object (e.g. MiniMagic::Tool or Vips::Image).
+    # accumulator object (e.g. MiniMagick::Tool or Vips::Image).
     def self.accumulator(name, klass)
       define_method(name) { @accumulator }
       protected(name)
@@ -14,7 +14,7 @@ module ImageProcessing
     # operation directly on the accumulator object. This provides a common
     # umbrella above defined macros and direct operations.
     def self.apply_operation(accumulator, name, *args, &block)
-      if (instance_methods - Object.instance_methods).include?(name)
+      if method_defined?(name)
         instance = new(accumulator)
         instance.public_send(name, *args, &block)
       else
