@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "Set of higher-level helper methods for image processing."
   spec.description   = "Set of higher-level helper methods for image processing."
-  spec.homepage      = "https://github.com/janko-m/image_processing"
+  spec.homepage      = "https://github.com/janko/image_processing"
   spec.authors       = ["Janko Marohnić"]
   spec.email         = ["janko.marohnic@gmail.com"]
   spec.license       = "MIT"

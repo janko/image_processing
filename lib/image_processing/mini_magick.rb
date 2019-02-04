@@ -195,7 +195,7 @@ module ImageProcessing
 
           if layers.any?
             layers.each { |path| File.delete(path) }
-            raise Error, "Multi-layer image is being converted into a single-layer format. You should either process individual layers or set :allow_splitting to true. See https://github.com/janko-m/image_processing/wiki/Splitting-a-PDF-into-multiple-images for how to process each layer individually."
+            raise Error, "Multi-layer image is being converted into a single-layer format. You should either process individual layers or set :allow_splitting to true. See https://github.com/janko/image_processing/wiki/Splitting-a-PDF-into-multiple-images for how to process each layer individually."
           end
         end
 

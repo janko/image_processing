@@ -1,150 +1,150 @@
 ## 1.7.1 (2018-09-27)
 
-* [vips] Make `#remove` that's used for removing image metadata chainable (@janko-m)
+* [vips] Make `#remove` that's used for removing image metadata chainable (@janko)
 
 ## 1.7.0 (2018-09-20)
 
-* [vips] `#rotate` now always calls `vips_similarity()` and forwards all options to it (@janko-m)
+* [vips] `#rotate` now always calls `vips_similarity()` and forwards all options to it (@janko)
 
 ## 1.6.0 (2018-07-13)
 
-* [vips] In `#composite` accept `:offset` option for the position of the overlay image (@janko-m)
+* [vips] In `#composite` accept `:offset` option for the position of the overlay image (@janko)
 
-* [vips] In `#composite` accept `:gravity` option for the direction of the overlay image (@janko-m)
+* [vips] In `#composite` accept `:gravity` option for the direction of the overlay image (@janko)
 
-* [vips] In `#composite` accept blend mode as an optional `:mode` parameter which defaults to `:over` (@janko-m)
+* [vips] In `#composite` accept blend mode as an optional `:mode` parameter which defaults to `:over` (@janko)
 
-* [minimagick] In `#composite` rename `:compose` option to `:mode` (@janko-m)
+* [minimagick] In `#composite` rename `:compose` option to `:mode` (@janko)
 
-* [minimagick] In `#composite` replace `:geometry` option with `:offset` which accepts an array (@janko-m)
+* [minimagick] In `#composite` replace `:geometry` option with `:offset` which accepts an array (@janko)
 
 ## 1.5.0 (2018-07-10)
 
-* [minimagick, vips] Add `#composite` method (@janko-m)
+* [minimagick, vips] Add `#composite` method (@janko)
 
 * [core] Allow operations to accept blocks (janko-m)
 
 ## 1.4.0 (2018-06-14)
 
-* [minimagick] Accept RGB(A) arrays for color names for `:background` (@janko-m)
+* [minimagick] Accept RGB(A) arrays for color names for `:background` (@janko)
 
-* [minimagick] Don't add empty `-background` option in `#rotate` when `:background` is not given (@janko-m)
+* [minimagick] Don't add empty `-background` option in `#rotate` when `:background` is not given (@janko)
 
-* [vips] Modify `#rotate` to accept only `:background` and not other `vips_similarity()` options (@janko-m)
+* [vips] Modify `#rotate` to accept only `:background` and not other `vips_similarity()` options (@janko)
 
 ## 1.3.0 (2018-06-13)
 
-* [minimagick, vips] Add `#rotate` method (@janko-m)
+* [minimagick, vips] Add `#rotate` method (@janko)
 
-* [vips] Use native `vips_image_hasalpha()` and `vips_addalpha()` functions in `#resize_and_pad` (@janko-m)
+* [vips] Use native `vips_image_hasalpha()` and `vips_addalpha()` functions in `#resize_and_pad` (@janko)
 
 ## 1.2.0 (2018-04-18)
 
-* [minimagick] Allow appending "+" operators in `#loader` and `#saver` using the value `false` (@janko-m)
+* [minimagick] Allow appending "+" operators in `#loader` and `#saver` using the value `false` (@janko)
 
-* [core] Fix `#apply` not accepting a Hash as an argument (@janko-m)
+* [core] Fix `#apply` not accepting a Hash as an argument (@janko)
 
-* [core] Allow sending any builder commands via `#apply`, not just operations (@janko-m)
+* [core] Allow sending any builder commands via `#apply`, not just operations (@janko)
 
-* [minimagick] Add `#define` as a wrapper around `-define` (@janko-m)
+* [minimagick] Add `#define` as a wrapper around `-define` (@janko)
 
 ## 1.1.0 (2018-04-05)
 
 * [minimagick] Disallow splitting multi-layer images into multiple single-layer
   images by default to avoid unexpected behaviour, but can be re-enabled with
-  the `:allow_splitting` saver option (@janko-m)
+  the `:allow_splitting` saver option (@janko)
 
-* [core] Add `#apply` for applying a list of operations (@janko-m)
+* [core] Add `#apply` for applying a list of operations (@janko)
 
 ## 1.0.0 (2018-04-04)
 
-* Depend on `mini_magick` and `ruby-vips` gems (@janko-m, @mokolabs)
+* Depend on `mini_magick` and `ruby-vips` gems (@janko, @mokolabs)
 
-* [minimagick] Remove deprecated API in favor of the chainable API (@janko-m)
+* [minimagick] Remove deprecated API in favor of the chainable API (@janko)
 
-* [core] Rename `Builder#default_options` to `Builder#options` (@janko-m)
+* [core] Rename `Builder#default_options` to `Builder#options` (@janko)
 
-* [minimagick] Remove `:fail` loader option in favor of the existing `:regard_warnings` (@janko-m)
+* [minimagick] Remove `:fail` loader option in favor of the existing `:regard_warnings` (@janko)
 
-* [vips, minimagick] Don't fail on warnings when loading the image (@janko-m)
+* [vips, minimagick] Don't fail on warnings when loading the image (@janko)
 
-* [vips] Don't apply `Vips::Image#autorot` if `:autorotate` loader option was passed in (@janko-m)
+* [vips] Don't apply `Vips::Image#autorot` if `:autorotate` loader option was passed in (@janko)
 
-* [minimagick] Allow using value `nil` to add ImageMagick options that don't have a value (@janko-m)
+* [minimagick] Allow using value `nil` to add ImageMagick options that don't have a value (@janko)
 
-* [vips] Accept `:quality` saver option as an alias to `:Q` (@janko-m)
+* [vips] Accept `:quality` saver option as an alias to `:Q` (@janko)
 
-* [minimagick] Automatically sharpen thumbnails after resizing (@janko-m, @mokolabs)
+* [minimagick] Automatically sharpen thumbnails after resizing (@janko, @mokolabs)
 
-* [vips] Automatically sharpen thumbnails after resizing (@janko-m, @mokolabs)
+* [vips] Automatically sharpen thumbnails after resizing (@janko, @mokolabs)
 
 ## 0.11.2 (2018-03-31)
 
-* [minimagick] Avoid `#resize_*` operations stripping data by switching back to `-resize` (@janko-m)
+* [minimagick] Avoid `#resize_*` operations stripping data by switching back to `-resize` (@janko)
 
-* [core] Make sure an empty destination file doesn't remain on processing errors when `:destination` is used (@janko-m)
+* [core] Make sure an empty destination file doesn't remain on processing errors when `:destination` is used (@janko)
 
-* [vips] Fix `:alpha` not correctly adding alpha for certain types of images (@janko-m)
+* [vips] Fix `:alpha` not correctly adding alpha for certain types of images (@janko)
 
 ## 0.11.1 (2018-03-27)
 
-* [minimagick] Rename `#limit` to `#limits` to still allow adding `-limit` arguments directly (@janko-m)
+* [minimagick] Rename `#limit` to `#limits` to still allow adding `-limit` arguments directly (@janko)
 
 ## 0.11.0 (2018-03-27)
 
-* [minimagick] Fix broken deprecated `#convert` (@janko-m)
+* [minimagick] Fix broken deprecated `#convert` (@janko)
 
-* [minimagick] Add `#limit` for specifying resource limits using `-limit` (@janko-m)
+* [minimagick] Add `#limit` for specifying resource limits using `-limit` (@janko)
 
-* [minimagick] Use `-thumbnail` instead of `-resize` in `#resize_*` methods (@janko-m)
+* [minimagick] Use `-thumbnail` instead of `-resize` in `#resize_*` methods (@janko)
 
-* [minimagick] Add loader and saver options (@janko-m)
+* [minimagick] Add loader and saver options (@janko)
 
 ## 0.10.3 (2018-03-24)
 
-* [minimagick] Fix bang methods in deprecated API calling nondestructive versions (@janko-m)
+* [minimagick] Fix bang methods in deprecated API calling nondestructive versions (@janko)
 
 ## 0.10.2 (2018-03-22)
 
-* [minimagick] Add back default offset arguments to deprecated `#crop` (@janko-m)
+* [minimagick] Add back default offset arguments to deprecated `#crop` (@janko)
 
 ## 0.10.1 (2018-03-22)
 
-* [minimagick] Don't print deprecation warning for old API twice when IO objects are used (@janko-m)
+* [minimagick] Don't print deprecation warning for old API twice when IO objects are used (@janko)
 
 ## 0.10.0 (2018-03-21)
 
-* [minimagick] Rewrite MiniMagick module to use the chainable API (@janko-m)
+* [minimagick] Rewrite MiniMagick module to use the chainable API (@janko)
 
-* [minimagick] Deprecate the old API (@janko-m)
+* [minimagick] Deprecate the old API (@janko)
 
-* [minimagick] Raise an exception on processing warnings (@janko-m)
+* [minimagick] Raise an exception on processing warnings (@janko)
 
-* [minimagick] Speed up `.valid_image?` by an order of magnitude (@janko-m)
+* [minimagick] Speed up `.valid_image?` by an order of magnitude (@janko)
 
-* [minimagick] Don't accept arbitrary IO object anymore (@janko-m)
+* [minimagick] Don't accept arbitrary IO object anymore (@janko)
 
-* [minimagick] Removed unnecessary `#crop` and `#resample` macros (@janko-m)
+* [minimagick] Removed unnecessary `#crop` and `#resample` macros (@janko)
 
-* [vips] Ignore undefined loader/saver options (@janko-m)
+* [vips] Ignore undefined loader/saver options (@janko)
 
-* [vips] Preserve transparent background in `#resize_to_pad` (@janko-m)
+* [vips] Preserve transparent background in `#resize_to_pad` (@janko)
 
-* [vips] Remove the ability to specify colors using names (@janko-m)
+* [vips] Remove the ability to specify colors using names (@janko)
 
-* [minimagick, vips] Autorotate images after loading them (@janko-m)
+* [minimagick, vips] Autorotate images after loading them (@janko)
 
-* [core] Delete result `Tempfile` object in case of processing errors (@janko-m)
+* [core] Delete result `Tempfile` object in case of processing errors (@janko)
 
-* [core] Allow returning `nil` in the `#custom` block (@janko-m)
+* [core] Allow returning `nil` in the `#custom` block (@janko)
 
-* [core] Allow specifying a path string as source file (@janko-m)
+* [core] Allow specifying a path string as source file (@janko)
 
-* [core] Allow saving to a specific location with the `:destination` call option (@janko-m)
+* [core] Allow saving to a specific location with the `:destination` call option (@janko)
 
 ## 0.9.0 (2018-03-16)
 
-* Added libvips module (@GustavoCaso, @janko-m)
+* Added libvips module (@GustavoCaso, @janko)
 
 * Drop official support for MRI 2.0 and 2.1
 
@@ -154,15 +154,15 @@
 
 ## 0.4.4 (2017-06-16)
 
-* Fix last changes being incompatible with older Ruby versions, again (@janko-m)
+* Fix last changes being incompatible with older Ruby versions, again (@janko)
 
 ## 0.4.3 (2017-06-16)
 
-* Fix last changes being incompatible with older Ruby versions (@janko-m)
+* Fix last changes being incompatible with older Ruby versions (@janko)
 
 ## 0.4.2 (2017-06-16)
 
-* Don't use path of input file as basename for output file (@janko-m)
+* Don't use path of input file as basename for output file (@janko)
 
 ## 0.4.1 (2016-09-08)
 
