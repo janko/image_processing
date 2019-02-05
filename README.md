@@ -6,8 +6,8 @@ when handling image uploads.
 This gem can process images with either [ImageMagick]/[GraphicsMagick] or
 [libvips] libraries. ImageMagick is a good default choice, especially if you
 are migrating from another gem or library that uses ImageMagick. Libvips is a
-newer library that can process images [very rapidly][libvips performance] (up
-to 10x faster than ImageMagick).
+newer library that can process images [very rapidly][libvips performance]
+(often multiple times faster than ImageMagick).
 
 
 ## Goal
