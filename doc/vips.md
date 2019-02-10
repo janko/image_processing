@@ -123,6 +123,10 @@ Any additional options are forwarded to [`Vips::Image#thumbnail_image`]:
 pipeline.resize_to_fill!(400, 400, crop: :attention) # smart crop
 ```
 
+Crop option is `:centre` by default. Acceptable values are `:none`, `:attention`, `:centre`, `:entropy`, `:attention` and `:last`.
+
+Please note that from [`libvips`] 8.8, [`Vips::Image#thumbnail_image`] accepts two new values `:high` and `:low` for the crop option, which respectively positions the crop box at the high end and low end of the axis that needs cropping.
+
 See [`vips_thumbnail()`] for more details.
 
 #### `#resize_and_pad`
