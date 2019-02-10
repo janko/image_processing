@@ -77,9 +77,7 @@ module ImageProcessing
         image.gravity(gravity, width, height, extend: extend, background: background)
       end
 
-      # Rotates the image by an arbitrary angle. Additional options can be
-      # specified, such as background colors to fill in the gaps when rotating
-      # with an angle which is not a multiple of 90 degrees.
+      # Rotates the image by an arbitrary angle.
       def rotate(degrees, **options)
         image.similarity(angle: degrees, **options)
       end
