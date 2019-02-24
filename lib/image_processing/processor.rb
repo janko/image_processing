@@ -1,6 +1,24 @@
 module ImageProcessing
   # Abstract class inherited by individual processors.
   class Processor
+    def self.call(source:, loader:, operations:, saver:, destination: nil)
+      unless source.is_a?(String) || source.is_a?(self::ACCUMULATOR_CLASS)
+        fail Error, "invalid source: #{source.inspect}"
+      end
+
+      accumulator = load_image(source, **loader)
+
+      operations.each do |name, args, block|
+        accumulator = apply_operation(accumulator, name, *args, &block)
+      end
+
+      if destination
+        save_image(accumulator, destination, **saver)
+      else
+        accumulator
+      end
+    end
+
     # Use for processor subclasses to specify the name and the class of their
     # accumulator object (e.g. MiniMagick::Tool or Vips::Image).
     def self.accumulator(name, klass)

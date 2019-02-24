@@ -240,6 +240,12 @@ describe "ImageProcessing::Pipeline" do
     end
   end
 
+  it "raises exception when invalid source was provided" do
+    assert_raises(ImageProcessing::Error) do
+      ImageProcessing::Vips.source(:invalid).call
+    end
+  end
+
   it "raises a NoMethodError when predicate method is not defined" do
     assert_raises(NoMethodError) do
       ImageProcessing::Vips.valid?(@portrait)

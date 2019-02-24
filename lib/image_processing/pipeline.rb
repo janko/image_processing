@@ -4,36 +4,28 @@ module ImageProcessing
   class Pipeline
     DEFAULT_FORMAT = "jpg"
 
-    attr_reader :source, :loader, :saver, :format, :operations, :processor, :destination
+    attr_reader :loader, :saver, :format, :operations, :processor, :destination
 
     # Initializes the pipeline with all the processing options.
     def initialize(options)
+      fail Error, "source file is not provided" unless options[:source]
+
       options.each do |name, value|
-        value = normalize_source(value, options) if name == :source
         instance_variable_set(:"@#{name}", value)
       end
     end
 
-    # Performs the defined series of operations, and saves the result in a new
-    # tempfile or a specified path on disk, or if `save: false` was passed in
-    # returns the unsaved accumulator object that can be used for further
-    # processing.
+    # Determines the destination and calls the processor.
     def call(save: true)
-      accumulator = processor.load_image(source, **loader)
-
-      operations.each do |name, args, block|
-        accumulator = processor.apply_operation(accumulator, name, *args, &block)
-      end
-
       if save == false
-        accumulator
+        call_processor
       elsif destination
         handle_destination do
-          processor.save_image(accumulator, destination, **saver)
+          call_processor(destination: destination)
         end
       else
         create_tempfile do |tempfile|
-          processor.save_image(accumulator, tempfile.path, **saver)
+          call_processor(destination: tempfile.path)
         end
       end
     end
@@ -53,6 +45,16 @@ module ImageProcessing
     end
 
     private
+
+    def call_processor(**options)
+      processor.call(
+        source:     source,
+        loader:     loader,
+        operations: operations,
+        saver:      saver,
+        **options
+      )
+    end
 
     # Creates a new tempfile for the destination file, yields it, and refreshes
     # the file descriptor to get the updated file.
@@ -80,21 +82,15 @@ module ImageProcessing
     end
 
     # Converts the source image object into a path or the accumulator object.
-    def normalize_source(source, options)
-      fail Error, "source file is not provided" unless source
-
-      accumulator_class = options[:processor]::ACCUMULATOR_CLASS
-
-      if source.is_a?(accumulator_class)
-        source
-      elsif source.is_a?(String)
-        source
-      elsif source.respond_to?(:path)
-        source.path
-      elsif source.respond_to?(:to_path)
-        source.to_path
+    def source
+      if @source.is_a?(String)
+        @source
+      elsif @source.respond_to?(:path)
+        @source.path
+      elsif @source.respond_to?(:to_path)
+        @source.to_path
       else
-        fail Error, "source file needs to respond to #path, or be a String, a Pathname, or a #{accumulator_class} object"
+        @source
       end
     end
   end
