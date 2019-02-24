@@ -27,14 +27,21 @@ module ImageProcessing
       # Loads the image on disk into a Vips::Image object. Accepts additional
       # loader-specific options (e.g. interlacing). Afterwards auto-rotates the
       # image to be upright.
-      def self.load_image(path_or_image, autorot: true, **options)
+      def self.load_image(path_or_image, operations: [], autorot: true, **options)
         if path_or_image.is_a?(::Vips::Image)
           image = path_or_image
         else
-          source_path = path_or_image
-          options     = Utils.select_valid_loader_options(source_path, options)
+          path            = path_or_image
+          first_operation = operations.first.first if operations.any?
 
-          image = ::Vips::Image.new_from_file(source_path, **options)
+          # utilize resize-on-load optimization if possible
+          if first_operation.to_s.start_with?("resize_") && options.empty?
+            return apply_operation(path, operations.shift)
+          else
+            options = Utils.select_valid_loader_options(path, options)
+
+            image = ::Vips::Image.new_from_file(path, **options)
+          end
         end
 
         image = image.autorot if autorot && !options.key?(:autorotate)
@@ -121,8 +128,12 @@ module ImageProcessing
       # Resizes the image according to the specified parameters, and sharpens
       # the resulting thumbnail.
       def thumbnail(width, height, sharpen: SHARPEN_MASK, **options)
-        image = self.image
-        image = image.thumbnail_image(width, height: height, **options)
+        if self.image.is_a?(String) # path
+          # resize on load
+          image = ::Vips::Image.thumbnail(self.image, width, height: height, **options)
+        else
+          image = self.image.thumbnail_image(width, height: height, **options)
+        end
         image = image.conv(sharpen) if sharpen
         image
       end

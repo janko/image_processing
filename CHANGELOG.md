@@ -1,3 +1,7 @@
+## HEAD
+
+* [vips] Perform resize-on-load when possible, significantly improving resizing speed (@janko)
+
 ## 1.7.1 (2018-09-27)
 
 * [vips] Make `#remove` that's used for removing image metadata chainable (@janko)

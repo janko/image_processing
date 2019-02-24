@@ -6,10 +6,10 @@ module ImageProcessing
         fail Error, "invalid source: #{source.inspect}"
       end
 
-      accumulator = load_image(source, **loader)
+      accumulator = load_image(source, operations: operations, **loader)
 
-      operations.each do |name, args, block|
-        accumulator = apply_operation(accumulator, name, *args, &block)
+      operations.each do |operation|
+        accumulator = apply_operation(accumulator, operation)
       end
 
       if destination
@@ -31,7 +31,7 @@ module ImageProcessing
     # defined on the processor (macro), calls it. Otherwise calls the
     # operation directly on the accumulator object. This provides a common
     # umbrella above defined macros and direct operations.
-    def self.apply_operation(accumulator, name, *args, &block)
+    def self.apply_operation(accumulator, (name, args, block))
       if method_defined?(name)
         instance = new(accumulator)
         instance.public_send(name, *args, &block)

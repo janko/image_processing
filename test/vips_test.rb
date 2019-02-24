@@ -365,4 +365,31 @@ describe "ImageProcessing::Vips" do
       assert_similar original, @pipeline.composite!([Pathname(@landscape.path)], :over)
     end
   end
+
+  describe "resize-on-load" do
+    it "retains order of operations" do
+      result = ImageProcessing::Vips.source(@portrait)
+        .resize_to_fit(400, 400)
+        .crop(0, 0, 300, 300)
+        .call
+
+      assert_dimensions [300, 300], result
+
+      result = ImageProcessing::Vips.source(@portrait)
+        .crop(0, 0, 300, 300)
+        .resize_to_fit(400, 400)
+        .call
+
+      assert_dimensions [400, 400], result
+    end
+
+    it "is skipped on loader options" do
+      pipeline = ImageProcessing::Vips.source(fixture_image("invalid.jpg"))
+        .loader(fail: true)
+        .resize_to_fit(400, 400)
+
+      error = assert_raises(Vips::Error) { pipeline.call }
+      assert_match "Corrupt JPEG data", error.message
+    end
+  end
 end

@@ -30,6 +30,27 @@ processed = ImageProcessing::Vips
 processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6.png>
 ```
 
+### Resize-on-load
+
+If you're resizing, it's highly recommended to always have `#resize_*` as the
+first operation in the chain. That way the processor can perform resize-on-load
+(using [`vips_thumbnail()`]), which speeds up processing significantly, and in
+in certain cases even makes it more accurate.
+
+```rb
+# BAD: cannot utilize resize-on-load
+ImageProcessing::Vips
+  .source(image)
+  .colourspace(:grey16)
+  .resize_to_limit(400, 400)
+
+# GOOD: utilizes resize-on-load
+ImageProcessing::Vips
+  .source(image)
+  .resize_to_limit(400, 400)
+  .colourspace(:grey16)
+```
+
 ## Methods
 
 #### `.valid_image?`
