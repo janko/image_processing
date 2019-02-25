@@ -31,17 +31,16 @@ module ImageProcessing
         if path_or_image.is_a?(::Vips::Image)
           image = path_or_image
         else
-          path            = path_or_image
-          first_operation = operations.first.first if operations.any?
+          path = path_or_image
 
-          # utilize resize-on-load optimization if possible
-          if first_operation.to_s.start_with?("resize_") && options.empty?
-            return apply_operation(path, operations.shift)
-          else
-            options = Utils.select_valid_loader_options(path, options)
+          # utilize resize-on-load optimization when possible
+          return path if operations.any? &&
+                         operations[0][0].to_s.start_with?("resize_") &&
+                         options.empty?
 
-            image = ::Vips::Image.new_from_file(path, **options)
-          end
+          options = Utils.select_valid_loader_options(path, options)
+
+          image = ::Vips::Image.new_from_file(path, **options)
         end
 
         image = image.autorot if autorot && !options.key?(:autorotate)
