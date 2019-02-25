@@ -1,4 +1,4 @@
-## HEAD
+## 1.8.0 (2019-02-25)
 
 * [vips] Perform resize-on-load when possible, significantly improving resizing speed (@janko)
 
