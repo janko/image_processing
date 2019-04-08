@@ -337,6 +337,16 @@ See [`vips_jpegload()`], [`vips_pngload()`] etc. for more details on
 format-specific load options. Any provided options that are not defined for a
 specific loader will be ignored.
 
+By default, libvips will select the appropriate loader based on the type of the
+source image. If libvips fails to determine the type of the source image, you
+can force a specific loader:
+
+```rb
+ImageProcessing::Vips
+  .loader(loader: :svg) # calls `Vips::Image.svgload`
+  # ...
+```
+
 An additional `:autorot` option is accepted to specify whether
 [`vips_autorot()`] should be automatically called after the image is loaded
 (defaults to `true`).
@@ -385,6 +395,16 @@ ImageProcessing::Vips
 See [`vips_jpegsave()`], [`vips_pngsave()`] etc. for more details on
 format-specific save options. Any provided options that are not defined for a
 specific saver will be ignored.
+
+By default, libvips will select the appropriate saver based on the file
+extension of the destination path. If libvips fails to understand the file
+extension, you can force a specific saver:
+
+```rb
+ImageProcessing::Vips
+  .saver(saver: :tiff) # calls `Vips::Image#tiffsave`
+  # ...
+```
 
 If you would like to have more control over saving, you can call `#call(save:
 false)` to get the `Vips::Image` object, and call the saver on it directly.

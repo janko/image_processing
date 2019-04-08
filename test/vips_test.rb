@@ -85,6 +85,13 @@ describe "ImageProcessing::Vips" do
     assert_includes error.message, "not a known file format"
   end
 
+  it "accepts :loader" do
+    error = assert_raises(Vips::Error) do
+      ImageProcessing::Vips.loader(loader: :webp).call(@portrait)
+    end
+    assert_match "webp2vips", error.message
+  end
+
   it "applies saver options" do
     result = ImageProcessing::Vips.saver(strip: true).call(@portrait)
     refute_includes Vips::Image.new_from_file(result.path).get_fields, "exif-data"
@@ -103,6 +110,11 @@ describe "ImageProcessing::Vips" do
   it "raises correct Vips::Error on unknown saver" do
     error = assert_raises(Vips::Error) { ImageProcessing::Vips.convert("foo").call(@portrait) }
     assert_includes error.message, "No known saver"
+  end
+
+  it "accepts :saver" do
+    result = ImageProcessing::Vips.saver(saver: :webp).call(@portrait)
+    assert_type "WEBP", result
   end
 
   describe ".valid_image?" do

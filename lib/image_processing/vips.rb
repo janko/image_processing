@@ -27,14 +27,18 @@ module ImageProcessing
       # Loads the image on disk into a Vips::Image object. Accepts additional
       # loader-specific options (e.g. interlacing). Afterwards auto-rotates the
       # image to be upright.
-      def self.load_image(path_or_image, autorot: true, **options)
+      def self.load_image(path_or_image, loader: nil, autorot: true, **options)
         if path_or_image.is_a?(::Vips::Image)
           image = path_or_image
         else
-          path    = path_or_image
-          options = Utils.select_valid_loader_options(path, options)
+          path = path_or_image
 
-          image = ::Vips::Image.new_from_file(path, **options)
+          if loader
+            image = ::Vips::Image.public_send(:"#{loader}load", path, **options)
+          else
+            options = Utils.select_valid_loader_options(path, options)
+            image = ::Vips::Image.new_from_file(path, **options)
+          end
         end
 
         image = image.autorot if autorot && !options.key?(:autorotate)
@@ -49,11 +53,15 @@ module ImageProcessing
       # Writes the Vips::Image object to disk. This starts the processing
       # pipeline defined in the Vips::Image object. Accepts additional
       # saver-specific options (e.g. quality).
-      def self.save_image(image, destination_path, quality: nil, **options)
+      def self.save_image(image, path, saver: nil, quality: nil, **options)
         options = options.merge(Q: quality) if quality
-        options = Utils.select_valid_saver_options(destination_path, options)
 
-        image.write_to_file(destination_path, **options)
+        if saver
+          image.public_send(:"#{saver}save", path, **options)
+        else
+          options = Utils.select_valid_saver_options(path, options)
+          image.write_to_file(path, **options)
+        end
       end
 
       # Resizes the image to not be larger than the specified dimensions.
