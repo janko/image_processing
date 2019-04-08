@@ -6,7 +6,14 @@ module ImageProcessing
         fail Error, "invalid source: #{source.inspect}"
       end
 
-      accumulator = load_image(source, operations: operations, **loader)
+      if operations.dig(0, 0).to_s.start_with?("resize_") &&
+         loader.empty? &&
+         supports_resize_on_load?
+
+        accumulator = source
+      else
+        accumulator = load_image(source, **loader)
+      end
 
       operations.each do |operation|
         accumulator = apply_operation(accumulator, operation)
@@ -38,6 +45,10 @@ module ImageProcessing
       else
         accumulator.send(name, *args, &block)
       end
+    end
+
+    def self.supports_resize_on_load?
+      false
     end
 
     def initialize(accumulator = nil)

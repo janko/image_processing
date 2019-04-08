@@ -27,17 +27,11 @@ module ImageProcessing
       # Loads the image on disk into a Vips::Image object. Accepts additional
       # loader-specific options (e.g. interlacing). Afterwards auto-rotates the
       # image to be upright.
-      def self.load_image(path_or_image, operations: [], autorot: true, **options)
+      def self.load_image(path_or_image, autorot: true, **options)
         if path_or_image.is_a?(::Vips::Image)
           image = path_or_image
         else
-          path = path_or_image
-
-          # utilize resize-on-load optimization when possible
-          return path if operations.any? &&
-                         operations[0][0].to_s.start_with?("resize_") &&
-                         options.empty?
-
+          path    = path_or_image
           options = Utils.select_valid_loader_options(path, options)
 
           image = ::Vips::Image.new_from_file(path, **options)
@@ -45,6 +39,11 @@ module ImageProcessing
 
         image = image.autorot if autorot && !options.key?(:autorotate)
         image
+      end
+
+      # See #thumbnail.
+      def self.supports_resize_on_load?
+        true
       end
 
       # Writes the Vips::Image object to disk. This starts the processing
