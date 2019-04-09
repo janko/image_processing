@@ -1,5 +1,7 @@
 ## HEAD
 
+* Drop support for MRI 2.2 and 2.3 (@janko)
+
 * [vips] Allow forcing a specific loader or saver (@janko)
 
 ## 1.8.0 (2019-02-25)

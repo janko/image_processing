@@ -13,11 +13,10 @@ before_install:
   - bash install/imagemagick.sh
 
 rvm:
-  - 2.2
-  - 2.3
   - 2.4
   - 2.5
-  - jruby-9.2.0.0
+  - 2.6
+  - jruby-9.2.6.0
 
 # Doesn't currently work with MRI 2.5.1: https://github.com/travis-ci/travis-ci/issues/8978
 # cache: bundler
