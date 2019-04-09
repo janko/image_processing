@@ -87,9 +87,9 @@ describe "ImageProcessing::Vips" do
 
   it "accepts :loader" do
     error = assert_raises(Vips::Error) do
-      ImageProcessing::Vips.loader(loader: :webp).call(@portrait)
+      ImageProcessing::Vips.loader(loader: :tiff).call(@portrait)
     end
-    assert_match "webp2vips", error.message
+    assert_match "Not a TIFF", error.message
   end
 
   it "applies saver options" do
@@ -113,8 +113,9 @@ describe "ImageProcessing::Vips" do
   end
 
   it "accepts :saver" do
-    result = ImageProcessing::Vips.saver(saver: :webp).call(@portrait)
-    assert_type "WEBP", result
+    result = ImageProcessing::Vips.saver(saver: :png).call(@portrait)
+    assert_equal ".jpg", File.extname(result)
+    assert_type "PNG", result
   end
 
   describe ".valid_image?" do
