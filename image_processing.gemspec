@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   spec.name          = "image_processing"
   spec.version       = ImageProcessing::VERSION
 
-  spec.required_ruby_version = ">= 2.0"
+  spec.required_ruby_version = ">= 2.4"
 
   spec.summary       = "Set of higher-level helper methods for image processing."
   spec.description   = "Set of higher-level helper methods for image processing."
