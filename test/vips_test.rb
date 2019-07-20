@@ -65,9 +65,6 @@ describe "ImageProcessing::Vips" do
 
     result = ImageProcessing::Vips.loader(autorotate: false).call(fixture_image("rotated.jpg"))
     assert_dimensions [800, 600], result
-
-    result = ImageProcessing::Vips.resize_to_limit(1000, 1000, auto_rotate: false).call(fixture_image("rotated.jpg"))
-    assert_dimensions [800, 600], result
   end
 
   it "accepts Vips::Image as source" do
