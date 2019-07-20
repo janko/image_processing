@@ -1,4 +1,4 @@
-## HEAD
+## 1.9.1 (2019-07-20)
 
 * Bring back support for MRI 2.3 (@janko)
 
