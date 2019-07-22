@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.files         = Dir["README.md", "LICENSE.txt", "CHANGELOG.md", "lib/**/*.rb", "*.gemspec"]
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "mini_magick", ">= 4.9.3", "< 5"
+  spec.add_dependency "mini_magick", ">= 4.9.5", "< 5"
   spec.add_dependency "ruby-vips", ">= 2.0.13", "< 3"
 
   spec.add_development_dependency "rake"
