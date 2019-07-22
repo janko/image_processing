@@ -1,3 +1,7 @@
+## 1.9.2 (2019-07-22)
+
+* Bump `mini_magick` dependency to `>= 4.9.5` (@chioreandan)
+
 ## 1.9.1 (2019-07-20)
 
 * Bring back support for MRI 2.3 (@janko)
