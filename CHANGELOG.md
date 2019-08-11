@@ -1,3 +1,7 @@
+## HEAD
+
+* [vips] Use integer precision when sharpening for better quality (@metaskills)
+
 ## 1.9.2 (2019-07-22)
 
 * Bump `mini_magick` dependency to `>= 4.9.5` (@chioreandan)
