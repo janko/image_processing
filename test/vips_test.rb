@@ -174,6 +174,11 @@ describe "ImageProcessing::Vips" do
       normal    = @pipeline.resize_to_limit!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
+
+    it "sharpening uses integer precision" do
+      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
+      assert_equal :uchar, sharpened.format
+    end
   end
 
   describe "#resize_to_fit" do
@@ -217,6 +222,11 @@ describe "ImageProcessing::Vips" do
       normal    = @pipeline.resize_to_fit!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
+
+    it "sharpening uses integer precision" do
+      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
+      assert_equal :uchar, sharpened.format
+    end
   end
 
   describe "#resize_to_fill" do
@@ -247,6 +257,11 @@ describe "ImageProcessing::Vips" do
       sharpened = @pipeline.resize_to_fill!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
       normal   = @pipeline.resize_to_fill!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
+
+    it "sharpening uses integer precision" do
+      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
+      assert_equal :uchar, sharpened.format
     end
   end
 
@@ -296,6 +311,11 @@ describe "ImageProcessing::Vips" do
       sharpened = @pipeline.resize_and_pad!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
       normal    = @pipeline.resize_and_pad!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
+
+    it "sharpening uses integer precision" do
+      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
+      assert_equal :uchar, sharpened.format
     end
   end
 
