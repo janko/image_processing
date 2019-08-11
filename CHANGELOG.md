@@ -1,4 +1,4 @@
-## HEAD
+## 1.9.3 (2019-08-11)
 
 * [vips] Use integer precision when sharpening for better quality (@metaskills)
 
