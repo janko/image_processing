@@ -140,7 +140,7 @@ module ImageProcessing
         else
           image = self.image.thumbnail_image(width, height: height, **options)
         end
-        image = image.conv(sharpen) if sharpen
+        image = image.conv(sharpen, precision: :integer) if sharpen
         image
       end
 
