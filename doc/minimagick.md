@@ -3,6 +3,31 @@
 The `ImageProcessing::MiniMagick` module contains processing methods that use
 the [MiniMagick] gem (which is installed with the image_processing gem).
 
+## Contents
+
+* [Installation](#installation)
+* [Usage](#usage)
+  * [ImageMagick](#imagemagick)
+  * [GraphicsMagick](#graphicsmagick)
+* [Methods](#methods)
+  * [`.valid_image?`](#valid_image)
+  * [`#resize_to_limit`](#resize_to_limit)
+  * [`#resize_to_fit`](#resize_to_fit)
+  * [`#resize_to_fill`](#resize_to_fill)
+  * [`#resize_and_pad`](#resize_and_pad)
+  * [`#rotate`](#rotate)
+  * [`#composite`](#composite)
+  * [`#convert`](#convert)
+  * [`#define`](#define)
+  * [`#method_missing`](#method_missing)
+  * [`#custom`](#custom)
+  * [`#append`](#append)
+  * [`#loader`](#loader)
+  * [`#saver`](#saver)
+  * [`#limits`](#limits)
+  * [`#apply`](#apply)
+* [Sharpening](#sharpening)
+
 ## Installation
 
 You will need to install [ImageMagick]/[GraphicsMagick] before using this

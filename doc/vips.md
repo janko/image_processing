@@ -3,6 +3,28 @@
 The `ImageProcessing::Vips` module contains processing macros that use the
 [ruby-vips] gem (which is installed with the image_processing gem).
 
+## Contents
+
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Resize-on-load](#resize-on-load)
+* [Methods](#methods)
+  * [`.valid_image?`](#valid_image)
+  * [`#resize_to_limit`](#resize_to_limit)
+  * [`#resize_to_fit`](#resize_to_fit)
+  * [`#resize_to_fill`](#resize_to_fill)
+  * [`#resize_and_pad`](#resize_and_pad)
+  * [`#rotate`](#rotate)
+  * [`#composite`](#composite)
+  * [`#convert`](#convert)
+  * [`#method_missing`](#method_missing)
+  * [`#custom`](#custom)
+  * [`#append`](#append)
+  * [`#loader`](#loader)
+  * [`#saver`](#saver)
+  * [`#apply`](#apply)
+* [Sharpening](#sharpening)
+
 ## Installation
 
 You will need to install [libvips] before using this module:
