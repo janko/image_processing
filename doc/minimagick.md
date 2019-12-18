@@ -322,12 +322,16 @@ ImageProcessing::MiniMagick
 
 It accepts the following special options:
 
+* `:loader` -- explicitly set the input file type
 * `:page` -- specific page(s) that should be loaded
 * `:geometry` -- geometry that should be applied when loading
 * `:auto_orient` -- whether the image should be automatically oriented after it's loaded (defaults to `true`)
 * `:define` -- creates definitions that coders and decoders use for reading and writing image data
 
 ```rb
+ImageProcessing::MiniMagick.loader(loader: "jpg").call(image)
+# convert jpg:input.jpg -auto-orient output.jpg
+
 ImageProcessing::MiniMagick.loader(page: 0).convert("png").call(pdf)
 # convert input.pdf[0] -auto-orient output.png
 

@@ -25,7 +25,7 @@ module ImageProcessing
       # Initializes the image on disk into a MiniMagick::Tool object. Accepts
       # additional options related to loading the image (e.g. geometry).
       # Additionally auto-orients the image to be upright.
-      def self.load_image(path_or_magick, page: nil, geometry: nil, auto_orient: true, **options)
+      def self.load_image(path_or_magick, loader: nil, page: nil, geometry: nil, auto_orient: true, **options)
         if path_or_magick.is_a?(::MiniMagick::Tool)
           magick = path_or_magick
         else
@@ -34,11 +34,12 @@ module ImageProcessing
 
           Utils.apply_options(magick, options)
 
-          input_path  = source_path
-          input_path += "[#{page}]" if page
-          input_path += "[#{geometry}]" if geometry
+          input  = source_path
+          input  = "#{loader}:#{input}" if loader
+          input += "[#{page}]" if page
+          input += "[#{geometry}]" if geometry
 
-          magick << input_path
+          magick << input
         end
 
         magick.auto_orient if auto_orient

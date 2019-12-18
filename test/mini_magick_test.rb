@@ -100,6 +100,9 @@ describe "ImageProcessing::MiniMagick" do
   end
 
   it "applies loader options" do
+    result = ImageProcessing::MiniMagick.loader(loader: "jpg").call(@portrait)
+    assert_type "JPEG", result
+
     result = ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "100x100" } }).call(@portrait)
     assert_dimensions [150, 200], result unless ENV["GM"]
 
