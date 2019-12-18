@@ -329,16 +329,16 @@ It accepts the following special options:
 
 ```rb
 ImageProcessing::MiniMagick.loader(page: 0).convert("png").call(pdf)
-# convert input.pdf[0] -regard-warnings -auto-orient output.png
+# convert input.pdf[0] -auto-orient output.png
 
 ImageProcessing::MiniMagick.loader(geometry: "300x300").call(image)
-# convert input.jpg[300x300] -regard-warnings -auto-orient output.jpg
+# convert input.jpg[300x300] -auto-orient output.jpg
 
 ImageProcessing::MiniMagick.loader(auto_orient: false).call(image)
-# convert input.jpg -regard-warnings output.jpg
+# convert input.jpg output.jpg
 
 ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "300x300" } }).call(image)
-# convert -define jpeg:size=300x300 input.jpg -regard-warnings -auto-orient output.jpg
+# convert -define jpeg:size=300x300 input.jpg -auto-orient output.jpg
 ```
 
 All other options given will be interpreted as ImageMagick operations to be
@@ -387,7 +387,7 @@ It accepts the following special options:
 
 ```rb
 ImageProcessing::MiniMagick.saver(define: { jpeg: { optimize_coding: false } }).call(image)
-# convert input.jpg -regard-warnings -auto-orient -define jpeg:optimize-coding=false output.jpg
+# convert input.jpg -auto-orient -define jpeg:optimize-coding=false output.jpg
 
 ImageProcessing::MiniMagick.convert("png").call(pdf_document)
 # raises ImageProcessing::Error
