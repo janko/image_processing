@@ -54,7 +54,7 @@ module ImageProcessing
       # pipeline defined in the Vips::Image object. Accepts additional
       # saver-specific options (e.g. quality).
       def self.save_image(image, path, saver: nil, quality: nil, **options)
-        options = options.merge(Q: quality) if quality
+        options[:Q] = quality if quality
 
         if saver
           image.public_send(:"#{saver}save", path, **options)
