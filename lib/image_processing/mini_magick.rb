@@ -32,7 +32,7 @@ module ImageProcessing
           source_path = path_or_magick
           magick = ::MiniMagick::Tool::Convert.new
 
-          Utils.apply_options(magick, options)
+          Utils.apply_options(magick, **options)
 
           input  = source_path
           input  = "#{loader}:#{input}" if loader
@@ -50,7 +50,7 @@ module ImageProcessing
       # the result to disk. Accepts additional options related to saving the
       # image (e.g. quality).
       def self.save_image(magick, destination_path, allow_splitting: false, **options)
-        Utils.apply_options(magick, options)
+        Utils.apply_options(magick, **options)
 
         magick << destination_path
         magick.call
