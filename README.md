@@ -42,9 +42,9 @@ how to resize and process images.
 
 ## Usage
 
-Processing is performed through [`ImageProcessing::Vips`] or
-[`ImageProcessing::MiniMagick`] modules. Both modules share the same chainable
-API for defining the processing pipeline:
+Processing is performed through **[`ImageProcessing::Vips`]** or
+**[`ImageProcessing::MiniMagick`]** modules. Both modules share the same
+chainable API for defining the processing pipeline:
 
 ```rb
 require "image_processing/mini_magick"
