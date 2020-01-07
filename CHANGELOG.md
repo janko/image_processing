@@ -1,3 +1,7 @@
+## master
+
+* [vips] Fix compatibility with ruby-vips 2.0.17+ (@janko)
+
 ## 1.10.0 (2019-12-18)
 
 * [minimagick] Add `:loader` option for explicitly setting input file type (@janko)

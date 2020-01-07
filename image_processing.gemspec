@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "mini_magick", ">= 4.9.5", "< 5"
-  spec.add_dependency "ruby-vips", ">= 2.0.13", "< 3"
+  spec.add_dependency "ruby-vips", ">= 2.0.17", "< 3"
 
   spec.add_development_dependency "rake"
   spec.add_development_dependency "minitest", "~> 5.8"
