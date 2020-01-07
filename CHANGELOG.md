@@ -1,4 +1,4 @@
-## master
+## 1.10.1 (2020-01-07)
 
 * [vips] Fix compatibility with ruby-vips 2.0.17+ (@janko)
 
