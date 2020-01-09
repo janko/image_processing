@@ -54,7 +54,7 @@ module ImageProcessing
       # pipeline defined in the Vips::Image object. Accepts additional
       # saver-specific options (e.g. quality).
       def self.save_image(image, path, saver: nil, quality: nil, **options)
-        options = options.merge(Q: quality) if quality
+        options[:Q] = quality if quality
 
         if saver
           image.public_send(:"#{saver}save", path, **options)
@@ -187,15 +187,11 @@ module ImageProcessing
         # output image format. Each of these loaders and savers accept slightly
         # different options, so to allow the user to be able to specify options
         # for a specific loader/saver and have it ignored for other
-        # loaders/savers, we do a little bit of introspection and filter out
-        # options that don't exist for a particular loader or saver.
+        # loaders/savers, we do some introspection and filter out options that
+        # don't exist for a particular loader or saver.
         def select_valid_options(operation_name, options)
-          operation = ::Vips::Operation.new(operation_name)
-
-          operation_options = operation.get_construct_args
-            .select { |name, flags| (flags & ::Vips::ARGUMENT_INPUT)    != 0 }
-            .select { |name, flags| (flags & ::Vips::ARGUMENT_REQUIRED) == 0 }
-            .map(&:first).map(&:to_sym)
+          introspect        = ::Vips::Introspect.get(operation_name)
+          operation_options = introspect.optional_input.keys.map(&:to_sym)
 
           options.select { |name, value| operation_options.include?(name) }
         end
