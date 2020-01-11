@@ -1,3 +1,7 @@
+## 1.10.2 (2020-01-11)
+
+* Fix Ruby 2.7 warnings for separation of positional and keyword arguments (@kamipo, @janko)
+
 ## 1.10.1 (2020-01-07)
 
 * [vips] Fix compatibility with ruby-vips 2.0.17+ (@janko)
