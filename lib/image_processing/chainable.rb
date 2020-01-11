@@ -32,6 +32,8 @@ module ImageProcessing
           builder.send(name)
         elsif argument.is_a?(Array)
           builder.send(name, *argument)
+        elsif argument.is_a?(Hash)
+          builder.send(name, **argument)
         else
           builder.send(name, argument)
         end
@@ -46,6 +48,7 @@ module ImageProcessing
 
       operation(name, *args, &block)
     end
+    ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
 
     # Add an operation defined by the processor.
     def operation(name, *args, &block)
@@ -59,7 +62,7 @@ module ImageProcessing
       options = options.merge(source: file) if file
       options = options.merge(destination: destination) if destination
 
-      branch(options).call!(**call_options)
+      branch(**options).call!(**call_options)
     end
 
     # Creates a new builder object, merging current options with new options.
