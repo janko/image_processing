@@ -34,25 +34,33 @@ module ImageProcessing
       const_set(:ACCUMULATOR_CLASS, klass)
     end
 
-    # Calls the operation to perform the processing. If the operation is
-    # defined on the processor (macro), calls it. Otherwise calls the
-    # operation directly on the accumulator object. This provides a common
-    # umbrella above defined macros and direct operations.
+    # Delegates to #apply_operation.
     def self.apply_operation(accumulator, (name, args, block))
-      if method_defined?(name)
-        instance = new(accumulator)
-        instance.public_send(name, *args, &block)
-      else
-        accumulator.send(name, *args, &block)
-      end
+      new(accumulator).apply_operation(name, *args, &block)
     end
 
+    # Whether the processor supports resizing the image upon loading.
     def self.supports_resize_on_load?
       false
     end
 
     def initialize(accumulator = nil)
       @accumulator = accumulator
+    end
+
+    # Calls the operation to perform the processing. If the operation is
+    # defined on the processor (macro), calls the method. Otherwise calls the
+    # operation directly on the accumulator object. This provides a common
+    # umbrella above defined macros and direct operations.
+    def apply_operation(name, *args, &block)
+      receiver = respond_to?(name) ? self : @accumulator
+
+      if args.last.is_a?(Hash)
+        kwargs = args.pop
+        receiver.public_send(name, *args, **kwargs, &block)
+      else
+        receiver.public_send(name, *args, &block)
+      end
     end
 
     # Calls the given block with the accumulator object. Useful for when you

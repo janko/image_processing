@@ -110,7 +110,7 @@ describe "ImageProcessing::Pipeline" do
     actual1 = pipeline
       .apply(
         loader:        { autorotate: true },
-        resize_to_fit: [400, 400],
+        resize_to_fit: [400, 400, sharpen: false],
         invert:        true,
         rot90:         nil,
         rot:           :d90,
@@ -122,7 +122,7 @@ describe "ImageProcessing::Pipeline" do
     actual2 = pipeline
       .apply([
         [:loader,        { autorotate: true }],
-        [:resize_to_fit, [400, 400]],
+        [:resize_to_fit, [400, 400, sharpen: false]],
         [:invert,        true],
         [:rot90,         nil],
         [:rot,           :d90],
@@ -132,7 +132,7 @@ describe "ImageProcessing::Pipeline" do
 
     expected = pipeline
       .loader(autorotate: true)
-      .resize_to_fit(400, 400)
+      .resize_to_fit(400, 400, sharpen: false)
       .invert
       .rot90
       .rot(:d90)
