@@ -1,3 +1,7 @@
+## 1.10.3 (2020-01-12)
+
+* [vips] Fix auto-rotation not working in certain cases on libvips 8.9.0 (@janko)
+
 ## 1.10.2 (2020-01-11)
 
 * Fix Ruby 2.7 warnings for separation of positional and keyword arguments (@kamipo, @janko)
