@@ -138,8 +138,13 @@ module ImageProcessing
           # resize on load
           image = ::Vips::Image.thumbnail(self.image, width, height: height, **options)
         else
+          # we're already calling Image#autorot when loading the image
+          no_rotate = ::Vips.at_least_libvips?(8, 8) ? { no_rotate: true } : { auto_rotate: false }
+          options   = no_rotate.merge(options)
+
           image = self.image.thumbnail_image(width, height: height, **options)
         end
+
         image = image.conv(sharpen, precision: :integer) if sharpen
         image
       end

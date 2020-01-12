@@ -57,6 +57,9 @@ describe "ImageProcessing::Vips" do
     result = ImageProcessing::Vips.resize_to_limit(1000, 1000).call(fixture_image("rotated.jpg"))
     assert_dimensions [600, 800], result
 
+    result = ImageProcessing::Vips.loader(fail: true).resize_to_limit(1000, 1000).call(fixture_image("rotated.jpg"))
+    assert_dimensions [600, 800], result
+
     result = ImageProcessing::Vips.call(Vips::Image.new_from_file(fixture_image("rotated.jpg").path))
     assert_dimensions [600, 800], result
 
