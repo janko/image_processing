@@ -86,6 +86,15 @@ module ImageProcessing
         magick.extent "#{width}x#{height}"
       end
 
+      # Crops the image with the specified crop points.
+      def crop(*args)
+        case args.count
+        when 1 then magick.crop(*args)
+        when 4 then magick.crop("#{args[2]}x#{args[3]}+#{args[0]}+#{args[1]}")
+        else fail ArgumentError, "wrong number of arguments (expected 1 or 4, got #{args.count})"
+        end
+      end
+
       # Rotates the image by an arbitrary angle. For angles that are not
       # multiple of 90 degrees an optional background color can be specified to
       # fill in the gaps.

@@ -1,3 +1,7 @@
+## master
+
+* [minimagick] Add `#crop` which accepts `left, top, width, height` arguments (@janko)
+
 ## 1.10.3 (2020-01-12)
 
 * [vips] Fix auto-rotation not working in certain cases on libvips 8.9.0 (@janko)

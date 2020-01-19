@@ -331,6 +331,20 @@ describe "ImageProcessing::MiniMagick" do
     end
   end
 
+  describe "#crop" do
+    before do
+      @pipeline = ImageProcessing::MiniMagick.source(@portrait)
+    end
+
+    it "accepts geometry argument" do
+      assert_dimensions [300, 300], @pipeline.crop!("300x300+0+0")
+    end
+
+    it "accepts top, left, width, height arguments" do
+      assert_dimensions [300, 300], @pipeline.crop!(0, 0, 300, 300)
+    end
+  end
+
   describe "#rotate" do
     before do
       @pipeline = ImageProcessing::MiniMagick.source(@portrait)

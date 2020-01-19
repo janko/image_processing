@@ -15,6 +15,7 @@ the [MiniMagick] gem (which is installed with the image_processing gem).
   * [`#resize_to_fit`](#resize_to_fit)
   * [`#resize_to_fill`](#resize_to_fill)
   * [`#resize_and_pad`](#resize_and_pad)
+  * [`#crop`](#crop)
   * [`#rotate`](#rotate)
   * [`#composite`](#composite)
   * [`#convert`](#convert)
@@ -186,6 +187,24 @@ It accepts `:gravity` for specifying the [gravity] to apply while cropping
 
 ```rb
 pipeline.resize_and_pad!(400, 400, gravity: "north-west")
+```
+
+#### `#crop`
+
+Extracts an area from an image. The first two arguments are left & top edges of
+area to extract, while the last two arguments are the width & height of area to
+extract:
+
+```rb
+ImageProcessing::MiniMagick
+  .crop(20, 50, 300, 300) # extracts 300x300 area with top-left edge 20,50
+```
+
+You can also specify an ImageMagick geometry directly:
+
+```rb
+ImageProcessing::MiniMagick
+  .crop("300x300+20+50") # extracts 300x300 area with top-left edge 20,50
 ```
 
 #### `#rotate`

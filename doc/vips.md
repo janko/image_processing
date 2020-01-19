@@ -14,6 +14,7 @@ The `ImageProcessing::Vips` module contains processing macros that use the
   * [`#resize_to_fit`](#resize_to_fit)
   * [`#resize_to_fill`](#resize_to_fill)
   * [`#resize_and_pad`](#resize_and_pad)
+  * [`#crop`](#crop)
   * [`#rotate`](#rotate)
   * [`#composite`](#composite)
   * [`#convert`](#convert)
@@ -219,6 +220,17 @@ pipeline.resize_to_fill!(400, 400, linear: true)
 ```
 
 See [`vips_thumbnail()`] and [`vips_gravity()`] for more details.
+
+#### `#crop`
+
+Extracts an area from an image. The first two arguments are left & top edges of
+area to extract, while the last two arguments are the width & height of area to
+extract:
+
+```rb
+ImageProcessing::Vips
+  .crop(20, 50, 300, 300) # extracts 300x300 area with top-left edge 20,50
+```
 
 #### `#rotate`
 
