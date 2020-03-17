@@ -161,7 +161,7 @@ module ImageProcessing
 
       # Resizes the image using the specified geometry, and sharpens the
       # resulting thumbnail.
-      def thumbnail(geometry, sharpen: {})
+      def thumbnail(geometry, sharpen: nil)
         magick.resize(geometry)
 
         if sharpen
