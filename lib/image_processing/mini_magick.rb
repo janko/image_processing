@@ -201,7 +201,7 @@ module ImageProcessing
         # format, ImageMagick will create multiple images, one for each layer.
         # We want to warn the user that this is probably not what they wanted.
         def disallow_split_layers!(destination_path)
-          layers = Dir[destination_path.sub(/\.\w+$/, '-*\0')]
+          layers = Dir[destination_path.sub(/(\.\w+)?$/, '-*\0')]
 
           if layers.any?
             layers.each { |path| File.delete(path) }

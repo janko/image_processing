@@ -1,5 +1,7 @@
 ## master
 
+* [minimagick] Handle destination format having no file extension (@janko)
+
 * [minimagick] Disable sharpening on `#resize_*` operators by default (@flori)
 
 * [minimagick] Add `#crop` which accepts `left, top, width, height` arguments (@janko)

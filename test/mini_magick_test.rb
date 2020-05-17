@@ -86,6 +86,21 @@ describe "ImageProcessing::MiniMagick" do
     end
   end unless ENV["GM"]
 
+  it "allows resizing images without extension" do
+    result1 = Tempfile.new("image") # no file extension
+
+    ImageProcessing::MiniMagick
+      .source(@portrait)
+      .resize_to_limit(400, 400)
+      .call(destination: result1.path)
+
+    result2 = ImageProcessing::MiniMagick
+      .source(@portrait)
+      .resize_to_limit!(400, 400)
+
+    assert_similar result2, result1
+  end
+
   it "accepts geometry" do
     pipeline = ImageProcessing::MiniMagick.source(@portrait)
     assert_dimensions [300, 400], pipeline.loader(geometry: "400x400").call
