@@ -1,5 +1,7 @@
 ## master
 
+* [minimagick] Disable sharpening on `#resize_*` operators by default (@flori)
+
 * [minimagick] Add `#crop` which accepts `left, top, width, height` arguments (@janko)
 
 ## 1.10.3 (2020-01-12)

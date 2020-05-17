@@ -484,32 +484,16 @@ ImageProcessing::MiniMagick
 
 ## Sharpening
 
-All `#resize_*` operations will automatically sharpen the resulting thumbnails
-after resizing, using the [`-sharpen`] option.
+With `#resize_*` operators, you can additional sharpen the thumbnails via the
+`:sharpen` option, which performs [`-sharpen`] operation (higher sigma means
+more sharpening):
 
 ```rb
 ImageProcessing::MiniMagick
   .source(image)
-  .resize_to_limit!(400, 400)
+  .resize_to_limit!(400, 400, sharpen: { radius: 0, sigma: 1 })
 
 # convert input.jpg -resize 400x400> -sharpen 0x1 output.jpg
-```
-
-You can modify the radius and sigma of the Gaussian operator via the `:sharpen`
-option (higher sigma means more sharpening):
-
-```rb
-ImageProcessing::MiniMagick
-  .source(image)
-  .resize_to_limit!(400, 400, sharpen: { radius: 1, sigma: 2 })
-```
-
-You can disable automatic sharpening by setting `:sharpen` to `false`:
-
-```rb
-ImageProcessing::MiniMagick
-  .source(image)
-  .resize_to_limit!(400, 400, sharpen: false)
 ```
 
 [MiniMagick]: https://github.com/minimagick/minimagick
