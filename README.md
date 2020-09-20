@@ -166,6 +166,15 @@ pipeline = ImageProcessing::Vips.instrumenter do |**options, &processing|
     processing.call # calls the pipeline
   end
 end
+
+pipeline
+  .source(image)
+  .loader(fail: true)
+  .saver(quality: 85)
+  .convert("png")
+  .resize_to_limit(500, 500)
+  .flip(:horizontal)
+  .call # calls instrumenter
 ```
 
 ## Contributing
