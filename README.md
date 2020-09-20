@@ -148,6 +148,25 @@ You can continue reading the API documentation for specific modules:
 See the **[wiki]** for additional "How To" guides for common scenarios. The wiki
 is publicly editable, so you're encouraged to add your own guides.
 
+## Instrumentation
+
+You can register an `#instrumenter` block for a given pipeline, which will wrap
+the pipeline execution, allowing you to record performance metrics.
+
+```rb
+pipeline = ImageProcessing::Vips.instrumenter do |**options, &processing|
+  options[:source]     #=> #<File:...>
+  options[:loader]     #=> { fail: true }
+  options[:saver]      #=> { quality: 85 }
+  options[:format]     #=> "png"
+  options[:operations] #=> [[:resize_to_limit, 500, 500], [:flip, [:horizontal]]]
+  options[:processor]  #=> ImageProcessing::Vips::Processor
+
+  ActiveSupport::Notifications.instrument("process.image_processing", **options) do
+    processing.call # calls the pipeline
+  end
+end
+```
 
 ## Contributing
 

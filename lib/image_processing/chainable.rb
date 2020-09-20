@@ -21,6 +21,11 @@ module ImageProcessing
       branch saver: options
     end
 
+    # Register instrumentation block that will be called around the pipeline.
+    def instrumenter(&block)
+      branch instrumenter: block
+    end
+
     # Add multiple operations as a hash or an array.
     #
     #   .apply(resize_to_limit: [400, 400], strip: true)
