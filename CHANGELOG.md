@@ -1,3 +1,7 @@
+## 1.12.0 (2020-09-20)
+
+* Add instrumentation support via `#instrumenter` (@janko)
+
 ## 1.11.0 (2020-05-17)
 
 * [minimagick] Handle destination format having no file extension (@janko)
