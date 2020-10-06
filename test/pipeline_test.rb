@@ -46,6 +46,13 @@ describe "ImageProcessing::Pipeline" do
     assert_type "JPEG", result
   end
 
+  it "saves as JPEG when format is unknown and the path ends with a '.'" do
+    png = ImageProcessing::Vips.convert("png").call(@portrait)
+    result = ImageProcessing::Vips.invert.call(copy_to_tempfile(png, "."))
+    assert_equal ".jpg", File.extname(result.path)
+    assert_type "JPEG", result
+  end
+
   it "accepts destination path" do
     destination = Tempfile.new(["destination", ".jpg"])
     ImageProcessing::Vips.source(@portrait).call(destination: destination.path)

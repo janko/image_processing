@@ -37,9 +37,9 @@ module ImageProcessing
 
     # Determines the appropriate destination image format.
     def destination_format
-      format   = File.extname(destination)[1..-1] if destination
+      format   = determine_format(destination) if destination
       format ||= self.format
-      format ||= File.extname(source_path)[1..-1] if source_path
+      format ||= determine_format(source_path) if source_path
 
       format || DEFAULT_FORMAT
     end
@@ -92,6 +92,12 @@ module ImageProcessing
       else
         @source
       end
+    end
+
+    def determine_format(file_path)
+      extension = File.extname(file_path)
+
+      extension[1..-1] if extension.size > 1
     end
   end
 end
