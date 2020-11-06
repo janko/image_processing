@@ -1,3 +1,7 @@
+## HEAD
+
+* Fix format fallback for files ending with a dot on Ruby 2.7+ (@coding-chimp)
+
 ## 1.12.0 (2020-09-20)
 
 * Add instrumentation support via `#instrumenter` (@janko)
