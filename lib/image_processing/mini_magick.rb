@@ -69,9 +69,11 @@ module ImageProcessing
       end
 
       # Resizes the image to fill the specified dimensions, applying any
-      # necessary cropping.
-      def resize_to_fill(width, height, gravity: "Center", **options)
+      # necessary cropping. Passing crop: false will treat each
+      # dimmension as a minimum and overflow as needed.
+      def resize_to_fill(width, height, gravity: "Center", crop: true, **options)
         thumbnail("#{width}x#{height}^", **options)
+        return magick unless crop
         magick.gravity gravity
         magick.background color(:transparent)
         magick.extent "#{width}x#{height}"

@@ -264,6 +264,10 @@ describe "ImageProcessing::MiniMagick" do
       assert_dimensions [1000, 1000], @pipeline.resize_to_fill!(1000, 1000)
     end
 
+    it "will skip cropping if asked" do
+      assert_dimensions [400, 533], @pipeline.resize_to_fill!(400, 400, crop: false)
+    end
+
     it "produces correct image" do
       expected = fixture_image("fill.jpg")
       assert_similar expected, @pipeline.resize_to_fill!(400, 400)
