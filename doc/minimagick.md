@@ -321,7 +321,7 @@ processing, otherwise if `nil` is returned the original
 `MiniMagick::Tool::Convert` object will be used.
 
 ```rb
-ImagePocessing::MiniMagick
+ImageProcessing::MiniMagick
   .custom { |magick| magick.colorspace("grayscale") if gray? }
   # ...
 ```
