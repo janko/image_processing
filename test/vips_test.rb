@@ -115,7 +115,7 @@ describe "ImageProcessing::Vips" do
 
   it "raises correct Vips::Error on unknown saver" do
     error = assert_raises(Vips::Error) { ImageProcessing::Vips.convert("foo").call(@portrait) }
-    assert_includes error.message, "No known saver"
+    assert_includes error.message, "is not a known file format"
   end
 
   it "accepts :saver" do
