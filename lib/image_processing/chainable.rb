@@ -53,7 +53,9 @@ module ImageProcessing
     # Call the defined processing and get the result. Allows specifying
     # the source file and destination.
     def call(file = nil, destination: nil, **call_options)
-      options = { source: file, destination: destination }.compact
+      options = {}
+      options[:source] = file if file
+      options[:destination] = destination if destination
 
       branch(**options).call!(**call_options)
     end
