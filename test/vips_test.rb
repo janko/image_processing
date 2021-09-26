@@ -295,7 +295,7 @@ describe "ImageProcessing::Vips" do
     it "produces correct image when enlarging" do
       @pipeline = ImageProcessing::Vips.source(@landscape)
       expected = fixture_image("pad-large.jpg")
-      assert_similar expected, @pipeline.resize_and_pad!(1000, 1000, background: [0, 255, 0])
+      assert_similar expected, @pipeline.resize_and_pad!(1000, 1000, background: [55, 126, 34])
     end
 
     it "accepts gravity" do

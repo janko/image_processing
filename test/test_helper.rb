@@ -10,7 +10,7 @@ require "minispec-metadata"
 
 ENV["VIPS_WARNING"] = "0" # disable libvips warnings
 
-require "phashion" unless RUBY_ENGINE == "jruby"
+require "dhash-vips"
 require "vips"
 require "mini_magick"
 
@@ -27,15 +27,11 @@ class MiniTest::Test
   end
 
   def assert_similar(image1, image2)
-    return if RUBY_ENGINE == "jruby" # Phashion has C extensions
-
-    assert_operator distance(image1, image2), :<=, 4
+    assert_operator distance(image1, image2), :<=, 3
   end
 
   def refute_similar(image1, image2)
-    return if RUBY_ENGINE == "jruby" # Phashion has C extensions
-
-    assert_operator distance(image1, image2), :>, 4
+    assert_operator distance(image1, image2), :>, 3
   end
 
   def assert_dimensions(dimensions, file)
@@ -49,10 +45,10 @@ class MiniTest::Test
   private
 
   def distance(image1, image2)
-    a = Phashion::Image.new(image1.path)
-    b = Phashion::Image.new(image2.path)
+    hash1 = DHashVips::IDHash.fingerprint(image1.path)
+    hash2 = DHashVips::IDHash.fingerprint(image2.path)
 
-    a.distance_from(b).abs
+    DHashVips::IDHash.distance hash1, hash2
   end
 end
 
