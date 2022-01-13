@@ -29,8 +29,16 @@ how to resize and process images.
 
 1. Install ImageMagick and/or libvips:
 
-  ```sh
+In a Mac terminal:
+  
+```sh
   $ brew install imagemagick vips
+  ```
+
+ In a debian/ubuntu terminal:
+
+```sh
+  $ sudo apt install imagemagick libvips
   ```
 
 2. Add the gem to your Gemfile:
@@ -181,8 +189,15 @@ pipeline
 
 Our test suite requires both `imagemagick` and `libvips` libraries to be installed.
 
+In a Mac terminal:
+
 ```
 $ brew install imagemagick vips
+```
+
+In a debian/ubuntu terminal:
+```shell
+sudo apt install imagemagick libvips
 ```
 
 Afterwards you can run tests with
