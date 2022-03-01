@@ -1,3 +1,7 @@
+## HEAD
+
+* Prevent remote shell execution when using `#apply` with operations coming from user input (@janko)
+
 ## 1.12.1 (2020-11-06)
 
 * Fix format fallback for files ending with a dot on Ruby 2.7+ (@coding-chimp)

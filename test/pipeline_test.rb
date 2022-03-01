@@ -258,4 +258,19 @@ describe "ImageProcessing::Pipeline" do
       ImageProcessing::Vips.valid?(@portrait)
     end
   end
+
+  it "doesn't allow making system calls" do
+    ImageProcessing::Vips.source(@portrait).apply(system: "touch foo.txt")
+    refute File.exist?("foo.txt")
+
+    assert_raises Vips::Error do
+      ImageProcessing::Vips.source(@portrait).spawn("touch foo.txt").call
+    end
+    refute File.exist?("foo.txt")
+
+    assert_raises MiniMagick::Error do
+      ImageProcessing::MiniMagick.source(@portrait).spawn("touch foo.txt").call
+    end
+    refute File.exist?("foo.txt")
+  end
 end
