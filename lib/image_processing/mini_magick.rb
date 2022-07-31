@@ -213,9 +213,9 @@ module ImageProcessing
         def apply_options(magick, define: {}, **options)
           options.each do |option, value|
             case value
-            when true, nil then magick.send(option)
-            when false     then magick.send(option).+
-            else                magick.send(option, *value)
+            when true, nil then magick.public_send(option)
+            when false     then magick.public_send(option).+
+            else                magick.public_send(option, *value)
             end
           end
 

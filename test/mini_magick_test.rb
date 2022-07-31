@@ -173,6 +173,26 @@ describe "ImageProcessing::MiniMagick" do
     assert_dimensions [600, 800], result
   end
 
+  it "doesn't allow calling Kernel methods via loader/saver options" do
+    error = assert_raises(MiniMagick::Error) do
+      ImageProcessing::MiniMagick
+        .source(@portrait)
+        .loader(system: "touch test/malicious.txt")
+        .call
+    end
+
+    assert_match "unrecognized option `-system'", error.message
+
+    error = assert_raises(MiniMagick::Error) do
+      ImageProcessing::MiniMagick
+        .source(@portrait)
+        .saver(system: "touch test/malicious.txt")
+        .call
+    end
+
+    assert_match "unrecognized option `-system'", error.message
+  end
+
   describe ".valid_image?" do
     it "returns true for correct images" do
       assert ImageProcessing::MiniMagick.valid_image?(@portrait)

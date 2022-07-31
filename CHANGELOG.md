@@ -1,3 +1,7 @@
+## HEAD
+
+* [minimagick] Don't allow calling Kernel options via `loader`/`saver` options (@janko)
+
 ## 1.12.2 (2022-03-01)
 
 * Prevent remote shell execution when using `#apply` with operations coming from user input (@janko)
