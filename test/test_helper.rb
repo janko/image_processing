@@ -14,7 +14,7 @@ require "dhash-vips"
 require "vips"
 require "mini_magick"
 
-class MiniTest::Test
+class Minitest::Test
   def fixture_image(name)
     File.open("test/fixtures/#{name}", "rb")
   end
