@@ -76,6 +76,24 @@ describe "ImageProcessing::Vips" do
     assert_dimensions [600, 800], result
   end
 
+  it "analyzes a image" do
+    result = ImageProcessing::Vips.analyze(@portrait)
+    expected = { width: 600, height: 800, rotated: false }
+    assert_equal expected, result
+  end
+
+  it "analyzes a rotated image" do
+    result = ImageProcessing::Vips.analyze(fixture_image("rotated.jpg"))
+    expected = { width: 800, height: 600, rotated: true }
+    assert_equal expected, result
+  end
+
+  it "does not analyze an invalid image" do
+    result = ImageProcessing::Vips.analyze(fixture_image("invalid.jpg"))
+    expected = {}
+    assert_equal expected, result
+  end
+
   it "applies loader options" do
     result = ImageProcessing::Vips.loader(shrink: 2).call(@portrait)
     assert_dimensions [300, 400], result
