@@ -106,6 +106,24 @@ describe "ImageProcessing::MiniMagick" do
     assert_dimensions [300, 400], pipeline.loader(geometry: "400x400").call
   end unless ENV["GM"]
 
+  it "analyzes the image" do
+    result = ImageProcessing::MiniMagick.analyze(@portrait)
+    expected = { width: 600, height: 800, rotated: false }
+    assert_equal expected, result
+  end
+
+  it "analyzes the rotated image" do
+    result = ImageProcessing::MiniMagick.analyze(fixture_image("rotated.jpg"))
+    expected = { width: 800, height: 600, rotated: true }
+    assert_equal expected, result
+  end
+
+  it "does not analyze an invalid image" do
+    result = ImageProcessing::MiniMagick.analyze(fixture_image("invalid.jpg"))
+    expected = {}
+    assert_equal expected, result
+  end
+
   it "auto orients by default" do
     result = ImageProcessing::MiniMagick.call(fixture_image("rotated.jpg"))
     assert_dimensions [600, 800], result
