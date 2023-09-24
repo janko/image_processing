@@ -306,7 +306,7 @@ describe "ImageProcessing::Vips" do
 
     it "accepts thumbnail options" do
       pad  = @pipeline.resize_and_pad!(400, 400)
-      crop = @pipeline.resize_and_pad!(400, 400, crop: :centre)
+      crop = @pipeline.resize_and_pad!(400, 400, crop: :entropy)
       refute_similar pad, crop
     end
 
