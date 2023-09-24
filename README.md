@@ -30,7 +30,7 @@ how to resize and process images.
 1. Install ImageMagick and/or libvips:
 
 In a Mac terminal:
-  
+
 ```sh
   $ brew install imagemagick vips
   ```
