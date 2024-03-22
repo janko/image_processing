@@ -268,6 +268,13 @@ describe "ImageProcessing::Vips" do
     end
   end
 
+  describe "#resize_to_cover" do
+    it "resizes the portrait image to fill out the given landscape dimensions" do
+      @portrait_pipeline = ImageProcessing::Vips.source(@portrait)
+      assert_dimensions [300, 400], @portrait_pipeline.resize_to_cover!(300, 200)
+    end
+  end
+
   describe "#resize_and_pad" do
     before do
       @pipeline = ImageProcessing::Vips.source(@portrait)
