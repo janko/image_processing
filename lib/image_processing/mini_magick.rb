@@ -95,6 +95,12 @@ module ImageProcessing
         end
       end
 
+      # Resizes the image to cover the specified dimensions, without
+      # cropping the excess.
+      def cover(width, height, **options)
+        thumbnail("#{width}x#{height}^", **options)
+      end
+
       # Rotates the image by an arbitrary angle. For angles that are not
       # multiple of 90 degrees an optional background color can be specified to
       # fill in the gaps.
