@@ -2,6 +2,9 @@
 
 * [minimagick] Don't allow calling Kernel options via `loader`/`saver` options (@janko)
 
+* Add `#cover` that allows one to resize an image to cover a given width and height without cropping
+  the excess. (@brendon)
+
 ## 1.12.2 (2022-03-01)
 
 * Prevent remote shell execution when using `#apply` with operations coming from user input (@janko)
