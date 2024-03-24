@@ -269,6 +269,60 @@ describe "ImageProcessing::Vips" do
     end
   end
 
+  describe "#resize_and_pad" do
+    before do
+      @pipeline = ImageProcessing::Vips.source(@portrait)
+    end
+
+    it "resizes and fills out the remaining space to fill out the given dimensions" do
+      assert_dimensions [400, 400], @pipeline.resize_and_pad!(400, 400)
+    end
+
+    it "enlarges image and fills out the remaining space to fill out the given dimensions" do
+      assert_dimensions [1000, 1000], @pipeline.resize_and_pad!(1000, 1000)
+    end
+
+    it "produces correct image when shrinking" do
+      result = @pipeline.convert("png").resize_and_pad!(400, 400, alpha: true)
+      assert_similar fixture_image("pad.png"), result
+      assert_equal 4, Vips::Image.new_from_file(result.path).bands
+
+      transparent_png = @pipeline.add_alpha.convert!("png")
+      result = @pipeline.source(transparent_png).resize_and_pad!(400, 400, alpha: true)
+      assert_similar fixture_image("pad.png"), result
+      assert_equal 4, Vips::Image.new_from_file(result.path).bands
+    end
+
+    it "produces correct image when enlarging" do
+      @pipeline = ImageProcessing::Vips.source(@landscape)
+      expected = fixture_image("pad-large.jpg")
+      assert_similar expected, @pipeline.resize_and_pad!(1000, 1000, background: [55, 126, 34])
+    end
+
+    it "accepts gravity" do
+      centre    = @pipeline.resize_and_pad!(400, 400)
+      northwest = @pipeline.resize_and_pad!(400, 400, gravity: "north-west")
+      refute_similar centre, northwest
+    end
+
+    it "accepts thumbnail options" do
+      pad  = @pipeline.resize_and_pad!(400, 400)
+      crop = @pipeline.resize_and_pad!(400, 400, crop: :entropy)
+      refute_similar pad, crop
+    end
+
+    it "accepts sharpening options" do
+      sharpened = @pipeline.resize_and_pad!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
+      normal    = @pipeline.resize_and_pad!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
+
+    it "sharpening uses integer precision" do
+      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
+      assert_equal :uchar, sharpened.format
+    end
+  end
+
   describe "#cover" do
     before do
       @portrait_pipeline = ImageProcessing::Vips.source(@portrait)
@@ -331,60 +385,6 @@ describe "ImageProcessing::Vips" do
 
     it "sharpening uses integer precision" do
       sharpened = @portrait_pipeline.cover(400, 400).call(save: false)
-      assert_equal :uchar, sharpened.format
-    end
-  end
-
-  describe "#resize_and_pad" do
-    before do
-      @pipeline = ImageProcessing::Vips.source(@portrait)
-    end
-
-    it "resizes and fills out the remaining space to fill out the given dimensions" do
-      assert_dimensions [400, 400], @pipeline.resize_and_pad!(400, 400)
-    end
-
-    it "enlarges image and fills out the remaining space to fill out the given dimensions" do
-      assert_dimensions [1000, 1000], @pipeline.resize_and_pad!(1000, 1000)
-    end
-
-    it "produces correct image when shrinking" do
-      result = @pipeline.convert("png").resize_and_pad!(400, 400, alpha: true)
-      assert_similar fixture_image("pad.png"), result
-      assert_equal 4, Vips::Image.new_from_file(result.path).bands
-
-      transparent_png = @pipeline.add_alpha.convert!("png")
-      result = @pipeline.source(transparent_png).resize_and_pad!(400, 400, alpha: true)
-      assert_similar fixture_image("pad.png"), result
-      assert_equal 4, Vips::Image.new_from_file(result.path).bands
-    end
-
-    it "produces correct image when enlarging" do
-      @pipeline = ImageProcessing::Vips.source(@landscape)
-      expected = fixture_image("pad-large.jpg")
-      assert_similar expected, @pipeline.resize_and_pad!(1000, 1000, background: [55, 126, 34])
-    end
-
-    it "accepts gravity" do
-      centre    = @pipeline.resize_and_pad!(400, 400)
-      northwest = @pipeline.resize_and_pad!(400, 400, gravity: "north-west")
-      refute_similar centre, northwest
-    end
-
-    it "accepts thumbnail options" do
-      pad  = @pipeline.resize_and_pad!(400, 400)
-      crop = @pipeline.resize_and_pad!(400, 400, crop: :entropy)
-      refute_similar pad, crop
-    end
-
-    it "accepts sharpening options" do
-      sharpened = @pipeline.resize_and_pad!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
-      normal    = @pipeline.resize_and_pad!(400, 400, sharpen: false)
-      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
-    end
-
-    it "sharpening uses integer precision" do
-      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
       assert_equal :uchar, sharpened.format
     end
   end
