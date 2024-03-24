@@ -82,9 +82,17 @@ module ImageProcessing
         thumbnail(width, height, crop: :centre, **options)
       end
 
+      # Resizes the image to fit within the specified dimensions and fills
+      # the remaining area with the specified background color.
+      def resize_and_pad(width, height, gravity: "centre", extend: nil, background: nil, alpha: nil, **options)
+        image = thumbnail(width, height, **options)
+        image = image.add_alpha if alpha && !image.has_alpha?
+        image.gravity(gravity, width, height, extend: extend, background: background)
+      end
+
       # Resizes the image to cover the specified dimensions, without
       # cropping the excess.
-      def resize_to_cover(width, height, **options)
+      def cover(width, height, **options)
         image_ratio = Rational(image.width, image.height)
         thumbnail_ratio = Rational(width, height)
 
@@ -94,15 +102,7 @@ module ImageProcessing
           height = ::Vips::MAX_COORD
         end
 
-        thumbnail(width, height, crop: :none, **options)
-      end
-
-      # Resizes the image to fit within the specified dimensions and fills
-      # the remaining area with the specified background color.
-      def resize_and_pad(width, height, gravity: "centre", extend: nil, background: nil, alpha: nil, **options)
-        image = thumbnail(width, height, **options)
-        image = image.add_alpha if alpha && !image.has_alpha?
-        image.gravity(gravity, width, height, extend: extend, background: background)
+        thumbnail(width, height, **options, crop: :none)
       end
 
       # Rotates the image by an arbitrary angle.
