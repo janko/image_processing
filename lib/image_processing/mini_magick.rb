@@ -86,6 +86,12 @@ module ImageProcessing
         magick.extent "#{width}x#{height}"
       end
 
+      # Resizes the image to cover the specified dimensions, without
+      # cropping the excess.
+      def cover(width, height, **options)
+        thumbnail("#{width}x#{height}^", **options)
+      end
+
       # Crops the image with the specified crop points.
       def crop(*args)
         case args.count
@@ -93,12 +99,6 @@ module ImageProcessing
         when 4 then magick.crop("#{args[2]}x#{args[3]}+#{args[0]}+#{args[1]}")
         else fail ArgumentError, "wrong number of arguments (expected 1 or 4, got #{args.count})"
         end
-      end
-
-      # Resizes the image to cover the specified dimensions, without
-      # cropping the excess.
-      def cover(width, height, **options)
-        thumbnail("#{width}x#{height}^", **options)
       end
 
       # Rotates the image by an arbitrary angle. For angles that are not

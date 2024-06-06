@@ -367,20 +367,6 @@ describe "ImageProcessing::MiniMagick" do
     end
   end
 
-  describe "#crop" do
-    before do
-      @pipeline = ImageProcessing::MiniMagick.source(@portrait)
-    end
-
-    it "accepts geometry argument" do
-      assert_dimensions [300, 300], @pipeline.crop!("300x300+0+0")
-    end
-
-    it "accepts top, left, width, height arguments" do
-      assert_dimensions [300, 300], @pipeline.crop!(0, 0, 300, 300)
-    end
-  end
-
   describe "#cover" do
     before do
       @portrait_pipeline = ImageProcessing::MiniMagick.source(@portrait)
@@ -433,6 +419,20 @@ describe "ImageProcessing::MiniMagick" do
       sharpened = @portrait_pipeline.cover!(400, 400, sharpen: { sigma: 1 })
       normal    = @portrait_pipeline.cover!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
+  end
+
+  describe "#crop" do
+    before do
+      @pipeline = ImageProcessing::MiniMagick.source(@portrait)
+    end
+
+    it "accepts geometry argument" do
+      assert_dimensions [300, 300], @pipeline.crop!("300x300+0+0")
+    end
+
+    it "accepts top, left, width, height arguments" do
+      assert_dimensions [300, 300], @pipeline.crop!(0, 0, 300, 300)
     end
   end
 
