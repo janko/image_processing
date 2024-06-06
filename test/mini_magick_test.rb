@@ -8,6 +8,7 @@ describe "ImageProcessing::MiniMagick" do
   before do
     @portrait  = fixture_image("portrait.jpg")
     @landscape = fixture_image("landscape.jpg")
+    @square = fixture_image("square.jpg")
   end
 
   it "applies imagemagick operations" do
@@ -362,6 +363,61 @@ describe "ImageProcessing::MiniMagick" do
     it "accepts sharpening options" do
       sharpened = @pipeline.resize_and_pad!(400, 400, sharpen: { sigma: 1 })
       normal    = @pipeline.resize_and_pad!(400, 400, sharpen: false)
+      assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
+    end
+  end
+
+  describe "#cover" do
+    before do
+      @portrait_pipeline = ImageProcessing::MiniMagick.source(@portrait)
+      @landscape_pipeline = ImageProcessing::MiniMagick.source(@landscape)
+      @square_pipeline = ImageProcessing::MiniMagick.source(@square)
+    end
+
+    it "resizes the portrait image to fill out the given landscape dimensions" do
+      assert_dimensions [300, 400], @portrait_pipeline.cover!(300, 200)
+    end
+
+    it "resizes the portrait image to fill out the given portrait dimensions" do
+      assert_dimensions [225, 300], @portrait_pipeline.cover!(200, 300)
+    end
+
+    it "resizes the portrait image to fill out the given square dimensions" do
+      assert_dimensions [300, 400], @portrait_pipeline.cover!(300, 300)
+    end
+
+    it "resizes the landscape image to fill out the given portrait dimensions" do
+      assert_dimensions [400, 300], @landscape_pipeline.cover!(200, 300)
+    end
+
+    it "resizes the landscape image to fill out the given landscape dimensions" do
+      assert_dimensions [300, 225], @landscape_pipeline.cover!(300, 200)
+    end
+
+    it "resizes the landscape image to fill out the given square dimensions" do
+      assert_dimensions [400, 300], @landscape_pipeline.cover!(300, 300)
+    end
+
+    it "resizes the square image to fill out the given portrait dimensions" do
+      assert_dimensions [300, 300], @square_pipeline.cover!(200, 300)
+    end
+
+    it "resizes the square image to fill out the given landscape dimensions" do
+      assert_dimensions [300, 300], @square_pipeline.cover!(300, 200)
+    end
+
+    it "resizes the square image to fill out the given square dimensions" do
+      assert_dimensions [300, 300], @square_pipeline.cover!(300, 300)
+    end
+
+    it "produces correct image" do
+      expected = fixture_image("cover.jpg")
+      assert_similar expected, @portrait_pipeline.cover!(300, 200)
+    end
+
+    it "accepts sharpening options" do
+      sharpened = @portrait_pipeline.cover!(400, 400, sharpen: { sigma: 1 })
+      normal    = @portrait_pipeline.cover!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
   end

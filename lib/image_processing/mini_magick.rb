@@ -86,6 +86,12 @@ module ImageProcessing
         magick.extent "#{width}x#{height}"
       end
 
+      # Resizes the image to cover the specified dimensions, without
+      # cropping the excess.
+      def cover(width, height, **options)
+        thumbnail("#{width}x#{height}^", **options)
+      end
+
       # Crops the image with the specified crop points.
       def crop(*args)
         case args.count

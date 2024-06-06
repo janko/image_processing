@@ -90,6 +90,21 @@ module ImageProcessing
         image.gravity(gravity, width, height, extend: extend, background: background)
       end
 
+      # Resizes the image to cover the specified dimensions, without
+      # cropping the excess.
+      def cover(width, height, **options)
+        image_ratio = Rational(image.width, image.height)
+        thumbnail_ratio = Rational(width, height)
+
+        if image_ratio > thumbnail_ratio
+          width = ::Vips::MAX_COORD
+        else
+          height = ::Vips::MAX_COORD
+        end
+
+        thumbnail(width, height, **options, crop: :none)
+      end
+
       # Rotates the image by an arbitrary angle.
       def rotate(degrees, **options)
         image.similarity(angle: degrees, **options)
