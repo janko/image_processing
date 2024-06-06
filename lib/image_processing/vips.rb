@@ -107,7 +107,12 @@ module ImageProcessing
 
       # Rotates the image by an arbitrary angle.
       def rotate(degrees, **options)
-        image.similarity(angle: degrees, **options)
+        if ([0, 90, 180, 270].include?(degrees) && options.empty?)
+          rot_command = "rot#{degrees}".to_sym
+          image.public_send rot_command
+        else
+          image.similarity(angle: degrees, **options)
+        end
       end
 
       # Overlays the specified image over the current one. Supports specifying
