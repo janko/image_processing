@@ -21,7 +21,6 @@ The `ImageProcessing::Vips` module contains processing macros that use the
   * [`#convert`](#convert)
   * [`#method_missing`](#method_missing)
   * [`#custom`](#custom)
-  * [`#append`](#append)
   * [`#loader`](#loader)
   * [`#saver`](#saver)
   * [`#apply`](#apply)
