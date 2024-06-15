@@ -157,7 +157,11 @@ module ImageProcessing
 
       # Appends a raw ImageMagick command-line argument to the command.
       def append(*args)
-        magick.merge! args
+        if args.empty?
+          magick.append
+        else
+          magick.merge! args
+        end
       end
 
       private

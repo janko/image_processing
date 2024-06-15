@@ -597,5 +597,10 @@ describe "ImageProcessing::MiniMagick" do
 
       assert_similar expected, actual
     end
+
+    it "still supports -append" do
+      result = ImageProcessing::MiniMagick.append("wizard:").append.call(@portrait)
+      assert_dimensions [600, 1440], result
+    end
   end
 end
