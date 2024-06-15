@@ -109,7 +109,7 @@ module ImageProcessing
 
       # Rotates the image by an arbitrary angle.
       def rotate(degrees, **options)
-        if ([0, 90, 180, 270].include?(degrees) && options.empty?)
+        if ([90, 180, 270].include?(degrees) && options.empty?)
           rot_command = "rot#{degrees}".to_sym
           image.public_send rot_command
         else
