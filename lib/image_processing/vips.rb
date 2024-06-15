@@ -92,7 +92,9 @@ module ImageProcessing
 
       # Resizes the image to cover the specified dimensions, without
       # cropping the excess.
-      def cover(width, height, **options)
+      def resize_to_cover(width, height, **options)
+        image = self.image.is_a?(String) ? ::Vips::Image.new_from_file(self.image) : self.image
+
         image_ratio = Rational(image.width, image.height)
         thumbnail_ratio = Rational(width, height)
 

@@ -15,7 +15,7 @@ the [MiniMagick] gem (which is installed with the image_processing gem).
   * [`#resize_to_fit`](#resize_to_fit)
   * [`#resize_to_fill`](#resize_to_fill)
   * [`#resize_and_pad`](#resize_and_pad)
-  * [`#cover`](#cover)
+  * [`#resize_to_cover`](#resize_to_cover)
   * [`#crop`](#crop)
   * [`#rotate`](#rotate)
   * [`#composite`](#composite)
@@ -190,7 +190,7 @@ It accepts `:gravity` for specifying the [gravity] to apply while cropping
 pipeline.resize_and_pad!(400, 400, gravity: "north-west")
 ```
 
-#### `#cover`
+#### `#resize_to_cover`
 
 Resizes the image to cover the specified dimensions while retaining the
 original aspect ratio. The overflowing areas will not be cropped.
@@ -198,7 +198,7 @@ original aspect ratio. The overflowing areas will not be cropped.
 ```rb
 pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
 
-result = pipeline.cover!(300, 300)
+result = pipeline.resize_to_cover!(300, 300)
 
 MiniMagick::Image.new(result.path).dimensions #=> [300, 400]
 ```

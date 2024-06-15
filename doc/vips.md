@@ -14,7 +14,7 @@ The `ImageProcessing::Vips` module contains processing macros that use the
   * [`#resize_to_fit`](#resize_to_fit)
   * [`#resize_to_fill`](#resize_to_fill)
   * [`#resize_and_pad`](#resize_and_pad)
-  * [`#cover`](#cover)
+  * [`#resize_to_cover`](#resize_to_cover)
   * [`#crop`](#crop)
   * [`#rotate`](#rotate)
   * [`#composite`](#composite)
@@ -221,7 +221,7 @@ pipeline.resize_to_fill!(400, 400, linear: true)
 
 See [`vips_thumbnail()`] and [`vips_gravity()`] for more details.
 
-#### `#cover`
+#### `#resize_to_cover`
 
 Resizes the image to cover the specified dimensions while retaining the
 original aspect ratio. The overflowing areas will not be cropped.
@@ -229,7 +229,7 @@ original aspect ratio. The overflowing areas will not be cropped.
 ```rb
 pipeline = ImageProcessing::Vips.source(image) # 600x800
 
-result = pipeline.cover!(300, 300)
+result = pipeline.resize_to_cover!(300, 300)
 
 Vips::Image.new_from_file(result.path).size #=> [300, 400]
 ```
@@ -237,7 +237,7 @@ Vips::Image.new_from_file(result.path).size #=> [300, 400]
 Any additional options (except `crop`) are forwarded to [`Vips::Image#thumbnail_image`]:
 
 ```rb
-pipeline.cover!(400, 400, linear: true)
+pipeline.resize_to_cover!(400, 400, linear: true)
 ```
 
 See [`vips_thumbnail()`] for more details.

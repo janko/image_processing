@@ -323,7 +323,7 @@ describe "ImageProcessing::Vips" do
     end
   end
 
-  describe "#cover" do
+  describe "#resize_to_cover" do
     before do
       @portrait_pipeline = ImageProcessing::Vips.source(@portrait)
       @landscape_pipeline = ImageProcessing::Vips.source(@landscape)
@@ -331,60 +331,60 @@ describe "ImageProcessing::Vips" do
     end
 
     it "resizes the portrait image to fill out the given landscape dimensions" do
-      assert_dimensions [300, 400], @portrait_pipeline.cover!(300, 200)
+      assert_dimensions [300, 400], @portrait_pipeline.resize_to_cover!(300, 200)
     end
 
     it "resizes the portrait image to fill out the given portrait dimensions" do
-      assert_dimensions [225, 300], @portrait_pipeline.cover!(200, 300)
+      assert_dimensions [225, 300], @portrait_pipeline.resize_to_cover!(200, 300)
     end
 
     it "resizes the portrait image to fill out the given square dimensions" do
-      assert_dimensions [300, 400], @portrait_pipeline.cover!(300, 300)
+      assert_dimensions [300, 400], @portrait_pipeline.resize_to_cover!(300, 300)
     end
 
     it "resizes the landscape image to fill out the given portrait dimensions" do
-      assert_dimensions [400, 300], @landscape_pipeline.cover!(200, 300)
+      assert_dimensions [400, 300], @landscape_pipeline.resize_to_cover!(200, 300)
     end
 
     it "resizes the landscape image to fill out the given landscape dimensions" do
-      assert_dimensions [300, 225], @landscape_pipeline.cover!(300, 200)
+      assert_dimensions [300, 225], @landscape_pipeline.resize_to_cover!(300, 200)
     end
 
     it "resizes the landscape image to fill out the given square dimensions" do
-      assert_dimensions [400, 300], @landscape_pipeline.cover!(300, 300)
+      assert_dimensions [400, 300], @landscape_pipeline.resize_to_cover!(300, 300)
     end
 
     it "resizes the square image to fill out the given portrait dimensions" do
-      assert_dimensions [300, 300], @square_pipeline.cover!(200, 300)
+      assert_dimensions [300, 300], @square_pipeline.resize_to_cover!(200, 300)
     end
 
     it "resizes the square image to fill out the given landscape dimensions" do
-      assert_dimensions [300, 300], @square_pipeline.cover!(300, 200)
+      assert_dimensions [300, 300], @square_pipeline.resize_to_cover!(300, 200)
     end
 
     it "resizes the square image to fill out the given square dimensions" do
-      assert_dimensions [300, 300], @square_pipeline.cover!(300, 300)
+      assert_dimensions [300, 300], @square_pipeline.resize_to_cover!(300, 300)
     end
 
     it "produces correct image" do
       expected = fixture_image("cover.jpg")
-      assert_similar expected, @portrait_pipeline.cover!(300, 200)
+      assert_similar expected, @portrait_pipeline.resize_to_cover!(300, 200)
     end
 
     it "accepts thumbnail options except :crop" do
-      attention = @portrait_pipeline.cover!(400, 400, crop: :attention)
-      centre    = @portrait_pipeline.cover!(400, 400, crop: :centre)
+      attention = @portrait_pipeline.resize_to_cover!(400, 400, crop: :attention)
+      centre    = @portrait_pipeline.resize_to_cover!(400, 400, crop: :centre)
       assert_similar centre, attention
     end
 
     it "accepts sharpening options" do
-      sharpened = @portrait_pipeline.cover!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
-      normal   = @portrait_pipeline.cover!(400, 400, sharpen: false)
+      sharpened = @portrait_pipeline.resize_to_cover!(400, 400, sharpen: ImageProcessing::Vips::Processor::SHARPEN_MASK)
+      normal   = @portrait_pipeline.resize_to_cover!(400, 400, sharpen: false)
       assert sharpened.size > normal.size, "Expected sharpened thumbnail to have bigger filesize than not sharpened thumbnail"
     end
 
     it "sharpening uses integer precision" do
-      sharpened = @portrait_pipeline.cover(400, 400).call(save: false)
+      sharpened = @portrait_pipeline.resize_to_cover(400, 400).call(save: false)
       assert_equal :uchar, sharpened.format
     end
   end

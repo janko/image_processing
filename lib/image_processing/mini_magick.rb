@@ -88,7 +88,7 @@ module ImageProcessing
 
       # Resizes the image to cover the specified dimensions, without
       # cropping the excess.
-      def cover(width, height, **options)
+      def resize_to_cover(width, height, **options)
         thumbnail("#{width}x#{height}^", **options)
       end
 
