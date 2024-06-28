@@ -16,6 +16,27 @@ module ImageProcessing
       false
     end
 
+    def self.analyze(file)
+      if valid_image?(file)
+        image = ::MiniMagick::Image.new(file.path)
+        Analyzer.new(image).analyze
+      else
+        {}
+      end
+    end
+
+    class Analyzer < ImageProcessing::Analyzer
+      ROTATIONS = %w[ RightTop LeftBottom TopRight BottomLeft ]
+
+      private
+
+      def rotated?
+        ROTATIONS.include?(@image["%[orientation]"])
+      rescue ::MiniMagick::Error
+        false
+      end
+    end
+
     class Processor < ImageProcessing::Processor
       accumulator :magick, ::MiniMagick::Tool
 
