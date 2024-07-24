@@ -1,7 +1,10 @@
-## HEAD
+## 1.13.0 (2024-07-24)
 
-* Add `#cover` that allows one to resize an image to cover a given width and height without cropping
-  the excess. (@brendon)
+* [minimagick] Use `-append` when calling `#append` with no arguments (@janko)
+
+* [vips] Avoid lines on the side when rotating by multiples of 90 degrees (@etherbob)
+
+* Add `#resize_to_cover` that allows resizing an image to cover a given rectangle without cropping the excess (@brendon)
 
 ## 1.12.2 (2022-03-01)
 
