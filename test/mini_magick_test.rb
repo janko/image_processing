@@ -421,7 +421,7 @@ describe "ImageProcessing::MiniMagick" do
       @pipeline = ImageProcessing::MiniMagick.source(@portrait)
     end
 
-    it "rotates the image by specifed number of degrees" do
+    it "rotates the image by specified number of degrees" do
       assert_dimensions [600, 800], @pipeline.rotate!(0)
       assert_dimensions [800, 600], @pipeline.rotate!(90)
       assert_dimensions [600, 800], @pipeline.rotate!("180")
