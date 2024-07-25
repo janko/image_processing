@@ -394,7 +394,7 @@ describe "ImageProcessing::Vips" do
       @pipeline = ImageProcessing::Vips.source(@portrait)
     end
 
-    it "rotates by muliples of 90" do
+    it "rotates by multiples of 90" do
       assert_dimensions [600, 800], @pipeline.rotate!(0)
       assert_dimensions [800, 600], @pipeline.rotate!(90)
       assert_dimensions [600, 800], @pipeline.rotate!(180)
