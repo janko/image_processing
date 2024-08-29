@@ -6,6 +6,7 @@ fail "image_processing/vips requires libvips 8.6+" unless Vips.at_least_libvips?
 module ImageProcessing
   module Vips
     extend Chainable
+    ROTATIONS = /Right-top|Left-bottom|Top-right|Bottom-left/
 
     # Returns whether the given image file is processable.
     def self.valid_image?(file)
@@ -13,6 +14,27 @@ module ImageProcessing
       true
     rescue ::Vips::Error
       false
+    end
+
+    def self.analyze(file)
+      if valid_image?(file)
+        image = ::Vips::Image.new_from_file(file.path, access: :sequential)
+        Analyzer.new(image).analyze
+      else
+        {}
+      end
+    end
+
+    class Analyzer < ImageProcessing::Analyzer
+      ROTATIONS = /Right-top|Left-bottom|Top-right|Bottom-left/
+
+      private
+
+      def rotated?
+        ROTATIONS === @image.get("exif-ifd0-Orientation")
+      rescue ::Vips::Error
+        false
+      end
     end
 
     class Processor < ImageProcessing::Processor
