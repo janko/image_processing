@@ -7,9 +7,16 @@ module ImageProcessing
 
     # Returns whether the given image file is processable.
     def self.valid_image?(file)
-      ::MiniMagick::Tool::Convert.new do |convert|
-        convert << file.path
-        convert << "null:"
+      if ::MiniMagick.respond_to?(:convert)
+        ::MiniMagick.convert do |convert|
+          convert << file.path
+          convert << "null:"
+        end
+      else
+        ::MiniMagick::Tool::Convert.new do |convert|
+          convert << file.path
+          convert << "null:"
+        end
       end
       true
     rescue ::MiniMagick::Error
