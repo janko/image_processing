@@ -14,7 +14,7 @@ describe "ImageProcessing::MiniMagick" do
   it "applies imagemagick operations" do
     actual = ImageProcessing::MiniMagick.flip.call(@portrait)
     expected = Tempfile.new(["result", ".jpg"], binmode: true).tap do |tempfile|
-      MiniMagick::Tool::Convert.new do |cmd|
+      ImageProcessing::MiniMagick.convert_shim do |cmd|
         cmd << @portrait.path
         cmd.flip
         cmd << tempfile.path
@@ -37,7 +37,7 @@ describe "ImageProcessing::MiniMagick" do
   it "applies macro operations" do
     actual = ImageProcessing::MiniMagick.resize_to_limit(400, 400).call(@portrait)
     expected = Tempfile.new(["result", ".jpg"], binmode: true).tap do |tempfile|
-      MiniMagick::Tool::Convert.new do |cmd|
+      ImageProcessing::MiniMagick.convert_shim do |cmd|
         cmd << @portrait.path
         cmd.resize("400x400")
         cmd << tempfile.path
@@ -55,7 +55,7 @@ describe "ImageProcessing::MiniMagick" do
 
   it "accepts page" do
     tiff = Tempfile.new(["file", ".tiff"])
-    MiniMagick::Tool::Convert.new do |convert|
+    ImageProcessing::MiniMagick.convert_shim do |convert|
       convert.merge! [@portrait.path, @portrait.path, @portrait.path]
       convert << tiff.path
     end
@@ -70,7 +70,7 @@ describe "ImageProcessing::MiniMagick" do
 
   it "disallows split layers by default" do
     tiff = Tempfile.new(["file", ".tiff"])
-    MiniMagick::Tool::Convert.new do |convert|
+    ImageProcessing::MiniMagick.convert_shim do |convert|
       convert.merge! [@portrait.path, @portrait.path, @portrait.path]
       convert << tiff.path
     end
@@ -168,7 +168,7 @@ describe "ImageProcessing::MiniMagick" do
   end
 
   it "accepts magick object as source" do
-    magick = MiniMagick::Tool::Convert.new
+    magick = ImageProcessing::MiniMagick.convert_shim
     magick << fixture_image("rotated.jpg").path
     result = ImageProcessing::MiniMagick.source(magick).call
     assert_dimensions [600, 800], result
@@ -568,7 +568,7 @@ describe "ImageProcessing::MiniMagick" do
     it "appends CLI arguments" do
       actual = ImageProcessing::MiniMagick.append("-resize", "400x400").call(@portrait)
       expected = Tempfile.new(["result", ".jpg"], binmode: true).tap do |tempfile|
-        MiniMagick::Tool::Convert.new do |cmd|
+        ImageProcessing::MiniMagick.convert_shim do |cmd|
           cmd << @portrait.path
           cmd.resize("400x400")
           cmd << tempfile.path
