@@ -7,6 +7,7 @@ describe "ImageProcessing::Vips" do
     @portrait  = fixture_image("portrait.jpg")
     @landscape = fixture_image("landscape.jpg")
     @square = fixture_image("square.jpg")
+    @exif_portrait = fixture_image("exif_portrait.jpg")
   end
 
   it "applies vips operations" do
@@ -328,6 +329,7 @@ describe "ImageProcessing::Vips" do
       @portrait_pipeline = ImageProcessing::Vips.source(@portrait)
       @landscape_pipeline = ImageProcessing::Vips.source(@landscape)
       @square_pipeline = ImageProcessing::Vips.source(@square)
+      @exif_portrait_pipeline = ImageProcessing::Vips.source(@exif_portrait)
     end
 
     it "resizes the portrait image to fill out the given landscape dimensions" do
@@ -386,6 +388,10 @@ describe "ImageProcessing::Vips" do
     it "sharpening uses integer precision" do
       sharpened = @portrait_pipeline.resize_to_cover(400, 400).call(save: false)
       assert_equal :uchar, sharpened.format
+    end
+
+    it "works correctly with EXIF orientation" do
+      assert_dimensions [300, 617], @exif_portrait_pipeline.resize_to_cover!(300, 200)
     end
   end
 
