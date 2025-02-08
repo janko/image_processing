@@ -1,3 +1,7 @@
+## Unreleased
+
+* Fix `#resize_to_cover` when dealing with EXIF orientated images (@brendon)
+
 ## 1.13.0 (2024-07-24)
 
 * [minimagick] Use `-append` when calling `#append` with no arguments (@janko)
