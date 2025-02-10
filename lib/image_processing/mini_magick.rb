@@ -5,9 +5,17 @@ module ImageProcessing
   module MiniMagick
     extend Chainable
 
+    def self.convert_shim(&block)
+      if ::MiniMagick.respond_to?(:convert)
+        ::MiniMagick.convert(&block)
+      else
+        ::MiniMagick::Tool::Convert.new(&block)
+      end
+    end
+
     # Returns whether the given image file is processable.
     def self.valid_image?(file)
-      ::MiniMagick::Tool::Convert.new do |convert|
+      convert_shim do |convert|
         convert << file.path
         convert << "null:"
       end
@@ -30,7 +38,7 @@ module ImageProcessing
           magick = path_or_magick
         else
           source_path = path_or_magick
-          magick = ::MiniMagick::Tool::Convert.new
+          magick = ::ImageProcessing::MiniMagick.convert_shim
 
           Utils.apply_options(magick, **options)
 
