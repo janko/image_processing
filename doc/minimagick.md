@@ -314,7 +314,7 @@ ImageProcessing::MiniMagick
 
 #### `#method_missing`
 
-Any unknown methods will be delegated to [`MiniMagick::Tool::Convert`]. See the
+Any unknown methods will be delegated to [`MiniMagick.convert`]. See the
 list of all available options by running `convert -help` and visiting the
 [ImageMagick reference].
 
@@ -329,10 +329,10 @@ ImageProcessing::MiniMagick
 
 #### `#custom`
 
-Yields the intermediary `MiniMagick::Tool::Convert` object. If the block return
-value is a `MiniMagick::Tool::Convert` object it will be used in further
+Yields the intermediary `MiniMagick.convert` object. If the block return
+value is a `MiniMagick::Tool` object it will be used in further
 processing, otherwise if `nil` is returned the original
-`MiniMagick::Tool::Convert` object will be used.
+`MiniMagick::Tool` object will be used.
 
 ```rb
 ImageProcessing::MiniMagick
@@ -407,7 +407,7 @@ If you would like to have more control over loading, you can create the
 `MiniMagick::Tool` object directly, and just pass it as the source file.
 
 ```rb
-magick = MiniMagick::Tool::Convert.new
+magick = MiniMagick.convert
 magick << "..." << "..." << "..."
 
 ImageProcessing::MiniMagick
@@ -454,7 +454,7 @@ magick = ImageProcessing::MiniMagick
   .resize_to_limit(400, 400)
   .call(save: false)
 
-magick #=> #<MiniMagick::Tool::Convert ...>
+magick #=> #<MiniMagick::Tool ...>
 
 magick << "output.png"
 magick.call
@@ -520,7 +520,7 @@ ImageProcessing::MiniMagick
 [direction]: https://www.imagemagick.org/script/command-line-options.php#gravity
 [color]: https://www.imagemagick.org/script/color.php
 [ImageMagick reference]: https://www.imagemagick.org/script/command-line-options.php
-[`MiniMagick::Tool::Convert`]: https://github.com/minimagick/minimagick#metal
+[`MiniMagick.convert`]: https://github.com/minimagick/minimagick#metal
 [Reading JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_read
 [Writing JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_write
 [`-limit`]: https://www.imagemagick.org/script/command-line-options.php#limit

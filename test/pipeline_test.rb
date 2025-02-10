@@ -237,7 +237,7 @@ describe "ImageProcessing::Pipeline" do
     assert_equal [300, 400], vips_image.size
 
     magick = ImageProcessing::MiniMagick.source(@portrait).resize_to_limit(400, 400).call(save: false)
-    assert_instance_of MiniMagick::Tool::Convert, magick
+    assert_kind_of MiniMagick::Tool, magick
     assert_includes magick.args, "400x400>"
   end
 
