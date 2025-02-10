@@ -1,4 +1,4 @@
-## Unreleased
+## 1.14.0 (2025-02-10)
 
 * Add support for MiniMagick 5.x (@lukeasrodgers)
 
