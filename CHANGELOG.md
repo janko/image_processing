@@ -1,5 +1,7 @@
 ## Unreleased
 
+* Add support for MiniMagick 5.x (@lukeasrodgers)
+
 * Fix `#resize_to_cover` when dealing with EXIF orientated images (@brendon)
 
 ## 1.13.0 (2024-07-24)
