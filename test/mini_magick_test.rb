@@ -2,8 +2,6 @@ require "test_helper"
 require "image_processing/mini_magick"
 require "pathname"
 
-MiniMagick.cli = :graphicsmagick if ENV["GM"]
-
 describe "ImageProcessing::MiniMagick" do
   before do
     @portrait  = fixture_image("portrait.jpg")
@@ -85,7 +83,7 @@ describe "ImageProcessing::MiniMagick" do
       refute_equal 0, File.size(path)
       File.delete(path)
     end
-  end unless ENV["GM"]
+  end
 
   it "allows resizing images without extension" do
     result1 = Tempfile.new("image") # no file extension
@@ -105,7 +103,7 @@ describe "ImageProcessing::MiniMagick" do
   it "accepts geometry" do
     pipeline = ImageProcessing::MiniMagick.source(@portrait)
     assert_dimensions [300, 400], pipeline.loader(geometry: "400x400").call
-  end unless ENV["GM"]
+  end
 
   it "auto orients by default" do
     result = ImageProcessing::MiniMagick.call(fixture_image("rotated.jpg"))
@@ -120,7 +118,7 @@ describe "ImageProcessing::MiniMagick" do
     assert_type "JPEG", result
 
     result = ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "100x100" } }).call(@portrait)
-    assert_dimensions [150, 200], result unless ENV["GM"]
+    assert_dimensions [150, 200], result
 
     result = ImageProcessing::MiniMagick.loader(strip: true).call(@portrait)
     assert_empty MiniMagick::Image.new(result.path).exif
@@ -132,15 +130,15 @@ describe "ImageProcessing::MiniMagick" do
     assert_empty MiniMagick::Image.new(result.path).exif
 
     result = ImageProcessing::MiniMagick.loader(colorspace: "Gray").call(@portrait)
-    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"] unless ENV["GM"]
+    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"]
 
     result = ImageProcessing::MiniMagick.loader(set: ["comment", "This is a comment"]).call(@portrait)
-    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"] unless ENV["GM"]
+    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"]
   end
 
   it "applies saver options" do
     result = ImageProcessing::MiniMagick.saver(define: { jpeg: { fancy_unsampling: "off", extent: "20KB" } }).call(@portrait)
-    assert_operator result.size, :<, 20*1024 unless ENV["GM"]
+    assert_operator result.size, :<, 20*1024
 
     result = ImageProcessing::MiniMagick.saver(strip: true).call(@portrait)
     assert_empty MiniMagick::Image.new(result.path).exif
@@ -152,10 +150,10 @@ describe "ImageProcessing::MiniMagick" do
     assert_empty MiniMagick::Image.new(result.path).exif
 
     result = ImageProcessing::MiniMagick.saver(colorspace: "Gray").call(@portrait)
-    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"] unless ENV["GM"]
+    assert_equal "Gray", MiniMagick::Image.new(result.path).data["colorspace"]
 
     result = ImageProcessing::MiniMagick.saver(set: ["comment", "This is a comment"]).call(@portrait)
-    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"] unless ENV["GM"]
+    assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"]
   end
 
   it "applies blocks to operations" do
@@ -234,10 +232,10 @@ describe "ImageProcessing::MiniMagick" do
 
     it "doesn't require both dimensions" do
       assert_dimensions [300, 400],  @pipeline.resize_to_fit!(300, nil)
-      assert_dimensions [750, 1000], @pipeline.resize_to_fit!(750, nil) unless ENV["GM"]
+      assert_dimensions [750, 1000], @pipeline.resize_to_fit!(750, nil)
 
       assert_dimensions [300, 400],  @pipeline.resize_to_fit!(nil, 400)
-      assert_dimensions [750, 1000], @pipeline.resize_to_fit!(nil, 1000) unless ENV["GM"]
+      assert_dimensions [750, 1000], @pipeline.resize_to_fit!(nil, 1000)
     end
 
     it "produces correct image" do
@@ -534,7 +532,7 @@ describe "ImageProcessing::MiniMagick" do
 
       assert_similar result1, result2
     end
-  end unless ENV["GM"]
+  end
 
   describe "#define" do
     it "adds -define options from a Hash" do

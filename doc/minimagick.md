@@ -68,7 +68,7 @@ that you want to use it:
 ```rb
 require "image_processing/mini_magick"
 
-MiniMagick.cli = :graphicsmagick
+MiniMagick.graphicsmagick = true
 
 processed = ImageProcessing::MiniMagick
   .source(image)
