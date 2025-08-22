@@ -490,6 +490,7 @@ ImageProcessing::Vips
     resize_to_limit: [400, 400],
     convert: "jpg",
     saver: { quality: 100 },
+    loader: { shrink: 1.5 }
   )
   # ...
 ```

@@ -492,6 +492,7 @@ ImageProcessing::MiniMagick
     resize_to_limit: [400, 400],
     convert: "jpg",
     saver: { quality: 100 },
+    loader: { define: { jpeg: { size: "1600x1600" } } }
   )
   # ...
 ```
