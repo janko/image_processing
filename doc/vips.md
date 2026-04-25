@@ -497,8 +497,16 @@ ImageProcessing::Vips
 
 ## Sharpening
 
-All `#resize_*` operations will automatically sharpen the resulting thumbnails
-after resizing, using the following [convolution mask]:
+With `#resize_*` operators, you can additional sharpen the thumbnails via the
+`:sharpen` option:
+
+```rb
+ImageProcessing::Vips
+  .source(image)
+  .resize_to_limit!(400, 400, sharpen: true)
+```
+
+This will use the following [convolution mask] by default:
 
 ```rb
 Vips::Image.new_from_array [
@@ -507,7 +515,7 @@ Vips::Image.new_from_array [
   [-1, -1, -1]], 24
 ```
 
-You can assign a different convolution mask via the `:sharpen` option:
+You can also assign your own convolution mask:
 
 ```rb
 sharpen_mask = Vips::Image.new_from_array [
@@ -518,14 +526,6 @@ sharpen_mask = Vips::Image.new_from_array [
 ImageProcessing::Vips
   .source(image)
   .resize_to_limit!(400, 400, sharpen: sharpen_mask)
-```
-
-You can disable automatic sharpening by setting `:sharpen` to `false`:
-
-```rb
-ImageProcessing::Vips
-  .source(image)
-  .resize_to_limit!(400, 400, sharpen: false)
 ```
 
 [ruby-vips]: https://github.com/libvips/ruby-vips

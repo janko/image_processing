@@ -181,7 +181,7 @@ describe "ImageProcessing::Vips" do
     end
 
     it "sharpening uses integer precision" do
-      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
+      sharpened = @pipeline.resize_to_limit(400, 400, sharpen: true).call(save: false)
       assert_equal :uchar, sharpened.format
     end
   end
@@ -229,7 +229,7 @@ describe "ImageProcessing::Vips" do
     end
 
     it "sharpening uses integer precision" do
-      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
+      sharpened = @pipeline.resize_to_limit(400, 400, sharpen: true).call(save: false)
       assert_equal :uchar, sharpened.format
     end
   end
@@ -265,7 +265,7 @@ describe "ImageProcessing::Vips" do
     end
 
     it "sharpening uses integer precision" do
-      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
+      sharpened = @pipeline.resize_to_limit(400, 400, sharpen: true).call(save: false)
       assert_equal :uchar, sharpened.format
     end
   end
@@ -319,7 +319,7 @@ describe "ImageProcessing::Vips" do
     end
 
     it "sharpening uses integer precision" do
-      sharpened = @pipeline.resize_to_limit(400, 400).call(save: false)
+      sharpened = @pipeline.resize_to_limit(400, 400, sharpen: true).call(save: false)
       assert_equal :uchar, sharpened.format
     end
   end
@@ -386,7 +386,7 @@ describe "ImageProcessing::Vips" do
     end
 
     it "sharpening uses integer precision" do
-      sharpened = @portrait_pipeline.resize_to_cover(400, 400).call(save: false)
+      sharpened = @portrait_pipeline.resize_to_cover(400, 400, sharpen: true).call(save: false)
       assert_equal :uchar, sharpened.format
     end
 

@@ -155,7 +155,7 @@ module ImageProcessing
 
       # Resizes the image according to the specified parameters, and sharpens
       # the resulting thumbnail.
-      def thumbnail(width, height, sharpen: SHARPEN_MASK, **options)
+      def thumbnail(width, height, sharpen: nil, **options)
         if self.image.is_a?(String) # path
           # resize on load
           image = ::Vips::Image.thumbnail(self.image, width, height: height, **options)
@@ -167,7 +167,11 @@ module ImageProcessing
           image = self.image.thumbnail_image(width, height: height, **options)
         end
 
-        image = image.conv(sharpen, precision: :integer) if sharpen
+        if sharpen
+          sharpen_mask = sharpen.is_a?(TrueClass) ? SHARPEN_MASK : sharpen
+          image = image.conv(sharpen_mask, precision: :integer)
+        end
+
         image
       end
 
