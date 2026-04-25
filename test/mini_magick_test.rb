@@ -117,7 +117,7 @@ describe "ImageProcessing::MiniMagick" do
     result = ImageProcessing::MiniMagick.loader(loader: "jpg").call(@portrait)
     assert_type "JPEG", result
 
-    result = ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "100x100" } }).call(@portrait)
+    result = ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "200x200" } }).call(@portrait)
     assert_dimensions [150, 200], result
 
     result = ImageProcessing::MiniMagick.loader(geometry: "100x100").call(@portrait)
