@@ -28,12 +28,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true
-
       - name: Update apt
         env:
           DEBIAN_FRONTEND: noninteractive
@@ -51,6 +45,12 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run:
           sudo apt-get install --fix-missing -qq -o Acquire::Retries=3 libvips
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
 
       - name: Run tests
         run: bundle exec rake test
