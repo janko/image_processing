@@ -26,5 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "minitest", "~> 5.8"
   spec.add_development_dependency "minitest-hooks", ">= 1.4.2"
   spec.add_development_dependency "minispec-metadata"
-  spec.add_development_dependency "dhash-vips"
+  spec.add_development_dependency "dhash-vips" unless RUBY_ENGINE == "jruby"
 end

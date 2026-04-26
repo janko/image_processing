@@ -10,7 +10,7 @@ require "minispec-metadata"
 
 ENV["VIPS_WARNING"] = "0" # disable libvips warnings
 
-require "dhash-vips"
+require "dhash-vips" unless RUBY_ENGINE == "jruby"
 require "vips"
 require "mini_magick"
 
@@ -27,10 +27,12 @@ class Minitest::Test
   end
 
   def assert_similar(image1, image2)
+    skip "dhash-vips not available on JRuby" if RUBY_ENGINE == "jruby"
     assert_operator distance(image1, image2), :<=, 3
   end
 
   def refute_similar(image1, image2)
+    skip "dhash-vips not available on JRuby" if RUBY_ENGINE == "jruby"
     assert_operator distance(image1, image2), :>, 3
   end
 
