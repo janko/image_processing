@@ -4,7 +4,7 @@ Gem::Specification.new do |spec|
   spec.name          = "image_processing"
   spec.version       = ImageProcessing::VERSION
 
-  spec.required_ruby_version = ">= 2.3"
+  spec.required_ruby_version = ">= 3.0"
 
   spec.summary       = "High-level wrapper for processing images for the web with ImageMagick or libvips."
   spec.description   = "High-level wrapper for processing images for the web with ImageMagick or libvips."
