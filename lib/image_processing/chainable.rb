@@ -33,6 +33,10 @@ module ImageProcessing
     #   .apply([[:resize_to_limit, [400, 400]], [:strip, true])
     def apply(operations)
       operations.inject(self) do |builder, (name, argument)|
+        if invalid_operation?(name)
+          fail ArgumentError, "#{name.inspect} is not a valid ImageProcessing operation"
+        end
+
         if argument == true || argument == nil
           builder.public_send(name)
         elsif argument.is_a?(Array)
@@ -81,11 +85,22 @@ module ImageProcessing
 
     private
 
+    # This prevents calling unsafe Ruby core methods such as `Kernel#system`,
+    # which would allow for remote shell execution.
+    def invalid_operation?(name)
+      return true if name.end_with?("!")
+
+      owner = method(name).owner
+      [BasicObject, Kernel, Object, Module].include?(owner)
+    rescue NameError
+      false
+    end
+
     # Assume that any unknown method names an operation supported by the
     # processor. Add a bang ("!") if you want processing to be performed.
     def method_missing(name, *args, &block)
       return super if name.to_s.end_with?("?")
-      return send(name.to_s.chomp("!"), *args, &block).call if name.to_s.end_with?("!")
+      return public_send(name.to_s.chomp("!"), *args, &block).call if name.to_s.end_with?("!")
 
       operation(name, *args, &block)
     end

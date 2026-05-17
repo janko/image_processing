@@ -260,7 +260,9 @@ describe "ImageProcessing::Pipeline" do
   end
 
   it "doesn't allow making system calls" do
-    ImageProcessing::Vips.source(@portrait).apply(system: "touch foo.txt")
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.source(@portrait).apply(system: "touch foo.txt")
+    end
     refute File.exist?("foo.txt")
 
     assert_raises Vips::Error do
@@ -273,4 +275,66 @@ describe "ImageProcessing::Pipeline" do
     end
     refute File.exist?("foo.txt")
   end
+
+  it "doesn't allow instance_eval/instance_exec via apply" do
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.source(@portrait).apply(instance_eval: "system('touch foo.txt')")
+    end
+    refute File.exist?("foo.txt")
+
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.source(@portrait).apply(instance_exec: "system('touch foo.txt')")
+    end
+    refute File.exist?("foo.txt")
+
+    assert_raises ArgumentError do
+      ImageProcessing::MiniMagick.source(@portrait).apply(instance_eval: "system('touch foo.txt')")
+    end
+    refute File.exist?("foo.txt")
+  end
+
+  it "doesn't allow class_eval/module_eval via apply" do
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.apply(class_eval: "system('touch foo.txt')")
+    end
+    refute File.exist?("foo.txt")
+
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.apply(module_eval: "system('touch foo.txt')")
+    end
+    refute File.exist?("foo.txt")
+
+    assert_raises ArgumentError do
+      ImageProcessing::MiniMagick.apply(class_eval: "system('touch foo.txt')")
+    end
+    refute File.exist?("foo.txt")
+
+    assert_raises ArgumentError do
+      ImageProcessing::MiniMagick.apply(module_eval: "system('touch foo.txt')")
+    end
+    refute File.exist?("foo.txt")
+  end
+
+  it "doesn't allow send-based bypass via apply" do
+    # CVE issue #100: apply({ send: ["system", "..."] })
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.source(@portrait).apply(send: ["system", "touch foo.txt"])
+    end
+    refute File.exist?("foo.txt")
+  end
+
+  it "doesn't allow bang operations in apply" do
+    # Bang names are rejected outright — they're pipeline-terminating shortcuts,
+    # not valid operations to chain (use apply!(...) instead)
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.source(@portrait).apply(system!: "touch foo.txt")
+    end
+    refute File.exist?("foo.txt")
+
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.source(@portrait).apply(instance_eval!: "system('touch foo.txt')")
+    end
+    refute File.exist?("foo.txt")
+  end
+
 end
