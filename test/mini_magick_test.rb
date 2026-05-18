@@ -468,13 +468,6 @@ describe "ImageProcessing::MiniMagick" do
       assert_equal %W[-compose Over -composite], magick.args[3..-1]
     end
 
-    it "accepts deprecated :compose" do
-      assert_output nil, /renamed/ do
-        magick = @pipeline.composite(@landscape, compose: "Over").call(save: false)
-        assert_equal %W[-compose Over -composite], magick.args[3..-1]
-      end
-    end
-
     it "accepts :gravity" do
       magick = @pipeline.composite(@landscape, gravity: "Center").call(save: false)
       assert_equal %W[-gravity Center -composite], magick.args[3..-1]
@@ -483,13 +476,6 @@ describe "ImageProcessing::MiniMagick" do
     it "accepts :offset" do
       magick = @pipeline.composite(@landscape, offset: [5, -15]).call(save: false)
       assert_equal %W[-geometry +5-15 -composite], magick.args[3..-1]
-    end
-
-    it "accepts deprecated :geometry" do
-      assert_output nil, /deprecated/ do
-        magick = @pipeline.composite(@landscape, geometry: "+0+0").call(save: false)
-        assert_equal %W[-geometry +0+0 -composite], magick.args[3..-1]
-      end
     end
 
     it "accepts :args" do

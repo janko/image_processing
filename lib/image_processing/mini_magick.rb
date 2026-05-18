@@ -124,18 +124,9 @@ module ImageProcessing
       # Overlays the specified image over the current one. Supports specifying
       # an additional mask, composite mode, direction or offset of the overlay
       # image.
-      def composite(overlay = :none, mask: nil, mode: nil, gravity: nil, offset: nil, args: nil, **options, &block)
+      def composite(overlay = :none, mask: nil, mode: nil, gravity: nil, offset: nil, args: nil, &block)
         return magick.composite if overlay == :none
 
-        if options.key?(:compose)
-          warn "[IMAGE_PROCESSING] The :compose parameter in #composite has been renamed to :mode, the :compose alias will be removed in ImageProcessing 2."
-          mode = options[:compose]
-        end
-
-        if options.key?(:geometry)
-          warn "[IMAGE_PROCESSING] The :geometry parameter in #composite has been deprecated and will be removed in ImageProcessing 2. Use :offset instead, e.g. `geometry: \"+10+15\"` should be replaced with `offset: [10, 15]`."
-          geometry = options[:geometry]
-        end
         geometry = "%+d%+d" % offset if offset
 
         overlay_path = convert_to_path(overlay, "overlay")
