@@ -1,5 +1,9 @@
-require "vips"
 require "image_processing"
+begin
+  require "vips"
+rescue LoadError
+  fail ImageProcessing::Error, "Vips backend requires the ruby-vips gem. Please add `gem \"ruby-vips\", \"~> 2.0\"` to your Gemfile."
+end
 
 Vips.block_untrusted(true) if Vips.respond_to?(:block_untrusted) && !ENV["VIPS_BLOCK_UNTRUSTED"]
 

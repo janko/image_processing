@@ -19,9 +19,6 @@ Gem::Specification.new do |spec|
   spec.metadata = { "changelog_uri" => spec.homepage + "/blob/master/CHANGELOG.md",
                     "rubygems_mfa_required" => "true" }
 
-  spec.add_dependency "mini_magick", ">= 4.9.5", "< 6"
-  spec.add_dependency "ruby-vips", ">= 2.0.17", "< 3"
-
   spec.add_development_dependency "rake"
   spec.add_development_dependency "minitest", "~> 5.8"
   spec.add_development_dependency "minitest-hooks", ">= 1.4.2"
