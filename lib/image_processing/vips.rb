@@ -1,6 +1,8 @@
 require "vips"
 require "image_processing"
 
+Vips.block_untrusted(true) if Vips.respond_to?(:block_untrusted) && !ENV["VIPS_BLOCK_UNTRUSTED"]
+
 module ImageProcessing
   module Vips
     extend Chainable
