@@ -2,7 +2,7 @@ require "image_processing"
 begin
   require "mini_magick"
 rescue LoadError
-  fail ImageProcessing::Error, "MiniMagick backend requires the mini_magick gem. Please add `gem \"mini_magick\", \"~> 5.0\"` to your Gemfile."
+  fail ImageProcessing::Error, "ImageProcessing::MiniMagick requires the mini_magick gem. Please add `gem \"mini_magick\", \"~> 5.0\"` to your Gemfile."
 end
 
 module ImageProcessing

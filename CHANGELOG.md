@@ -1,3 +1,17 @@
+## 2.0.0 (2026-05-20)
+
+* `mini_magick`/`ruby-vips` are now soft dependencies and need to be manually added to the Gemfile (@janko)
+
+* Avoid remote shell execution vulnerability in `#apply` when arguments are coming from user input (@janko)
+
+* [vips] Unfuzzed loaders are now blocked by default (@janko)
+
+* [vips] Sharpening after resize has been disabled by default (@janko)
+
+* [minimagick] Remove deprecated `:compose` and `:geometry` keyword arguments for `#composite` (@janko)
+
+* Ruby 3.0+ is now required (@janko)
+
 ## 1.14.0 (2025-02-10)
 
 * Add support for MiniMagick 5.x (@lukeasrodgers)
