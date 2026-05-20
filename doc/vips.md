@@ -74,6 +74,22 @@ ImageProcessing::Vips
   .colourspace(:grey16)
 ```
 
+### Untrusted loaders
+
+This gem automatically [blocks all untrusted operations][block
+untrusted] on libvips 8.13+. This means that formats like SVGs and PDFs can't be
+processed by default, as they're considered to be more vulnerable to attack
+vectors.
+
+If you want to accept all available formats, you can disable this safeguard to allow all operations:
+
+```rb
+require "image_processing/vips"
+# ...
+# must be called after `image_processing/vips` has been required
+Vips.block_untrusted(false)
+```
+
 ## Methods
 
 #### `.valid_image?`
@@ -552,3 +568,4 @@ ImageProcessing::Vips
 [convolution mask]: https://en.wikipedia.org/wiki/Kernel_(image_processing)
 [watermark]: https://en.wikipedia.org/wiki/Watermark
 [crop high low]: https://github.com/janko/image_processing/wiki/Resize-To-Fill
+[block untrusted]: https://www.rubydoc.info/gems/ruby-vips/Vips#block_untrusted-class_method

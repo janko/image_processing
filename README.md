@@ -3,11 +3,10 @@
 Provides higher-level image processing helpers that are commonly needed
 when handling image uploads.
 
-This gem can process images with either [ImageMagick]/[GraphicsMagick] or
-[libvips] libraries. ImageMagick is a good default choice, especially if you
-are migrating from another gem or library that uses ImageMagick. Libvips is a
-newer library that can process images [very rapidly][libvips performance]
-(often multiple times faster than ImageMagick).
+This gem can process images with [ImageMagick] or [libvips]. ImageMagick is a
+good default choice, especially if you are migrating from another gem or library
+that uses ImageMagick. Libvips is a newer library that can process images [very
+rapidly][libvips performance] (often multiple times faster than ImageMagick).
 
 
 ## Goal
@@ -16,7 +15,7 @@ The goal of this project is to have a single gem that contains all the
 helper methods needed to resize and process images.
 
 Currently, existing attachment gems (like Paperclip, CarrierWave, Refile,
-Dragonfly, ActiveStorage, and others) implement their own custom image
+Dragonfly, Active Storage, and others) implement their own custom image
 helper methods. But why? That's not very DRY, is it?
 
 Let's be honest. Image processing is a dark, mysterious art. So we want to
@@ -32,19 +31,23 @@ how to resize and process images.
 In a Mac terminal:
 
 ```sh
-  $ brew install imagemagick vips
+  $ brew install imagemagick # if using ImageMagick
+  $ brew install vips # if using libvips
   ```
 
  In a debian/ubuntu terminal:
 
 ```sh
-  $ sudo apt install imagemagick libvips
+  $ sudo apt install imagemagick # if using ImageMagick
+  $ sudo apt install libvips # if using libvips
   ```
 
-2. Add the gem to your Gemfile:
+2. Add the gem(s) to your Gemfile:
 
   ```rb
-  gem "image_processing", "~> 1.0"
+  gem "image_processing", "~> 2.0"
+  gem "mini_magick", "~> 5.0" # if using ImageMagick
+  gem "ruby-vips", "~> 2.0" # if using libvips
   ```
 
 
@@ -66,7 +69,7 @@ processed = ImageProcessing::MiniMagick
 processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6.png>
 ```
 
-This allows easy branching when generating multiple derivates:
+This allows easy branching when generating multiple derivatives:
 
 ```rb
 require "image_processing/vips"
@@ -187,22 +190,9 @@ pipeline
 
 ## Contributing
 
-Our test suite requires both `imagemagick` and `libvips` libraries to be installed.
+Our test suite requires both `imagemagick` and `libvips` libraries to be installed. Afterwards you can run tests with:
 
-In a Mac terminal:
-
-```
-$ brew install imagemagick vips
-```
-
-In a debian/ubuntu terminal:
-```shell
-sudo apt install imagemagick libvips
-```
-
-Afterwards you can run tests with
-
-```
+```sh
 $ bundle exec rake test
 ```
 
