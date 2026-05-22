@@ -132,6 +132,28 @@ describe "ImageProcessing::MiniMagick" do
     assert_equal "This is a comment", MiniMagick::Image.new(result.path).data["properties"]["comment"]
   end
 
+  it "does not execute Kernel#system passed as a loader option" do
+    canary = Tempfile.new("canary")
+    File.delete(canary.path)
+
+    assert_raises(StandardError) do
+      ImageProcessing::MiniMagick.loader(system: "touch #{canary.path}").call(@portrait)
+    end
+
+    refute File.exist?(canary.path), "Kernel#system was invoked via loader option"
+  end
+
+  it "does not execute Kernel#system passed as a saver option" do
+    canary = Tempfile.new("canary")
+    File.delete(canary.path)
+
+    assert_raises(StandardError) do
+      ImageProcessing::MiniMagick.saver(system: "touch #{canary.path}").call(@portrait)
+    end
+
+    refute File.exist?(canary.path), "Kernel#system was invoked via saver option"
+  end
+
   it "applies blocks to operations" do
     magick = ImageProcessing::MiniMagick
       .source(@portrait)
