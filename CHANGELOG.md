@@ -1,3 +1,7 @@
+## 2.0.1 (2026-05-22)
+
+* [minimagick] Prevent remote shell execution when passing loader/saver options from user input
+
 ## 2.0.0 (2026-05-20)
 
 * `mini_magick`/`ruby-vips` are now soft dependencies and need to be manually added to the Gemfile (@janko)
