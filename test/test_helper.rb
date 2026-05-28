@@ -10,9 +10,52 @@ require "minispec-metadata"
 
 ENV["VIPS_WARNING"] = "0" # disable libvips warnings
 
-require "dhash-vips" unless RUBY_ENGINE == "jruby"
 require "vips"
 require "mini_magick"
+
+# Faithful port of DHashVips::IDHash, inlined to avoid the upstream gem's
+# fragile install-time test (which breaks on Ruby 4.0) and to make
+# similarity assertions available on JRuby as well.
+module PerceptualHash
+  module_function
+
+  SIZE = 8
+
+  def fingerprint(path)
+    image = Vips::Image.thumbnail(path, SIZE, height: SIZE, size: :force)
+    image = image.flatten(background: 255) if image.has_alpha?
+    image = image.colourspace("b-w")[0]
+    rows = image.to_a.map(&:flatten)
+    d1, i1 = signs_and_intensities(rows)
+    d2, i2 = signs_and_intensities(rows.transpose)
+    (((((i1 << SIZE * SIZE) | i2) << SIZE * SIZE) | d1) << SIZE * SIZE) | d2
+  end
+
+  def distance(a, b)
+    ((a ^ b) & ((a | b) >> 2 * SIZE * SIZE)).to_s(2).count("1")
+  end
+
+  def signs_and_intensities(matrix)
+    differences = matrix.zip(matrix.rotate(1)).flat_map do |r1, r2|
+      r1.zip(r2).map { |a, b| a - b }
+    end
+    threshold = median(differences.map(&:abs).sort)
+    signs = differences.inject(0) { |bits, d| (bits << 1) | (d < 0 ? 1 : 0) }
+    intensities = differences.inject(0) { |bits, d| (bits << 1) | (d.abs >= threshold ? 1 : 0) }
+    [signs, intensities]
+  end
+
+  def median(sorted)
+    h = sorted.size / 2
+    return sorted[h] if sorted[h] != sorted[h - 1]
+    right = sorted.dup
+    left = right.shift(h)
+    right.shift if right.size > left.size
+    return right.first if left.last != right.first
+    return right.uniq[1] if left.count(left.last) > right.count(right.first)
+    left.last
+  end
+end
 
 class Minitest::Test
   def fixture_image(name)
@@ -27,12 +70,10 @@ class Minitest::Test
   end
 
   def assert_similar(image1, image2)
-    skip "dhash-vips not available on JRuby" if RUBY_ENGINE == "jruby"
     assert_operator distance(image1, image2), :<=, 3
   end
 
   def refute_similar(image1, image2)
-    skip "dhash-vips not available on JRuby" if RUBY_ENGINE == "jruby"
     assert_operator distance(image1, image2), :>, 3
   end
 
@@ -47,10 +88,10 @@ class Minitest::Test
   private
 
   def distance(image1, image2)
-    hash1 = DHashVips::IDHash.fingerprint(image1.path)
-    hash2 = DHashVips::IDHash.fingerprint(image2.path)
-
-    DHashVips::IDHash.distance hash1, hash2
+    PerceptualHash.distance(
+      PerceptualHash.fingerprint(image1.path),
+      PerceptualHash.fingerprint(image2.path),
+    )
   end
 end
 
