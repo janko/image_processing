@@ -1,8 +1,8 @@
 require "image_processing"
 begin
   require "mini_magick"
-rescue LoadError => e
-  raise e, "ImageProcessing::MiniMagick requires the mini_magick gem. Please add `gem \"mini_magick\", \"~> 5.0\"` to your Gemfile."
+rescue LoadError
+  raise LoadError, "ImageProcessing::MiniMagick requires the mini_magick gem. Please add `gem \"mini_magick\", \"~> 5.0\"` to your Gemfile."
 end
 
 module ImageProcessing
