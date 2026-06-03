@@ -1,3 +1,7 @@
+## 2.0.2 (2026-06-03)
+
+* Raise `LoadError` instead of `ImageProcessing::Error` when soft dependencies are missing (@bdewater-thatch)
+
 ## 2.0.1 (2026-05-22)
 
 * [minimagick] Prevent remote shell execution when passing loader/saver options from user input
