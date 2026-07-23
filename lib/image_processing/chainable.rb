@@ -98,13 +98,12 @@ module ImageProcessing
 
     # Assume that any unknown method names an operation supported by the
     # processor. Add a bang ("!") if you want processing to be performed.
-    def method_missing(name, *args, &block)
+    def method_missing(name, ...)
       return super if name.to_s.end_with?("?")
-      return public_send(name.to_s.chomp("!"), *args, &block).call if name.to_s.end_with?("!")
+      return public_send(name.to_s.chomp("!"), ...).call if name.to_s.end_with?("!")
 
-      operation(name, *args, &block)
+      operation(name, ...)
     end
-    ruby2_keywords(:method_missing) if respond_to?(:ruby2_keywords, true)
 
     # Empty options which the builder starts with.
     DEFAULT_OPTIONS = {
