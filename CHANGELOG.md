@@ -1,3 +1,9 @@
+## Unreleased
+
+* Prevent remote code execution when operation names come from user input, closing bypasses through the `#operation` meta-builder, `#method_missing`, and nested `#send` calls (reported by @szymonsec)
+
+* [minimagick] Prevent remote code execution through unsafe public methods (e.g. `#instance_eval`, `#send`) passed as loader/saver option names
+
 ## 2.0.2 (2026-06-03)
 
 * Raise `LoadError` instead of `ImageProcessing::Error` when soft dependencies are missing (@bdewater-thatch)

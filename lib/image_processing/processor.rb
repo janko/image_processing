@@ -53,6 +53,15 @@ module ImageProcessing
     # operation directly on the accumulator object. This provides a common
     # umbrella above defined macros and direct operations.
     def apply_operation(name, *args, &block)
+      # Chainable performs the same check when operations are built, but that
+      # guard only sees the outer builder method name, so it can be routed
+      # around via the #operation meta-builder, #method_missing, or a nested
+      # #send. This is the single point every operation is finally dispatched
+      # through, so enforcing the guard here closes all of those paths.
+      if ImageProcessing.unsafe_method?(self, name)
+        fail Error, "#{name.inspect} is not a valid operation"
+      end
+
       receiver = respond_to?(name) ? self : @accumulator
 
       if args.last.is_a?(Hash)

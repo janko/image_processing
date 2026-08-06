@@ -154,6 +154,29 @@ describe "ImageProcessing::MiniMagick" do
     refute File.exist?(canary.path), "Kernel#system was invoked via saver option"
   end
 
+  it "does not dispatch to unsafe public methods passed as loader/saver options" do
+    # public_send blocks private methods like Kernel#system, but public
+    # metaprogramming methods (#instance_eval, #send, ...) need the extra guard.
+    unsafe_options = [
+      { instance_eval: "`touch #{@canary_path = Tempfile.new("canary").path}`" },
+      { send: ["system", "touch #{@canary_path}"] },
+    ]
+
+    unsafe_options.each do |option|
+      File.delete(@canary_path) if File.exist?(@canary_path)
+
+      assert_raises(ImageProcessing::Error) do
+        ImageProcessing::MiniMagick.loader(**option).call(@portrait)
+      end
+      refute File.exist?(@canary_path), "unsafe loader option executed: #{option.inspect}"
+
+      assert_raises(ImageProcessing::Error) do
+        ImageProcessing::MiniMagick.saver(**option).call(@portrait)
+      end
+      refute File.exist?(@canary_path), "unsafe saver option executed: #{option.inspect}"
+    end
+  end
+
   it "applies blocks to operations" do
     magick = ImageProcessing::MiniMagick
       .source(@portrait)

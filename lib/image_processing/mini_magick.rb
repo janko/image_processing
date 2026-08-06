@@ -225,6 +225,13 @@ module ImageProcessing
         # Applies options from the provided hash.
         def apply_options(magick, define: {}, **options)
           options.each do |option, value|
+            # Loader/saver option names may come from user input, so guard
+            # against dispatching to unsafe Ruby core methods (e.g. #send,
+            # #instance_eval) that public_send does not block on its own.
+            if ImageProcessing.unsafe_method?(magick, option)
+              raise Error, "#{option.inspect} is not a valid option"
+            end
+
             case value
             when true, nil then magick.public_send(option)
             when false     then magick.public_send(option).+

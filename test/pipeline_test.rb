@@ -265,12 +265,15 @@ describe "ImageProcessing::Pipeline" do
     end
     refute File.exist?("foo.txt")
 
-    assert_raises Vips::Error do
+    # `spawn` reaches the processor via #method_missing rather than #apply, so
+    # the builder-level guard never sees it. The processor-level guard blocks
+    # it because Kernel#spawn is an unsafe core method.
+    assert_raises ImageProcessing::Error do
       ImageProcessing::Vips.source(@portrait).spawn("touch foo.txt").call
     end
     refute File.exist?("foo.txt")
 
-    assert_raises MiniMagick::Error do
+    assert_raises ImageProcessing::Error do
       ImageProcessing::MiniMagick.source(@portrait).spawn("touch foo.txt").call
     end
     refute File.exist?("foo.txt")
@@ -321,6 +324,34 @@ describe "ImageProcessing::Pipeline" do
       ImageProcessing::Vips.source(@portrait).apply(send: ["system", "touch foo.txt"])
     end
     refute File.exist?("foo.txt")
+  end
+
+  it "doesn't allow bypass via the #operation meta-builder" do
+    # #operation is a legitimate Chainable method, so the builder-level guard
+    # only sees "operation" and lets the nested unsafe name through. The
+    # processor-level guard blocks the operation name that is actually
+    # dispatched, regardless of how it was built.
+    [ImageProcessing::Vips, ImageProcessing::MiniMagick].each do |processor|
+      unsafe_operations = [
+        ["send", "eval", "`touch foo.txt`"],
+        ["send", "system", "touch foo.txt"],
+        ["public_send", "system", "touch foo.txt"],
+        ["__send__", "system", "touch foo.txt"],
+        ["instance_eval", "`touch foo.txt`"],
+      ]
+
+      unsafe_operations.each do |operation|
+        assert_raises ImageProcessing::Error do
+          processor.source(@portrait).apply("operation" => operation).call
+        end
+        refute File.exist?("foo.txt"), "unsafe operation executed: #{operation.inspect}"
+
+        assert_raises ImageProcessing::Error do
+          processor.source(@portrait).operation(*operation).call
+        end
+        refute File.exist?("foo.txt"), "unsafe operation executed: #{operation.inspect}"
+      end
+    end
   end
 
   it "doesn't allow bang operations in apply" do
