@@ -7,6 +7,7 @@ This gem can process images with [ImageMagick] or [libvips]. ImageMagick is a
 good default choice, especially if you are migrating from another gem or library
 that uses ImageMagick. Libvips is a newer library that can process images [very
 rapidly][libvips performance] (often multiple times faster than ImageMagick).
+On JRuby, it can also process images with the Java2D image APIs.
 
 
 ## Goal
@@ -50,8 +51,15 @@ In a Mac terminal:
   gem "ruby-vips", "~> 2.0" # if using libvips
   ```
 
+On JRuby, `ImageProcessing::Java2D` uses only the bundled Java2D image APIs, so
+it needs no additional gem or native library. MiniMagick and Vips can still be
+selected.
+
 
 ## Usage
+
+On JRuby, **[`ImageProcessing::Java2D`]** provides the same chainable API using
+the Java2D image APIs.
 
 Processing is performed through **[`ImageProcessing::Vips`]** or
 **[`ImageProcessing::MiniMagick`]** modules. Both modules share the same
@@ -155,6 +163,7 @@ You can continue reading the API documentation for specific modules:
 
 * **[`ImageProcessing::Vips`]**
 * **[`ImageProcessing::MiniMagick`]**
+* **[`ImageProcessing::Java2D`]** (JRuby only; no additional dependency)
 
 See the **[wiki]** for additional "How To" guides for common scenarios. The wiki
 is publicly editable, so you're encouraged to add your own guides.
@@ -219,6 +228,7 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 [GraphicsMagick]: http://www.graphicsmagick.org
 [`ImageProcessing::Vips`]: doc/vips.md#readme
 [`ImageProcessing::MiniMagick`]: doc/minimagick.md#readme
+[`ImageProcessing::Java2D`]: doc/java2d.md#readme
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick
 [wiki]: https://github.com/janko/image_processing/wiki
 [HTTP.rb]: https://github.com/httprb/http

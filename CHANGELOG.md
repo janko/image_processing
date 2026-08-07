@@ -1,3 +1,7 @@
+## Next
+
+* Add a JRuby-only Java2D/ImageIO processor available as `ImageProcessing::Java2D`
+
 ## 2.0.3 (2026-06-08)
 
 * Prevent remote code execution when operation names come from user input, closing bypasses through the `#operation` meta-builder, `#method_missing`, and nested `#send` calls (reported by @szymonsec)

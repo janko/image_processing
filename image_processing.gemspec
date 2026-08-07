@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 3.0"
 
-  spec.summary       = "High-level wrapper for processing images for the web with ImageMagick or libvips."
-  spec.description   = "High-level wrapper for processing images for the web with ImageMagick or libvips."
+  spec.summary       = "High-level wrapper for processing images for the web with ImageMagick or libvips. Supports Java2D on JRuby."
+  spec.description   = "High-level wrapper for processing images for the web with ImageMagick or libvips. It also supports the Java2D image APIs on JRuby."
   spec.homepage      = "https://github.com/janko/image_processing"
   spec.authors       = ["Janko Marohnić"]
   spec.email         = ["janko.marohnic@gmail.com"]

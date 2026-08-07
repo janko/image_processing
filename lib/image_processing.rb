@@ -28,4 +28,7 @@ module ImageProcessing
 
   autoload :MiniMagick, "image_processing/mini_magick"
   autoload :Vips, "image_processing/vips"
+  autoload :Java2D, "image_processing/java2d"
+  # ActiveSupport camelizes the Rails processor name :java2d as Java2d.
+  autoload :Java2d, "image_processing/java2d"
 end
