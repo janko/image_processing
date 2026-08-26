@@ -9,11 +9,20 @@ module ImageProcessing
   module MiniMagick
     extend Chainable
 
-    def self.convert_shim(&block)
+    # mini_magick gained `inherit_fds:` on MiniMagick::Shell#execute in 5.4.0.
+    INHERIT_FDS_MINIMUM_VERSION = Gem::Version.new("5.4.0")
+
+    def self.convert_shim(inherit_fds: nil, &block)
+      if inherit_fds && ::MiniMagick.version < INHERIT_FDS_MINIMUM_VERSION
+        raise LoadError, "The `inherit_fds` loader option requires mini_magick #{INHERIT_FDS_MINIMUM_VERSION} or newer, but mini_magick #{::MiniMagick.version} is loaded. Please upgrade the gem."
+      end
+
+      options = inherit_fds ? { inherit_fds: inherit_fds } : {}
+
       if ::MiniMagick.respond_to?(:convert)
-        ::MiniMagick.convert(&block)
+        ::MiniMagick.convert(**options, &block)
       else
-        ::MiniMagick::Tool::Convert.new(&block)
+        ::MiniMagick::Tool::Convert.new(**options, &block)
       end
     end
 
@@ -37,12 +46,16 @@ module ImageProcessing
       # Initializes the image on disk into a MiniMagick::Tool object. Accepts
       # additional options related to loading the image (e.g. geometry).
       # Additionally auto-orients the image to be upright.
-      def self.load_image(path_or_magick, loader: nil, page: nil, geometry: nil, auto_orient: true, **options)
+      # `inherit_fds` names IO objects the tool inherits, so the source may be a
+      # `/dev/fd/N` path. The source stays a path, so `loader`, `page` and
+      # `geometry` still apply to it, which they would not if the caller passed
+      # a pre-built MiniMagick::Tool carrying the descriptor.
+      def self.load_image(path_or_magick, loader: nil, page: nil, geometry: nil, auto_orient: true, inherit_fds: nil, **options)
         if path_or_magick.is_a?(::MiniMagick::Tool)
           magick = path_or_magick
         else
           source_path = path_or_magick
-          magick = ::ImageProcessing::MiniMagick.convert_shim
+          magick = ::ImageProcessing::MiniMagick.convert_shim(inherit_fds: inherit_fds)
 
           Utils.apply_options(magick, **options)
 
