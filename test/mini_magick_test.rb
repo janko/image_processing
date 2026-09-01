@@ -9,6 +9,14 @@ describe "ImageProcessing::MiniMagick" do
     @square = fixture_image("square.jpg")
   end
 
+  def with_mini_magick_version(version)
+    original = MiniMagick.method(:version)
+    MiniMagick.define_singleton_method(:version) { Gem::Version.new(version) }
+    yield
+  ensure
+    MiniMagick.define_singleton_method(:version, original)
+  end
+
   it "applies imagemagick operations" do
     actual = ImageProcessing::MiniMagick.flip.call(@portrait)
     expected = Tempfile.new(["result", ".jpg"], binmode: true).tap do |tempfile|
@@ -64,6 +72,60 @@ describe "ImageProcessing::MiniMagick" do
       .convert!("jpg")
 
     refute_equal 0, processed.size
+  end
+
+  if MiniMagick.version >= ImageProcessing::MiniMagick::INHERIT_FDS_MINIMUM_VERSION
+    it "reads a source given as a descriptor named in inherit_fds" do
+      tiff = Tempfile.new(["file", ".tiff"])
+      ImageProcessing::MiniMagick.convert_shim do |convert|
+        convert.merge! [@portrait.path, @portrait.path, @portrait.path]
+        convert << tiff.path
+      end
+
+      File.open(tiff.path, "rb") do |file|
+        processed = ImageProcessing::MiniMagick
+          .source("/dev/fd/#{file.fileno}")
+          .loader(loader: "tiff", page: 0, inherit_fds: [file])
+          .convert!("jpg")
+
+        assert_equal 1, MiniMagick::Image.new(processed.path).pages.size
+      end
+    end
+
+    it "applies loader, page and geometry to a source named as an inherited descriptor" do
+      magick = ImageProcessing::MiniMagick
+        .source("/dev/fd/3")
+        .loader(inherit_fds: [@portrait], loader: "jpg", page: 0, geometry: "300x300")
+        .call(save: false)
+
+      assert_equal %W[jpg:/dev/fd/3[0][300x300] -auto-orient], magick.args
+    end
+  else
+    it "tells the caller to upgrade when the installed mini_magick predates inherit_fds" do
+      error = assert_raises(LoadError) do
+        ImageProcessing::MiniMagick
+          .source(@portrait)
+          .loader(inherit_fds: [@portrait])
+          .convert!("jpg")
+      end
+
+      assert_includes error.message, MiniMagick.version.to_s
+      assert_includes error.message, "5.4.0"
+    end
+  end
+
+  it "names both the required and the running mini_magick version when it predates inherit_fds" do
+    error = assert_raises(LoadError) do
+      with_mini_magick_version("5.3.3") do
+        ImageProcessing::MiniMagick
+          .source(@portrait)
+          .loader(inherit_fds: [@portrait])
+          .convert!("jpg")
+      end
+    end
+
+    assert_includes error.message, "5.3.3"
+    assert_includes error.message, "5.4.0"
   end
 
   it "disallows split layers by default" do

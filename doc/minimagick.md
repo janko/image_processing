@@ -360,6 +360,7 @@ It accepts the following special options:
 * `:geometry` -- geometry that should be applied when loading
 * `:auto_orient` -- whether the image should be automatically oriented after it's loaded (defaults to `true`)
 * `:define` -- creates definitions that coders and decoders use for reading and writing image data
+* `:inherit_fds` -- IO objects the command inherits, so the source may name one as `/dev/fd/N` and be read without a copy (requires mini_magick 5.4.0, and a system that exposes descriptors as `/dev/fd`)
 
 ```rb
 ImageProcessing::MiniMagick.loader(loader: "jpg").call(image)
@@ -376,6 +377,15 @@ ImageProcessing::MiniMagick.loader(auto_orient: false).call(image)
 
 ImageProcessing::MiniMagick.loader(define: { jpeg: { size: "300x300" } }).call(image)
 # convert -define jpeg:size=300x300 input.jpg -auto-orient output.jpg
+
+File.open("input.pdf", "rb") do |file|
+  ImageProcessing::MiniMagick
+    .source("/dev/fd/#{file.fileno}")
+    .loader(inherit_fds: [file], page: 0)
+    .convert("png")
+    .call
+  # convert /dev/fd/3[0] -auto-orient output.png
+end
 ```
 
 All other options given will be interpreted as ImageMagick operations to be
