@@ -1,4 +1,8 @@
-## 2.0.3 (2026-06-08)
+## 2.1.0 (2026-09-01)
+
+* [minimagick] Add `inherit_fds:` so a loader can name an already-open input (thanks to @flavorjones)
+
+## 2.0.3 (2026-08-06)
 
 * Prevent remote code execution when operation names come from user input, closing bypasses through the `#operation` meta-builder, `#method_missing`, and nested `#send` calls (reported by @szymonsec)
 
