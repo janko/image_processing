@@ -1,7 +1,7 @@
 module ImageProcessing
   # Abstract class inherited by individual processors.
   class Processor
-    def self.call(source:, loader:, operations:, saver:, destination: nil)
+    def self.call(source:, loader:, operations:, saver:, destination: nil, format: nil)
       unless source.is_a?(String) || source.is_a?(self::ACCUMULATOR_CLASS)
         fail Error, "invalid source: #{source.inspect}"
       end
@@ -19,7 +19,9 @@ module ImageProcessing
         accumulator = apply_operation(accumulator, operation)
       end
 
-      if destination
+      if destination && format
+        save_image(accumulator, destination, format, **saver)
+      elsif destination
         save_image(accumulator, destination, **saver)
       else
         accumulator

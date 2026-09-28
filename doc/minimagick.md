@@ -302,6 +302,10 @@ File.extname(result.path)
 By default the original format is retained when writing the image to a file. If
 the source file doesn't have a file extension, the format will default to JPEG.
 
+When a destination path is given, its extension determines the format. When
+the destination path has no extension, as with a `/dev/fd/N` path, the format
+passed to `#convert` is used instead.
+
 #### `#define`
 
 Adds coder/decoder options with [`-define`] from the specified Hash.

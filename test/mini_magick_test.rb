@@ -59,6 +59,24 @@ describe "ImageProcessing::MiniMagick" do
     assert_type "PNG", result
   end
 
+  it "saves in the #convert format to a destination without an extension" do
+    destination = Tempfile.new("destination")
+    ImageProcessing::MiniMagick.convert("png").call(@portrait, destination: destination.path)
+    assert_type "PNG", destination
+  end
+
+  it "refuses a #convert format that ImageMagick would read as more than a format" do
+    destination = Tempfile.new("destination")
+    pipeline = ImageProcessing::MiniMagick.convert("png:redirected-")
+    assert_raises(ImageProcessing::Error) { pipeline.call(@portrait, destination: destination.path) }
+  end
+
+  it "saves in the destination's extension rather than the #convert format" do
+    destination = Tempfile.new(["destination", ".jpg"])
+    ImageProcessing::MiniMagick.convert("png").call(@portrait, destination: destination.path)
+    assert_type "JPEG", destination
+  end
+
   it "accepts page" do
     tiff = Tempfile.new(["file", ".tiff"])
     ImageProcessing::MiniMagick.convert_shim do |convert|
@@ -90,6 +108,17 @@ describe "ImageProcessing::MiniMagick" do
 
         assert_equal 1, MiniMagick::Image.new(processed.path).pages.size
       end
+    end
+
+    it "saves in the #convert format to a destination named as an inherited descriptor" do
+      destination = Tempfile.new("destination")
+      File.open(destination.path, "wb") do |file|
+        ImageProcessing::MiniMagick
+          .loader(inherit_fds: [file])
+          .convert("png")
+          .call(@portrait, destination: "/dev/fd/#{file.fileno}")
+      end
+      assert_type "PNG", destination
     end
 
     it "applies loader, page and geometry to a source named as an inherited descriptor" do
@@ -145,6 +174,20 @@ describe "ImageProcessing::MiniMagick" do
       refute_equal 0, File.size(path)
       File.delete(path)
     end
+  end
+
+  it "disallows split layers in the #convert format to a destination without an extension" do
+    tiff = Tempfile.new(["file", ".tiff"])
+    ImageProcessing::MiniMagick.convert_shim do |convert|
+      convert.merge! [@portrait.path, @portrait.path, @portrait.path]
+      convert << tiff.path
+    end
+    destination = Tempfile.new("destination")
+
+    pipeline = ImageProcessing::MiniMagick.source(tiff).convert("jpg")
+
+    assert_raises(ImageProcessing::Error) { pipeline.call(destination: destination.path) }
+    assert_empty Dir["#{destination.path}-*"]
   end
 
   it "allows resizing images without extension" do

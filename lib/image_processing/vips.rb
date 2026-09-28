@@ -56,12 +56,21 @@ module ImageProcessing
 
       # Writes the Vips::Image object to disk. This starts the processing
       # pipeline defined in the Vips::Image object. Accepts additional
-      # saver-specific options (e.g. quality).
-      def self.save_image(image, path, saver: nil, quality: nil, **options)
+      # saver-specific options (e.g. quality). The saver is chosen by `format`
+      # when given, otherwise by the path's extension.
+      def self.save_image(image, path, format = nil, saver: nil, quality: nil, **options)
         options[:Q] = quality if quality
 
         if saver
           image.public_send(:"#{saver}save", path, **options)
+        elsif format
+          saver = ::Vips.vips_foreign_find_save(".#{format}")
+          fail ::Vips::Error, "No known saver for '#{format}'." unless saver
+
+          filename      = ::Vips.p2str(::Vips.vips_filename_get_filename(path))
+          option_string = ::Vips.p2str(::Vips.vips_filename_get_options(path))
+          options       = Utils.select_valid_options(saver, options)
+          ::Vips::Operation.call(saver, [image, filename], options, option_string)
         else
           options = Utils.select_valid_saver_options(path, options)
           image.write_to_file(path, **options)

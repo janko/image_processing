@@ -126,6 +126,52 @@ describe "ImageProcessing::Vips" do
     assert_type "PNG", result
   end
 
+  it "saves in the #convert format to a destination without an extension" do
+    destination = Tempfile.new("destination")
+    ImageProcessing::Vips.convert("png").call(@portrait, destination: destination.path)
+    assert_type "PNG", destination
+  end
+
+  it "saves in the #convert format to a destination named as /dev/fd/N" do
+    destination = Tempfile.new("destination")
+    File.open(destination.path, "wb") do |file|
+      ImageProcessing::Vips.convert("png").call(@portrait, destination: "/dev/fd/#{file.fileno}")
+    end
+    assert_type "PNG", destination
+  end
+
+  it "ignores saver options that the #convert format's saver does not define" do
+    destination = Tempfile.new("destination")
+    ImageProcessing::Vips.saver(compression: 9).convert("jpg").call(@portrait, destination: destination.path)
+    assert_type "JPEG", destination
+  end
+
+  it "applies saver options in the #convert format to a destination without an extension" do
+    low, high = Tempfile.new("low"), Tempfile.new("high")
+    ImageProcessing::Vips.saver(quality: 10).convert("jpg").call(@portrait, destination: low.path)
+    ImageProcessing::Vips.saver(quality: 100).convert("jpg").call(@portrait, destination: high.path)
+    assert File.size(low.path) < File.size(high.path)
+  end
+
+  it "applies saver options named in a destination without an extension" do
+    low, high = Tempfile.new("low"), Tempfile.new("high")
+    ImageProcessing::Vips.convert("jpg").call(@portrait, destination: "#{low.path}[Q=10]")
+    ImageProcessing::Vips.convert("jpg").call(@portrait, destination: "#{high.path}[Q=100]")
+    assert File.size(low.path) < File.size(high.path)
+  end
+
+  it "prefers :saver to the #convert format" do
+    destination = Tempfile.new("destination")
+    ImageProcessing::Vips.saver(saver: :png).convert("jpg").call(@portrait, destination: destination.path)
+    assert_type "PNG", destination
+  end
+
+  it "saves in the destination's extension rather than the #convert format" do
+    destination = Tempfile.new(["destination", ".jpg"])
+    ImageProcessing::Vips.convert("png").call(@portrait, destination: destination.path)
+    assert_type "JPEG", destination
+  end
+
   describe ".valid_image?" do
     it "returns true for correct images" do
       assert ImageProcessing::Vips.valid_image?(@portrait)

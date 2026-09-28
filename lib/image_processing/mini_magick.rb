@@ -73,11 +73,21 @@ module ImageProcessing
 
       # Calls the built ImageMagick command to perform processing and save
       # the result to disk. Accepts additional options related to saving the
-      # image (e.g. quality).
-      def self.save_image(magick, destination_path, allow_splitting: false, **options)
+      # image (e.g. quality). `format` names the output format when given,
+      # otherwise ImageMagick infers it from the path's extension.
+      def self.save_image(magick, destination_path, format = nil, allow_splitting: false, **options)
         Utils.apply_options(magick, **options)
 
-        magick << destination_path
+        if format
+          # ImageMagick reads everything before the first colon as the
+          # format, so a format carrying a colon could redirect the output.
+          format = format.to_s
+          fail Error, "invalid format: #{format.inspect}" unless format.ascii_only? && format.match?(/\A\w+\z/)
+
+          magick << "#{format}:#{destination_path}"
+        else
+          magick << destination_path
+        end
         magick.call
 
         Utils.disallow_split_layers!(destination_path) unless allow_splitting
