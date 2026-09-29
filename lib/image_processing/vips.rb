@@ -64,13 +64,16 @@ module ImageProcessing
         if saver
           image.public_send(:"#{saver}save", path, **options)
         elsif format
-          saver = ::Vips.vips_foreign_find_save(".#{format}")
+          # Savers such as heifsave pick their encoding from the suffix (AV1
+          # for ".avif"), so save through a target, which takes the suffix
+          # separately from the path.
+          saver = ::Vips.vips_foreign_find_save_target(".#{format}")
           fail ::Vips::Error, "No known saver for '#{format}'." unless saver
 
           filename      = ::Vips.p2str(::Vips.vips_filename_get_filename(path))
           option_string = ::Vips.p2str(::Vips.vips_filename_get_options(path))
           options       = Utils.select_valid_options(saver, options)
-          ::Vips::Operation.call(saver, [image, filename], options, option_string)
+          image.write_to_target(::Vips::Target.new_to_file(filename), ".#{format}#{option_string}", **options)
         else
           options = Utils.select_valid_saver_options(path, options)
           image.write_to_file(path, **options)

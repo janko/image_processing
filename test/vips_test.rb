@@ -140,6 +140,13 @@ describe "ImageProcessing::Vips" do
     assert_type "PNG", destination
   end
 
+  it "saves AVIF rather than HEIC in the #convert format to a destination without an extension" do
+    skip "libvips lacks AVIF support" unless Vips.vips_foreign_find_save_target(".avif")
+    destination = Tempfile.new("destination")
+    ImageProcessing::Vips.convert("avif").call(@portrait, destination: destination.path)
+    assert_equal "av1", Vips::Image.new_from_file(destination.path).get("heif-compression")
+  end
+
   it "ignores saver options that the #convert format's saver does not define" do
     destination = Tempfile.new("destination")
     ImageProcessing::Vips.saver(compression: 9).convert("jpg").call(@portrait, destination: destination.path)
