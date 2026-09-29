@@ -350,6 +350,10 @@ File.extname(result.path)
 By default the original format is retained when writing the image to a file. If
 the source file doesn't have a file extension, the format will default to JPEG.
 
+When a destination path is given, its extension determines the format. When
+the destination path has no extension, as with a `/dev/fd/N` path, the format
+passed to `#convert` is used instead.
+
 NOTE: libvips 8.6 is able to normally read GIF images (and convert them to
 other formats), but it's not able to *save* to GIF format. If you need full GIF
 support, you need to use libvips 8.7+ compiled with ImageMagick support

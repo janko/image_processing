@@ -79,6 +79,17 @@ describe "ImageProcessing::Pipeline" do
     assert_raises(Vips::Error) { pipeline.call(destination: destination_path) }
   end
 
+  it "calls a processor whose .call predates the format keyword" do
+    processor = Class.new(ImageProcessing::Vips::Processor) do
+      def self.call(source:, loader:, operations:, saver:, destination: nil)
+        super
+      end
+    end
+    destination = Tempfile.new(["destination", ".png"])
+    ImageProcessing::Vips.branch(processor: processor).convert("jpg").call(@portrait, destination: destination.path)
+    assert_type "PNG", destination
+  end
+
   it "accepts loader options" do
     pipeline = ImageProcessing::Vips.loader(shrink: 2)
     assert_equal Hash[shrink: 2], pipeline.options[:loader]

@@ -21,7 +21,11 @@ module ImageProcessing
         call_processor
       elsif destination
         handle_destination do
-          call_processor(destination: destination)
+          if format && !determine_format(destination)
+            call_processor(destination: destination, format: format)
+          else
+            call_processor(destination: destination)
+          end
         end
       else
         create_tempfile do |tempfile|
