@@ -1,3 +1,7 @@
+## 2.2.0 (2026-09-29)
+
+* Save in the `#convert` format when the destination path has no extension, such as a `/dev/fd/N` path (thanks to @flavorjones)
+
 ## 2.1.0 (2026-09-01)
 
 * [minimagick] Add `inherit_fds:` so a loader can name an already-open input (thanks to @flavorjones)
