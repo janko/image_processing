@@ -60,11 +60,19 @@ module ImageProcessing
       # around via the #operation meta-builder, #method_missing, or a nested
       # #send. This is the single point every operation is finally dispatched
       # through, so enforcing the guard here closes all of those paths.
-      if ImageProcessing.unsafe_method?(self, name)
+      #
+      # Macros defined by the processor are called on the processor; anything
+      # else is forwarded to the accumulator, but only if the accumulator's
+      # class defines it or handles it via #method_missing. Methods inherited
+      # from elsewhere (Ruby core, or modules mixed into every object such as
+      # ActiveSupport's Object#try) are rejected.
+      if respond_to?(name) && method(name).owner <= ImageProcessing::Processor
+        receiver = self
+      elsif ImageProcessing.allowed_method?(@accumulator, name, [self.class::ACCUMULATOR_CLASS])
+        receiver = @accumulator
+      else
         fail Error, "#{name.inspect} is not a valid operation"
       end
-
-      receiver = respond_to?(name) ? self : @accumulator
 
       if args.last.is_a?(Hash)
         kwargs = args.pop

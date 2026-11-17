@@ -259,12 +259,26 @@ describe "ImageProcessing::MiniMagick" do
     refute File.exist?(canary.path), "Kernel#system was invoked via saver option"
   end
 
+  it "allows CLI options that are named like private Ruby methods" do
+    # Kernel#format and Kernel#print are private, so they can't be called via
+    # public_send and should be forwarded to ImageMagick as -format/-print.
+    magick = ImageProcessing::MiniMagick
+      .source(@portrait)
+      .apply(format: "%w")
+      .print("%h")
+      .call(save: false)
+
+    assert_includes magick.args.each_cons(2).to_a, ["-format", "%w"]
+    assert_includes magick.args.each_cons(2).to_a, ["-print", "%h"]
+  end
+
   it "does not dispatch to unsafe public methods passed as loader/saver options" do
     # public_send blocks private methods like Kernel#system, but public
     # metaprogramming methods (#instance_eval, #send, ...) need the extra guard.
     unsafe_options = [
       { instance_eval: "`touch #{@canary_path = Tempfile.new("canary").path}`" },
       { send: ["system", "touch #{@canary_path}"] },
+      { try: ["instance_eval", "`touch #{@canary_path}`"] },
     ]
 
     unsafe_options.each do |option|

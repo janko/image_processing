@@ -248,10 +248,11 @@ module ImageProcessing
         # Applies options from the provided hash.
         def apply_options(magick, define: {}, **options)
           options.each do |option, value|
-            # Loader/saver option names may come from user input, so guard
-            # against dispatching to unsafe Ruby core methods (e.g. #send,
-            # #instance_eval) that public_send does not block on its own.
-            if ImageProcessing.unsafe_method?(magick, option)
+            # Loader/saver option names may come from user input, so only
+            # dispatch to MiniMagick::Tool's own methods or CLI options handled
+            # by #method_missing, never to methods such as #instance_eval,
+            # #send or ActiveSupport's #try.
+            unless ImageProcessing.allowed_method?(magick, option, [::MiniMagick::Tool])
               raise Error, "#{option.inspect} is not a valid option"
             end
 

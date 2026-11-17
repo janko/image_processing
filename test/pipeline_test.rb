@@ -271,23 +271,23 @@ describe "ImageProcessing::Pipeline" do
   end
 
   it "doesn't allow making system calls" do
-    assert_raises ArgumentError do
-      ImageProcessing::Vips.source(@portrait).apply(system: "touch foo.txt")
-    end
-    refute File.exist?("foo.txt")
+    # Kernel#system and Kernel#spawn are private, so public_send can't call
+    # them. The names fall through to #method_missing and are passed to
+    # libvips/ImageMagick as (non-existent) operations, which fail.
+    {
+      ImageProcessing::Vips       => ::Vips::Error,
+      ImageProcessing::MiniMagick => ::MiniMagick::Error,
+    }.each do |processor, error|
+      assert_raises error do
+        processor.source(@portrait).apply(system: "touch foo.txt").call
+      end
+      refute File.exist?("foo.txt")
 
-    # `spawn` reaches the processor via #method_missing rather than #apply, so
-    # the builder-level guard never sees it. The processor-level guard blocks
-    # it because Kernel#spawn is an unsafe core method.
-    assert_raises ImageProcessing::Error do
-      ImageProcessing::Vips.source(@portrait).spawn("touch foo.txt").call
+      assert_raises error do
+        processor.source(@portrait).spawn("touch foo.txt").call
+      end
+      refute File.exist?("foo.txt")
     end
-    refute File.exist?("foo.txt")
-
-    assert_raises ImageProcessing::Error do
-      ImageProcessing::MiniMagick.source(@portrait).spawn("touch foo.txt").call
-    end
-    refute File.exist?("foo.txt")
   end
 
   it "doesn't allow instance_eval/instance_exec via apply" do
@@ -363,6 +363,46 @@ describe "ImageProcessing::Pipeline" do
         refute File.exist?("foo.txt"), "unsafe operation executed: #{operation.inspect}"
       end
     end
+  end
+
+  it "doesn't allow methods mixed into every object" do
+    # ActiveSupport defines Object#try in a module (ActiveSupport::Tryable),
+    # so an owner denylist of Ruby core classes doesn't catch it, and
+    # try("instance_eval", code) would run arbitrary Ruby code.
+    [ImageProcessing::Vips, ImageProcessing::MiniMagick].each do |processor|
+      unsafe_operations = [
+        ["try", "instance_eval", "`touch foo.txt`"],
+        ["try!", "instance_eval", "`touch foo.txt`"],
+      ]
+
+      unsafe_operations.each do |name, *args|
+        assert_raises ArgumentError do
+          processor.source(@portrait).apply(name => args)
+        end
+        refute File.exist?("foo.txt"), "unsafe operation executed: #{name}"
+
+        assert_raises ImageProcessing::Error do
+          processor.source(@portrait).apply("operation" => [name, *args]).call
+        end
+        refute File.exist?("foo.txt"), "unsafe operation executed: #{name}"
+
+        assert_raises ImageProcessing::Error do
+          processor.source(@portrait).operation(name, *args).call
+        end
+        refute File.exist?("foo.txt"), "unsafe operation executed: #{name}"
+      end
+    end
+  end
+
+  it "doesn't allow overwriting builder options via apply" do
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.source(@portrait).apply(branch: { processor: "Kernel" })
+    end
+
+    assert_raises ArgumentError do
+      ImageProcessing::Vips.source(@portrait).apply(call: { destination: "foo.txt" })
+    end
+    refute File.exist?("foo.txt")
   end
 
   it "doesn't allow bang operations in apply" do

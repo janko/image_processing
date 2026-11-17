@@ -13,6 +13,20 @@ ENV["VIPS_WARNING"] = "0" # disable libvips warnings
 require "vips"
 require "mini_magick"
 
+# Mimics ActiveSupport's Object#try, which is defined in a module mixed into
+# every object, so that tests can verify user-provided operation names can't
+# reach such methods.
+module ObjectTry
+  def try(*args, &block)
+    public_send(*args, &block) if args.empty? || respond_to?(args.first)
+  end
+
+  def try!(*args, &block)
+    public_send(*args, &block)
+  end
+end
+Object.include(ObjectTry)
+
 # Faithful port of DHashVips::IDHash, inlined to avoid the upstream gem's
 # fragile install-time test (which breaks on Ruby 4.0) and to make
 # similarity assertions available on JRuby as well.

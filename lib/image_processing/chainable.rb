@@ -85,16 +85,26 @@ module ImageProcessing
 
     private
 
-    # This prevents calling unsafe Ruby core methods such as `Kernel#system`,
-    # which would allow for remote shell execution. The processor enforces the
-    # same guard when operations are dispatched, which also covers paths that
-    # bypass this early check (e.g. the #operation meta-builder).
+    # Operation names may come from user input, so only allow Chainable's own
+    # builder methods and unknown names (which become processor operations via
+    # #method_missing). This prevents dispatching to methods such as
+    # `Kernel#send`, `BasicObject#instance_eval` or ActiveSupport's
+    # `Object#try`, which would allow remote code execution. The processor
+    # enforces the same guard when operations are dispatched, which also covers
+    # paths that bypass this early check (e.g. the #operation meta-builder).
     #
     # Bang names are rejected here because they are Chainable's execution
-    # shortcut (see #method_missing), not operations to chain.
+    # shortcut (see #method_missing), not operations to chain. #branch and
+    # #call are rejected because they would let input overwrite internal
+    # builder options or the destination path.
     def invalid_operation?(name)
-      name.end_with?("!") || ImageProcessing.unsafe_method?(self, name)
+      name.end_with?("!") ||
+        NON_OPERATION_METHODS.include?(name.to_s) ||
+        !ImageProcessing.allowed_method?(self, name, [Chainable])
     end
+
+    # Chainable methods that must not be reachable through #apply.
+    NON_OPERATION_METHODS = %w[branch call].freeze
 
     # Assume that any unknown method names an operation supported by the
     # processor. Add a bang ("!") if you want processing to be performed.
