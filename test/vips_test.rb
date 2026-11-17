@@ -134,7 +134,10 @@ describe "ImageProcessing::Vips" do
 
   it "saves in the #convert format to a destination named as /dev/fd/N" do
     destination = Tempfile.new("destination")
-    File.open(destination.path, "wb") do |file|
+    # libvips opens the destination read-write, and on macOS reopening a
+    # /dev/fd/N descriptor can't widen its access mode, so the descriptor
+    # must be opened read-write as well.
+    File.open(destination.path, "w+b") do |file|
       ImageProcessing::Vips.convert("png").call(@portrait, destination: "/dev/fd/#{file.fileno}")
     end
     assert_type "PNG", destination
