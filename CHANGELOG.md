@@ -1,3 +1,9 @@
+## 2.2.1 (2026-11-21)
+
+* Prevent remote code execution when operation names or MiniMagick loader/saver option names come from user input and a library such as ActiveSupport adds methods like `Object#try` to every object (reported by @hgrgr)
+
+* [minimagick] Allow loader/saver options named like private Kernel methods again, such as `format:` and `print:`
+
 ## 2.2.0 (2026-09-29)
 
 * Save in the `#convert` format when the destination path has no extension, such as a `/dev/fd/N` path (thanks to @flavorjones)
