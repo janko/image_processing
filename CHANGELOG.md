@@ -24,7 +24,7 @@
 
 ## 2.0.1 (2026-05-22)
 
-* [minimagick] Prevent remote shell execution when passing loader/saver options from user input
+* [minimagick] Prevent remote shell execution when passing loader/saver options from user input (reported by @bilerden)
 
 ## 2.0.0 (2026-05-20)
 
