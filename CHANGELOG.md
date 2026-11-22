@@ -1,4 +1,4 @@
-## HEAD
+## 2.2.2 (2026-11-22)
 
 * Allow operations defined in modules mixed into a processor or accumulator class again (e.g. `ImageProcessing::Vips::Processor.include(MyMacros)`), which 2.2.1 rejected
 
