@@ -28,28 +28,27 @@ how to resize and process images.
 
 1. Install ImageMagick and/or libvips:
 
-In a Mac terminal:
+   On macOS:
 
-```sh
-  $ brew install imagemagick # if using ImageMagick
-  $ brew install vips # if using libvips
-  ```
+   ```sh
+   $ brew install imagemagick # if using ImageMagick
+   $ brew install vips # if using libvips
+   ```
 
- In a debian/ubuntu terminal:
+   On Debian/Ubuntu:
 
-```sh
-  $ sudo apt install imagemagick # if using ImageMagick
-  $ sudo apt install libvips # if using libvips
-  ```
+   ```sh
+   $ sudo apt install imagemagick # if using ImageMagick
+   $ sudo apt install libvips # if using libvips
+   ```
 
 2. Add the gem(s) to your Gemfile:
 
-  ```rb
-  gem "image_processing", "~> 2.0"
-  gem "mini_magick", "~> 5.0" # if using ImageMagick
-  gem "ruby-vips", "~> 2.0" # if using libvips
-  ```
-
+   ```rb
+   gem "image_processing", "~> 2.0"
+   gem "mini_magick", "~> 5.0" # if using ImageMagick
+   gem "ruby-vips", "~> 2.0" # if using libvips
+   ```
 
 ## Usage
 
@@ -124,12 +123,13 @@ pipeline.options
 #     :saver=>{},
 #     :format=>"png",
 #     :operations=>[[:resize_to_limit, [400, 400]], [:strip, []]],
-#     :processor_class=>ImageProcessing::MiniMagick::Processor}
+#     :processor=>ImageProcessing::MiniMagick::Processor}
 ```
 
-The source object needs to responds to `#path`, or be a String, a Pathname, or
-a `Vips::Image`/`MiniMagick::Tool` object. Note that the processed file is
-always saved to a new location, in-place processing is not supported.
+The source object needs to respond to `#path`, or be a String, a Pathname, or
+a `Vips::Image`/`MiniMagick::Tool` object. If no source is given,
+`ImageProcessing::Error` is raised. Note that the processed file is always saved
+to a new location, in-place processing is not supported.
 
 ```rb
 ImageProcessing::Vips.source(File.open("source.jpg"))
@@ -148,8 +148,17 @@ pipeline = ImageProcessing::Vips.source(image)
 
 pipeline.call #=> #<Tempfile ...>
 pipeline.call(save: false) #=> #<Vips::Image ...>
-pipeline.call(destination: "/path/to/destination")
+pipeline.call(destination: "/path/to/destination.jpg")
 ```
+
+When saving to a tempfile, the output format is the one passed to `#convert`,
+falling back to the extension of the source file, and finally to JPEG. When
+saving to a `:destination` path, the format is determined by the path's
+extension; if the path has no extension (e.g. `/dev/fd/N`), the format passed
+to `#convert` is used.
+
+If processing fails while saving to a `:destination` path that didn't exist
+before, the partially written file is deleted before the error is re-raised.
 
 You can continue reading the API documentation for specific modules:
 
@@ -159,10 +168,44 @@ You can continue reading the API documentation for specific modules:
 See the **[wiki]** for additional "How To" guides for common scenarios. The wiki
 is publicly editable, so you're encouraged to add your own guides.
 
+## Applying operations from a hash
+
+Instead of chaining methods, you can pass operations as a hash to `#apply`,
+which is handy when the processing steps are stored as data (e.g. Active
+Storage variants). Hash keys are the builder methods to call, and values are
+the arguments: a single argument, an array of arguments, a hash of keyword
+arguments, or `true`/`nil` for no arguments.
+
+```rb
+ImageProcessing::Vips
+  .source(image)
+  .apply(resize_to_limit: [400, 400], sharpen: true, convert: "png")
+  .call
+
+# equivalent to
+
+ImageProcessing::Vips
+  .source(image)
+  .resize_to_limit(400, 400)
+  .sharpen
+  .convert("png")
+  .call
+```
+
+To call the same method more than once, pass an array of pairs instead:
+
+```rb
+ImageProcessing::Vips
+  .apply([[:rotate, 90], [:rotate, 90]])
+```
+
 ## Instrumentation
 
 You can register an `#instrumenter` block for a given pipeline, which will wrap
-the pipeline execution, allowing you to record performance metrics.
+the pipeline execution, allowing you to record performance metrics. The block
+receives the pipeline options as keyword arguments (including `:destination`
+when one was given), and the pipeline must be executed by calling the yielded
+block.
 
 ```rb
 pipeline = ImageProcessing::Vips.instrumenter do |**options, &processing|
@@ -170,7 +213,7 @@ pipeline = ImageProcessing::Vips.instrumenter do |**options, &processing|
   options[:loader]     #=> { fail: true }
   options[:saver]      #=> { quality: 85 }
   options[:format]     #=> "png"
-  options[:operations] #=> [[:resize_to_limit, 500, 500], [:flip, [:horizontal]]]
+  options[:operations] #=> [[:resize_to_limit, [500, 500]], [:flip, [:horizontal]]]
   options[:processor]  #=> ImageProcessing::Vips::Processor
 
   ActiveSupport::Notifications.instrument("process.image_processing", **options) do
@@ -214,9 +257,8 @@ The `ImageProcessing::MiniMagick` functionality was extracted from
 
 [MIT](LICENSE.txt)
 
-[libvips]: http://libvips.github.io/libvips/
-[ImageMagick]: https://www.imagemagick.org
-[GraphicsMagick]: http://www.graphicsmagick.org
+[libvips]: https://www.libvips.org/
+[ImageMagick]: https://imagemagick.org
 [`ImageProcessing::Vips`]: doc/vips.md#readme
 [`ImageProcessing::MiniMagick`]: doc/minimagick.md#readme
 [refile-mini_magick]: https://github.com/refile/refile-mini_magick

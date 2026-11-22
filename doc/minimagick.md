@@ -1,7 +1,7 @@
 # ImageProcessing::MiniMagick
 
 The `ImageProcessing::MiniMagick` module contains processing methods that use
-the [MiniMagick] gem (which is installed with the image_processing gem).
+the [MiniMagick] gem.
 
 ## Contents
 
@@ -32,17 +32,23 @@ the [MiniMagick] gem (which is installed with the image_processing gem).
 
 ## Installation
 
-You will need to install [ImageMagick]/[GraphicsMagick] before using this
-module:
+You will need to install [ImageMagick] before using this module:
 
 ```sh
 $ brew install imagemagick
-# or
-$ brew install graphicsmagick
 ```
 
 If you're using something other than Homebrew, see the [installation
 instructions] for more details.
+
+Then add the [MiniMagick] gem to your Gemfile:
+
+```rb
+gem "mini_magick", "~> 5.0"
+```
+
+MiniMagick will use the `magick` command on ImageMagick 7 and `convert` on
+ImageMagick 6. The `convert` commands in examples below are shown for brevity.
 
 ## Usage
 
@@ -62,13 +68,15 @@ processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6
 
 ### GraphicsMagick
 
-The MiniMagick gem supports [GraphicsMagick] as well, you just need to specify
-that you want to use it:
+MiniMagick can be configured to use [GraphicsMagick] instead, though as of
+MiniMagick 5 it's not officially supported, so some features might not work:
 
 ```rb
 require "image_processing/mini_magick"
 
-MiniMagick.graphicsmagick = true
+MiniMagick.configure do |config|
+  config.graphicsmagick = true
+end
 
 processed = ImageProcessing::MiniMagick
   .source(image)
@@ -83,8 +91,9 @@ processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6
 
 #### `.valid_image?`
 
-Tries to recompress the image, and returns `true` if no exception was raised,
-otherwise returns `false`.
+Tries to fully decode the image (by converting it to `null:`), and returns
+`true` if no exception was raised, otherwise returns `false`. The given file
+needs to respond to `#path`.
 
 ```rb
 ImageProcessing::MiniMagick.valid_image?(normal_image)  #=> true
@@ -149,11 +158,11 @@ pipeline = ImageProcessing::MiniMagick.source(image) # 600x800
 
 result = pipeline.resize_to_fill!(400, 400)
 
-MiniMagick.new(result.path).dimensions #=> [400, 400]
+MiniMagick::Image.new(result.path).dimensions #=> [400, 400]
 ```
 
-You can specify the [direction] of the image via the `:gravity` option
-(defaults to `"Center"`)
+You can specify the [direction] of the crop via the `:gravity` option
+(defaults to `"Center"`):
 
 ```rb
 pipeline.resize_to_fill!(400, 400, gravity: "north-west")
@@ -183,8 +192,8 @@ pipeline.resize_and_pad!(400, 400, background: [65, 105, 225, 1.0]) # RGBA value
 pipeline.resize_and_pad!(400, 400, background: "...")               # any supported ImageMagick color value
 ```
 
-It accepts `:gravity` for specifying the [gravity] to apply while cropping
-(defaults to `"Center"`).
+It accepts `:gravity` for specifying the [direction] where the resized image will
+be positioned within the padded area (defaults to `"Center"`).
 
 ```rb
 pipeline.resize_and_pad!(400, 400, gravity: "north-west")
@@ -309,6 +318,7 @@ passed to `#convert` is used instead.
 #### `#define`
 
 Adds coder/decoder options with [`-define`] from the specified Hash.
+Underscores in namespaces and keys are converted to dashes.
 
 ```rb
 ImageProcessing::MiniMagick
@@ -316,11 +326,19 @@ ImageProcessing::MiniMagick
   # ...
 ```
 
+A String is passed to `-define` as is:
+
+```rb
+ImageProcessing::MiniMagick
+  .define("png:compression-level=8") # -define png:compression-level=8
+  # ...
+```
+
 #### `#method_missing`
 
 Any unknown methods will be delegated to [`MiniMagick.convert`]. See the
-list of all available options by running `convert -help` and visiting the
-[ImageMagick reference].
+list of all available options by running `magick -help` (or `convert -help` on
+ImageMagick 6) and visiting the [ImageMagick reference].
 
 ```rb
 ImageProcessing::MiniMagick
@@ -352,6 +370,14 @@ Appends given values directly as arguments to the `convert` command.
 ImageProcessing::MiniMagick
   .append("-quality", 100)
   .append("-flip")
+  # ...
+```
+
+When called without arguments, it applies the [`-append`] operator instead:
+
+```rb
+ImageProcessing::MiniMagick
+  .append # -append
   # ...
 ```
 
@@ -451,7 +477,7 @@ All other options given will be interpreted as ImageMagick operations to be
 applied before the image is saved. Operation values can be either a single
 argument, an array of arguments, `true`/`nil` indicating no arguments, or
 `false` indicating the operator should be a "+" operator. See [Writing JPEG
-Control Options] for some examples. Note that is just syntax sugar over
+Control Options] for some examples. Note that this is just syntax sugar over
 applying the operations via the chainable API.
 
 ```rb
@@ -476,7 +502,8 @@ magick.call
 
 #### `#limits`
 
-Sets the pixel cache resource limits for the ImageMagick command.
+Sets the pixel cache resource limits for the ImageMagick command. The limits are
+placed at the start of the command, so they also apply when loading the image.
 
 ```rb
 ImageProcessing::MiniMagick
@@ -513,9 +540,11 @@ ImageProcessing::MiniMagick
 
 ## Sharpening
 
-With `#resize_*` operators, you can additional sharpen the thumbnails via the
+With `#resize_*` operators, you can additionally sharpen the thumbnails via the
 `:sharpen` option, which performs [`-sharpen`] operation (higher sigma means
-more sharpening):
+more sharpening). Sharpening is disabled by default; the given hash is merged
+with the default parameters (`radius: 0, sigma: 1`), so `sharpen: {}` uses the
+defaults:
 
 ```rb
 ImageProcessing::MiniMagick
@@ -526,25 +555,26 @@ ImageProcessing::MiniMagick
 ```
 
 [MiniMagick]: https://github.com/minimagick/minimagick
-[ImageMagick]: https://www.imagemagick.org
+[ImageMagick]: https://imagemagick.org
 [GraphicsMagick]: http://www.graphicsmagick.org
-[installation instructions]: https://www.imagemagick.org/script/download.php
-[fit]: http://www.imagemagick.org/Usage/thumbnails/#fit
-[fill]: http://www.imagemagick.org/Usage/thumbnails/#cut
-[pad]: http://www.imagemagick.org/Usage/thumbnails/#pad
-[direction]: https://www.imagemagick.org/script/command-line-options.php#gravity
-[color]: https://www.imagemagick.org/script/color.php
-[ImageMagick reference]: https://www.imagemagick.org/script/command-line-options.php
-[`MiniMagick.convert`]: https://github.com/minimagick/minimagick#metal
-[Reading JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_read
-[Writing JPEG Control Options]: http://www.imagemagick.org/Usage/formats/#jpg_write
-[`-limit`]: https://www.imagemagick.org/script/command-line-options.php#limit
-[Architecture]: https://www.imagemagick.org/script/architecture.php#cache
-[`-sharpen`]: https://www.imagemagick.org/script/command-line-options.php#sharpen
-[`-define`]: https://www.imagemagick.org/script/command-line-options.php#define
-[`-rotate`]: https://www.imagemagick.org/script/command-line-options.php#rotate
+[installation instructions]: https://imagemagick.org/script/download.php
+[fit]: https://usage.imagemagick.org/thumbnails/#fit
+[fill]: https://usage.imagemagick.org/thumbnails/#cut
+[pad]: https://usage.imagemagick.org/thumbnails/#pad
+[direction]: https://imagemagick.org/script/command-line-options.php#gravity
+[color]: https://imagemagick.org/script/color.php
+[ImageMagick reference]: https://imagemagick.org/script/command-line-options.php
+[`MiniMagick.convert`]: https://github.com/minimagick/minimagick#tools
+[Reading JPEG Control Options]: https://usage.imagemagick.org/formats/#jpg_read
+[Writing JPEG Control Options]: https://usage.imagemagick.org/formats/#jpg_write
+[`-limit`]: https://imagemagick.org/script/command-line-options.php#limit
+[Architecture]: https://imagemagick.org/script/architecture.php#cache
+[`-sharpen`]: https://imagemagick.org/script/command-line-options.php#sharpen
+[`-define`]: https://imagemagick.org/script/command-line-options.php#define
+[`-rotate`]: https://imagemagick.org/script/command-line-options.php#rotate
 [watermark]: https://en.wikipedia.org/wiki/Watermark
-[image composition]: https://www.imagemagick.org/script/compose.php
-[Compose Tables]: http://www.imagemagick.org/Usage/compose/tables/
-[position]: https://www.imagemagick.org/script/command-line-processing.php#geometry
-[`-composite`]: https://www.imagemagick.org/script/command-line-options.php#composite
+[image composition]: https://imagemagick.org/script/compose.php
+[Compose Tables]: https://usage.imagemagick.org/compose/tables/
+[position]: https://imagemagick.org/script/command-line-processing.php#geometry
+[`-composite`]: https://imagemagick.org/script/command-line-options.php#composite
+[`-append`]: https://imagemagick.org/script/command-line-options.php#append

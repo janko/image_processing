@@ -1,13 +1,14 @@
 # ImageProcessing::Vips
 
 The `ImageProcessing::Vips` module contains processing macros that use the
-[ruby-vips] gem (which is installed with the image_processing gem).
+[ruby-vips] gem.
 
 ## Contents
 
 * [Installation](#installation)
 * [Usage](#usage)
   * [Resize-on-load](#resize-on-load)
+  * [Untrusted loaders](#untrusted-loaders)
 * [Methods](#methods)
   * [`.valid_image?`](#valid_image)
   * [`#resize_to_limit`](#resize_to_limit)
@@ -38,6 +39,12 @@ If you're using something other than Homebrew, see the [installation
 instructions] for more details.
 
 NOTE: libvips 8.6 or higher is required.
+
+Then add the [ruby-vips] gem to your Gemfile:
+
+```rb
+gem "ruby-vips", "~> 2.0"
+```
 
 ## Usage
 
@@ -74,10 +81,15 @@ ImageProcessing::Vips
   .colourspace(:grey16)
 ```
 
+Resize-on-load is only possible when the source is a file path (not a
+`Vips::Image` object) and no `#loader` options were specified. Otherwise the
+image is loaded first and then resized with [`Vips::Image#thumbnail_image`].
+
 ### Untrusted loaders
 
 This gem automatically [blocks all untrusted operations][block
-untrusted] on libvips 8.13+. This means that formats like SVGs and PDFs can't be
+untrusted] on libvips 8.13+ (when the installed ruby-vips version supports it).
+This means that formats like SVGs and PDFs can't be
 processed by default, as they're considered to be more vulnerable to attack
 vectors.
 
@@ -90,12 +102,16 @@ require "image_processing/vips"
 Vips.block_untrusted(false)
 ```
 
+If the `VIPS_BLOCK_UNTRUSTED` environment variable is set, this gem leaves the
+setting to libvips, which then blocks untrusted operations on its own.
+
 ## Methods
 
 #### `.valid_image?`
 
 Tries to calculate the image average using sequential access, and returns
-`true` if no exception was raised, otherwise returns `false`.
+`true` if no exception was raised, otherwise returns `false`. The given file
+needs to respond to `#path`.
 
 ```rb
 ImageProcessing::Vips.valid_image?(normal_image)  #=> true
@@ -125,7 +141,8 @@ pipeline.resize_to_limit!(400, nil)
 pipeline.resize_to_limit!(nil, 400)
 ```
 
-Any additional options are forwarded to [`Vips::Image#thumbnail_image`]:
+Any additional options are forwarded to [`Vips::Image.thumbnail`] (or
+[`Vips::Image#thumbnail_image`] when resize-on-load isn't possible):
 
 ```rb
 pipeline.resize_to_limit!(400, 400, linear: true)
@@ -156,7 +173,8 @@ pipeline.resize_to_fit!(400, nil)
 pipeline.resize_to_fit!(nil, 400)
 ```
 
-Any additional options are forwarded to [`Vips::Image#thumbnail_image`]:
+Any additional options are forwarded to [`Vips::Image.thumbnail`] (or
+[`Vips::Image#thumbnail_image`] when resize-on-load isn't possible):
 
 ```rb
 pipeline.resize_to_fit!(400, 400, linear: true)
@@ -177,19 +195,18 @@ result = pipeline.resize_to_fill!(400, 400)
 Vips::Image.new_from_file(result.path).size #=> [400, 400]
 ```
 
-Any additional options are forwarded to [`Vips::Image#thumbnail_image`]:
+Any additional options are forwarded to [`Vips::Image.thumbnail`] (or
+[`Vips::Image#thumbnail_image`] when resize-on-load isn't possible):
 
 ```rb
 pipeline.resize_to_fill!(400, 400, crop: :attention) # smart crop
 ```
 
-Crop option is `:centre` by default. Acceptable options are currently `:none`,
-`:attention`, `:centre`, and `:entropy`.
-
-Note that from libvips 8.8, `:crop` option will accept two new values – `:high`
-and `:low` – which respectively position the crop box at the high end and low
-end of the axis that needs cropping. On libvips versions prior to 8.8 you can
-still get this behaviour, it just requires [some work][crop high low].
+The `:crop` option is `:centre` by default. Acceptable values are `:none`,
+`:centre`, `:entropy`, `:attention`, and on libvips 8.8+ also `:low` and
+`:high`, which respectively position the crop box at the low end and high end
+of the axis that needs cropping. On libvips versions prior to 8.8 you can still
+get this behaviour, it just requires [some work][crop high low].
 
 See [`vips_thumbnail()`] for more details.
 
@@ -215,8 +232,8 @@ add the alpha channel to the image:
 pipeline.resize_and_pad!(400, 400, alpha: true)
 ```
 
-The `:extend` and `:background` options are also accepted and are forwarded to
-[`Vips::Image#gravity`]:
+The `:extend` and `:background` options are also accepted and are
+forwarded to [`Vips::Image#gravity`]:
 
 ```rb
 pipeline.resize_and_pad!(400, 400, extend: :copy)
@@ -229,10 +246,11 @@ image will be positioned (defaults to `"centre"`).
 pipeline.resize_and_pad!(400, 400, gravity: "north-west")
 ```
 
-Any additional options are forwarded to [`Vips::Image#thumbnail_image`]:
+Any additional options are forwarded to [`Vips::Image.thumbnail`] (or
+[`Vips::Image#thumbnail_image`] when resize-on-load isn't possible):
 
 ```rb
-pipeline.resize_to_fill!(400, 400, linear: true)
+pipeline.resize_and_pad!(400, 400, linear: true)
 ```
 
 See [`vips_thumbnail()`] and [`vips_gravity()`] for more details.
@@ -250,7 +268,8 @@ result = pipeline.resize_to_cover!(300, 300)
 Vips::Image.new_from_file(result.path).size #=> [300, 400]
 ```
 
-Any additional options (except `crop`) are forwarded to [`Vips::Image#thumbnail_image`]:
+Both dimensions are required. Any additional options (except `:crop`) are
+forwarded to [`Vips::Image#thumbnail_image`]:
 
 ```rb
 pipeline.resize_to_cover!(400, 400, linear: true)
@@ -269,9 +288,13 @@ ImageProcessing::Vips
   .crop(20, 50, 300, 300) # extracts 300x300 area with top-left edge 20,50
 ```
 
+This calls `Vips::Image#crop` (an alias for `#extract_area`), so the area has
+to be fully contained within the image.
+
 #### `#rotate`
 
-Rotates the image by the specified angle.
+Rotates the image by the specified angle. Rotating by 90, 180 or 270 degrees
+without any options uses the lossless `#rot90`/`#rot180`/`#rot270`.
 
 ```rb
 ImageProcessing::Vips
@@ -305,14 +328,15 @@ ImageProcessing::Vips
 The overlay can be a `String`, `Pathname`, object that responds to `#path`, or
 a `Vips::Image`.
 
-The [blend mode] can be specified via the `:blend` option (defaults to `"over"`).
+The [blend mode] can be specified via the `:mode` option (defaults to `"over"`).
 
 ```rb
 composite(overlay, mode: "atop")
 ```
 
-The [direction] and position of the overlayed image can be controlled via the
-`:gravity` and `:offset` options:
+The [direction] of the overlayed image can be controlled via the `:gravity`
+option (defaults to `"north-west"`), and its position relative to that
+direction via the `:offset` option, given as `[x, y]`:
 
 ```rb
 composite(overlay, gravity: "south-east")
@@ -326,10 +350,12 @@ composite(overlay, premultiplied: true)
 ```
 
 You can still invoke `Vips::Image#composite` directly by passing the blend mode
-as the second argument:
+as the second argument. In that case the overlay can also be an array of
+images, and `:gravity`/`:offset` are not applied:
 
 ```rb
 composite(overlay, :over) # calls Vips::Image#composite
+composite([overlay1, overlay2], [:over, :atop])
 ```
 
 See [`vips_composite()`] for more details.
@@ -348,20 +374,22 @@ File.extname(result.path)
 ```
 
 By default the original format is retained when writing the image to a file. If
-the source file doesn't have a file extension, the format will default to JPEG.
+the source file doesn't have a file extension (or the source is a `Vips::Image`
+object), the format will default to JPEG.
 
 When a destination path is given, its extension determines the format. When
 the destination path has no extension, as with a `/dev/fd/N` path, the format
 passed to `#convert` is used instead.
 
-NOTE: libvips 8.6 is able to normally read GIF images (and convert them to
-other formats), but it's not able to *save* to GIF format. If you need full GIF
-support, you need to use libvips 8.7+ compiled with ImageMagick support
-(`--with-imagemagick` for Homebrew).
+NOTE: libvips can save to GIF natively only since version 8.12. On older
+versions, saving to GIF requires libvips to be compiled with ImageMagick
+support.
 
 #### `#method_missing`
 
-Any unknown methods will be delegated to [`Vips::Image`].
+Any unknown methods will be delegated to [`Vips::Image`]. The metadata methods
+`#set`, `#set_type`, `#set_value` and `#remove`, which normally mutate the image
+and return `nil`, are made chainable by returning the image.
 
 ```rb
 ImageProcessing::Vips
@@ -412,6 +440,8 @@ See [`vips_jpegload()`], [`vips_pngload()`] etc. for more details on
 format-specific load options. Any provided options that are not defined for a
 specific loader will be ignored.
 
+Note that specifying any loader options disables [resize-on-load].
+
 By default, libvips will select the appropriate loader based on the type of the
 source image. If libvips fails to determine the type of the source image, you
 can force a specific loader:
@@ -422,9 +452,13 @@ ImageProcessing::Vips
   # ...
 ```
 
+When a specific loader is forced, options are passed to it as is, without
+filtering out unknown ones.
+
 An additional `:autorot` option is accepted to specify whether
 [`vips_autorot()`] should be automatically called after the image is loaded
-(defaults to `true`).
+(defaults to `true`). Automatic rotation is also skipped when the loader's own
+`:autorotate` option is given.
 
 ```rb
 ImageProcessing::Vips
@@ -481,6 +515,9 @@ ImageProcessing::Vips
   # ...
 ```
 
+When a specific saver is forced, options are passed to it as is, without
+filtering out unknown ones.
+
 If you would like to have more control over saving, you can call `#call(save:
 false)` to get the `Vips::Image` object, and call the saver on it directly.
 
@@ -517,8 +554,8 @@ ImageProcessing::Vips
 
 ## Sharpening
 
-With `#resize_*` operators, you can additional sharpen the thumbnails via the
-`:sharpen` option:
+With `#resize_*` operators, you can additionally sharpen the thumbnails via the
+`:sharpen` option (sharpening is disabled by default):
 
 ```rb
 ImageProcessing::Vips
@@ -549,27 +586,29 @@ ImageProcessing::Vips
 ```
 
 [ruby-vips]: https://github.com/libvips/ruby-vips
-[libvips]: https://github.com/libvips/libvips
-[installation instructions]: https://github.com/libvips/libvips/wiki#building-and-installing
-[`Vips::Image`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image
-[`Vips::Image.new_from_file`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#new_from_file-class_method
-[`Vips::Image#write_to_file`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#write_to_file-instance_method
-[`Vips::Image#thumbnail_image`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
-[`Vips::Image#gravity`]: http://www.rubydoc.info/gems/ruby-vips/Vips/Image#gravity-instance_method
+[libvips]: https://www.libvips.org/
+[installation instructions]: https://www.libvips.org/install.html
+[`Vips::Image`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image
+[`Vips::Image.new_from_file`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#new_from_file-class_method
+[`Vips::Image#write_to_file`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#write_to_file-instance_method
+[`Vips::Image#thumbnail_image`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_image-instance_method
+[`Vips::Image#gravity`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#gravity-instance_method
 [`Vips::Image#composite`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#composite-instance_method
 [`Vips::Image#similarity`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#similarity-instance_method
-[`vips_thumbnail()`]: https://libvips.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
-[`vips_gravity()`]: http://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-gravity
-[`vips_composite()`]: http://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-composite
-[`vips_autorot()`]: https://libvips.github.io/libvips/API/current/libvips-conversion.html#vips-autorot
-[`vips_similarity()`]: http://libvips.github.io/libvips/API/current/libvips-resample.html#vips-similarity
-[`vips_jpegload()`]: https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegload
-[`vips_pngload()`]: https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-pngload
-[`vips_jpegsave()`]: https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
-[`vips_pngsave()`]: https://libvips.github.io/libvips/API/current/VipsForeignSave.html#vips-pngsave
-[direction]: http://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsCompassDirection
-[blend mode]: http://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+[`vips_thumbnail()`]: https://www.libvips.org/API/current/ctor.Image.thumbnail.html
+[`vips_gravity()`]: https://www.libvips.org/API/current/method.Image.gravity.html
+[`vips_composite()`]: https://www.libvips.org/API/current/type_func.Image.composite.html
+[`vips_autorot()`]: https://www.libvips.org/API/current/method.Image.autorot.html
+[`vips_similarity()`]: https://www.libvips.org/API/current/method.Image.similarity.html
+[`vips_jpegload()`]: https://www.libvips.org/API/current/ctor.Image.jpegload.html
+[`vips_pngload()`]: https://www.libvips.org/API/current/ctor.Image.pngload.html
+[`vips_jpegsave()`]: https://www.libvips.org/API/current/method.Image.jpegsave.html
+[`vips_pngsave()`]: https://www.libvips.org/API/current/method.Image.pngsave.html
+[direction]: https://www.libvips.org/API/current/enum.CompassDirection.html
+[blend mode]: https://www.libvips.org/API/current/enum.BlendMode.html
 [convolution mask]: https://en.wikipedia.org/wiki/Kernel_(image_processing)
 [watermark]: https://en.wikipedia.org/wiki/Watermark
 [crop high low]: https://github.com/janko/image_processing/wiki/Resize-To-Fill
 [block untrusted]: https://www.rubydoc.info/gems/ruby-vips/Vips#block_untrusted-class_method
+[`Vips::Image.thumbnail`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail-class_method
+[resize-on-load]: #resize-on-load
