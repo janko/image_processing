@@ -411,16 +411,15 @@ describe "ImageProcessing::Pipeline" do
     assert_dimensions [300, 400], result
   end
 
-  it "dispatches methods mixed into the accumulator class" do
+  it "dispatches methods mixed into the accumulator" do
     methods = Module.new do
       def halve
         resize(0.5)
       end
     end
 
-    accumulator = Class.new(Vips::Image) { include methods }
-    processor   = Class.new(ImageProcessing::Vips::Processor) do
-      define_method(:initialize) { |image| super(accumulator.new(image.ptr)) }
+    processor = Class.new(ImageProcessing::Vips::Processor) do
+      define_method(:initialize) { |image| super(image.extend(methods)) }
     end
     result = ImageProcessing::Vips.branch(processor: processor).source(@portrait).halve.call
     assert_dimensions [300, 400], result
