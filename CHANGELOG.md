@@ -1,3 +1,7 @@
+## HEAD
+
+* Allow operations defined in modules mixed into a processor or accumulator class again (e.g. `ImageProcessing::Vips::Processor.include(MyMacros)`), which 2.2.1 rejected
+
 ## 2.2.1 (2026-11-21)
 
 * Prevent remote code execution when operation names or MiniMagick loader/saver option names come from user input and a library such as ActiveSupport adds methods like `Object#try` to every object (reported by @hgrgr)

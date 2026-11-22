@@ -394,6 +394,48 @@ describe "ImageProcessing::Pipeline" do
     end
   end
 
+  it "dispatches macros mixed into a processor" do
+    macros = Module.new do
+      def halve
+        image.resize(0.5)
+      end
+    end
+
+    processor = Class.new(ImageProcessing::Vips::Processor) { include macros }
+    result = ImageProcessing::Vips.branch(processor: processor).source(@portrait).halve.call
+    assert_dimensions [300, 400], result
+
+    subclass  = Class.new(ImageProcessing::Vips::Processor)
+    processor = Class.new(subclass) { include macros }
+    result = ImageProcessing::Vips.branch(processor: processor).source(@portrait).apply(halve: true).call
+    assert_dimensions [300, 400], result
+  end
+
+  it "dispatches methods mixed into the accumulator class" do
+    methods = Module.new do
+      def halve
+        resize(0.5)
+      end
+    end
+
+    accumulator = Class.new(Vips::Image) { include methods }
+    processor   = Class.new(ImageProcessing::Vips::Processor) do
+      define_method(:initialize) { |image| super(accumulator.new(image.ptr)) }
+    end
+    result = ImageProcessing::Vips.branch(processor: processor).source(@portrait).halve.call
+    assert_dimensions [300, 400], result
+  end
+
+  it "doesn't allow methods mixed into every object, even with processor mixins" do
+    processor = Class.new(ImageProcessing::Vips::Processor) { include Module.new }
+
+    assert_raises ImageProcessing::Error do
+      ImageProcessing::Vips.branch(processor: processor).source(@portrait)
+        .operation("try", "instance_eval", "`touch foo.txt`").call
+    end
+    refute File.exist?("foo.txt")
+  end
+
   it "doesn't allow overwriting builder options via apply" do
     assert_raises ArgumentError do
       ImageProcessing::Vips.source(@portrait).apply(branch: { processor: "Kernel" })
