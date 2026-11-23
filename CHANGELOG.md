@@ -1,5 +1,7 @@
 ## HEAD
 
+* [vips] `.valid_image?` now returns `false` for truncated and corrupt images on libvips 8.12+
+
 * Ruby 3.2+ is now required
 
 * [vips] Add `#trim` for removing edges that match the background color, which defaults to the top-left pixel

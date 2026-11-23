@@ -13,7 +13,10 @@ module ImageProcessing
 
     # Returns whether the given image file is processable.
     def self.valid_image?(file)
-      ::Vips::Image.new_from_file(file.path, access: :sequential).avg
+      # libvips loads truncated and corrupt images by default
+      options = ::Vips.at_least_libvips?(8, 12) ? { fail_on: :error } : {}
+
+      ::Vips::Image.new_from_file(file.path, access: :sequential, **options).avg
       true
     rescue ::Vips::Error
       false

@@ -196,6 +196,11 @@ describe "ImageProcessing::Vips" do
       refute ImageProcessing::Vips.valid_image?(fixture_image("invalid.jpg"))
       refute ImageProcessing::Vips.valid_image?(copy_to_tempfile(fixture_image("invalid.jpg"))) # no extension
     end
+
+    it "returns false for truncated images" do
+      truncated = copy_to_tempfile(StringIO.new(@portrait.read(30_000)), ".jpg")
+      refute ImageProcessing::Vips.valid_image?(truncated)
+    end if Vips.at_least_libvips?(8, 12)
   end
 
   describe "#resize_to_limit" do

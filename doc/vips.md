@@ -111,7 +111,8 @@ setting to libvips, which then blocks untrusted operations on its own.
 #### `.valid_image?`
 
 Tries to calculate the image average using sequential access, and returns
-`true` if no exception was raised, otherwise returns `false`. The given file
+`true` if no exception was raised, otherwise returns `false`. On libvips 8.12+
+truncated and corrupt images are considered invalid as well. The given file
 needs to respond to `#path`.
 
 ```rb
