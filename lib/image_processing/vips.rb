@@ -5,6 +5,8 @@ rescue LoadError
   raise LoadError, "ImageProcessing::Vips requires the ruby-vips gem. Please add `gem \"ruby-vips\", \"~> 2.0\"` to your Gemfile."
 end
 
+require "image_processing/vips/io_source"
+
 Vips.block_untrusted(true) if Vips.respond_to?(:block_untrusted) && !ENV["VIPS_BLOCK_UNTRUSTED"]
 
 module ImageProcessing
@@ -28,12 +30,66 @@ module ImageProcessing
                                                    [-1, -1, -1]], 24
 
 
-      # Loads the image on disk into a Vips::Image object. Accepts additional
-      # loader-specific options (e.g. interlacing). Afterwards auto-rotates the
-      # image to be upright.
+      # Image data that was read into memory.
+      Buffer = Data.define(:data)
+
+      # Supports IO objects as sources. When saving, the IO is streamed into
+      # libvips (see IOSource). Otherwise the pixels are read only after the
+      # image is returned, so the IO is read into memory upfront instead.
+      def self.call(source:, destination: nil, **options)
+        return super if valid_source?(source) || !source.respond_to?(:read)
+
+        if destination
+          IOSource.process(source) do |vips_source|
+            super(source: vips_source, destination:, **options)
+          end
+        else
+          super(source: read_buffer(source), **options)
+        end
+      end
+
+      # Reads the IO object into a Buffer, relying only on IO#read(length).
+      def self.read_buffer(io)
+        data = String.new(encoding: Encoding::BINARY)
+
+        while (chunk = io.read(IOSource::CHUNK_SIZE)) && !chunk.empty?
+          data << chunk.b
+        end
+
+        Buffer.new(data)
+      end
+      private_class_method :read_buffer
+
+      # Accepts Vips::Source and Buffer objects in addition to paths and images.
+      def self.valid_source?(source)
+        super || source.is_a?(::Vips::Source) || source.is_a?(Buffer)
+      end
+
+      # Loads the image on disk, from a Vips::Source or from a Buffer into a
+      # Vips::Image object. Accepts additional loader-specific options (e.g. interlacing).
+      # Afterwards auto-rotates the image to be upright.
       def self.load_image(path_or_image, loader: nil, autorot: true, **options)
         if path_or_image.is_a?(::Vips::Image)
           image = path_or_image
+        elsif path_or_image.is_a?(::Vips::Source)
+          source = path_or_image
+
+          if loader
+            image = ::Vips::Image.public_send(:"#{loader}load_source", source, **options)
+          else
+            options = Utils.select_valid_source_loader_options(source, options)
+            image = ::Vips::Image.new_from_source(source, "", **options)
+          end
+        elsif path_or_image.is_a?(Buffer)
+          # libvips copies the data, so it doesn't need to be kept alive
+          data = path_or_image.data
+
+          if loader
+            image = ::Vips::Image.public_send(:"#{loader}load_buffer", data, **options)
+          else
+            options = Utils.select_valid_buffer_loader_options(data, options)
+            image = ::Vips::Image.new_from_buffer(data, "", **options)
+          end
         else
           path = path_or_image
 
@@ -109,7 +165,7 @@ module ImageProcessing
       # Resizes the image to cover the specified dimensions, without
       # cropping the excess.
       def resize_to_cover(width, height, **)
-        image = self.image.is_a?(String) ? self.class.load_image(self.image) : self.image
+        image = self.image.is_a?(::Vips::Image) ? self.image : self.class.load_image(self.image)
 
         image_ratio = Rational(image.width, image.height)
         thumbnail_ratio = Rational(width, height)
@@ -203,6 +259,12 @@ module ImageProcessing
         if self.image.is_a?(String) # path
           # resize on load
           image = ::Vips::Image.thumbnail(self.image, width, height:, **options)
+        elsif self.image.is_a?(::Vips::Source)
+          # resize on load
+          image = ::Vips::Image.thumbnail_source(self.image, width, height:, **options)
+        elsif self.image.is_a?(Buffer)
+          # resize on load
+          image = ::Vips::Image.thumbnail_buffer(self.image.data, width, height:, **options)
         else
           # we're already calling Image#autorot when loading the image
           no_rotate = ::Vips.at_least_libvips?(8, 8) ? { no_rotate: true } : { auto_rotate: false }
@@ -276,6 +338,18 @@ module ImageProcessing
         # libvips uses various loaders depending on the input format.
         def select_valid_loader_options(source_path, options)
           loader = ::Vips.vips_foreign_find_load(source_path)
+          loader ? select_valid_options(loader, options) : options
+        end
+
+        # Same as #select_valid_loader_options, but for a Vips::Source.
+        def select_valid_source_loader_options(source, options)
+          loader = ::Vips.vips_foreign_find_load_source(source)
+          loader ? select_valid_options(loader, options) : options
+        end
+
+        # Same as #select_valid_loader_options, but for data in memory.
+        def select_valid_buffer_loader_options(data, options)
+          loader = ::Vips.vips_foreign_find_load_buffer(data, data.bytesize)
           loader ? select_valid_options(loader, options) : options
         end
 

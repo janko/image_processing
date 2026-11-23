@@ -53,6 +53,13 @@ describe "ImageProcessing::MiniMagick" do
     assert_similar expected, actual
   end
 
+  it "doesn't support IO sources" do
+    error = assert_raises(ImageProcessing::Error) do
+      ImageProcessing::MiniMagick.call(StringIO.new(File.binread(@portrait.path)))
+    end
+    assert_match "doesn't support IO sources", error.message
+  end
+
   it "applies format" do
     result = ImageProcessing::MiniMagick.convert("png").call(@portrait)
     assert_equal ".png", File.extname(result.path)

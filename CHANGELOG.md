@@ -1,5 +1,7 @@
 ## HEAD
 
+* [vips] Accept IO objects as source and stream them into libvips, instead of requiring a file on disk
+
 * Ruby 3.2+ is now required
 
 * [vips] Add `#trim` for removing edges that match the background color, which defaults to the top-left pixel

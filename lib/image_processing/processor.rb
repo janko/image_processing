@@ -2,7 +2,11 @@ module ImageProcessing
   # Abstract class inherited by individual processors.
   class Processor
     def self.call(source:, loader:, operations:, saver:, destination: nil, format: nil)
-      unless source.is_a?(String) || source.is_a?(self::ACCUMULATOR_CLASS)
+      unless valid_source?(source)
+        if source.respond_to?(:read)
+          fail Error, "#{name} doesn't support IO sources, use a path or an object that responds to #path instead"
+        end
+
         fail Error, "invalid source: #{source.inspect}"
       end
 
@@ -39,6 +43,12 @@ module ImageProcessing
     # Delegates to #apply_operation.
     def self.apply_operation(accumulator, (name, args, block))
       new(accumulator).apply_operation(name, *args, &block)
+    end
+
+    # Whether the processor can load the given source object (a path or an
+    # accumulator object by default).
+    def self.valid_source?(source)
+      source.is_a?(String) || source.is_a?(self::ACCUMULATOR_CLASS)
     end
 
     # Whether the processor supports resizing the image upon loading.

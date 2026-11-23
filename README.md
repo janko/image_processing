@@ -138,6 +138,24 @@ ImageProcessing::Vips.source(Pathname.new("source.jpg"))
 ImageProcessing::Vips.source(Vips::Image.new_from_file("source.jpg"))
 ```
 
+With `ImageProcessing::Vips`, the source can also be an IO object that responds
+to `#read(length)`, such as a `StringIO`, a `Down::ChunkedIO` or a Shrine
+uploaded file. The IO object is streamed into libvips while processing, so it
+doesn't need to be written to disk first.
+
+```rb
+ImageProcessing::Vips.source(StringIO.new(image_data))
+ImageProcessing::Vips.source(Down.open("https://example.com/image.jpg"))
+```
+
+The IO object is read in the calling thread, while the image is processed in a
+separate thread, so a `#custom` block won't see thread-local or fiber-local
+state. Inside a `#custom` block, use libvips operations rather than methods
+that read pixels directly, such as `Vips::Image#to_a` or `#write_to_memory`:
+ruby-vips holds the GVL while running them, so they would deadlock waiting for
+data from the IO object. With `save: false`, the IO object is read into memory
+upfront, as libvips reads pixels only after the image is returned.
+
 When `#call` is called without options, the result of processing is a
 `Tempfile` object. You can save the processing result to a specific location by
 passing `:destination` to `#call`, or pass `save: false` to retrieve the raw

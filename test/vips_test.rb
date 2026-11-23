@@ -1,6 +1,7 @@
 require "test_helper"
 require "image_processing/vips"
 require "pathname"
+require "timeout"
 
 describe "ImageProcessing::Vips" do
   before do
@@ -184,6 +185,149 @@ describe "ImageProcessing::Vips" do
     destination = Tempfile.new(["destination", ".jpg"])
     ImageProcessing::Vips.convert("png").call(@portrait, destination: destination.path)
     assert_type "JPEG", destination
+  end
+
+  describe "IO source" do
+    # Reads chunks through Enumerator#next, which resumes a Fiber, so like
+    # Down::ChunkedIO it can only be read from the thread that created it.
+    # Optionally raises after reading the given number of bytes.
+    class FiberIO
+      attr_reader :bytes_read
+
+      def initialize(data, chunk_size: 16 * 1024, fail_after: nil)
+        source = StringIO.new(data)
+
+        @chunks = Enumerator.new do |yielder|
+          while (chunk = source.read(chunk_size))
+            yielder << chunk
+            raise IOError, "connection reset" if fail_after && source.pos >= fail_after
+          end
+        end
+        @buffer     = String.new
+        @bytes_read = 0
+      end
+
+      def read(length)
+        begin
+          @buffer << @chunks.next while @buffer.bytesize < length
+        rescue StopIteration
+        end
+
+        chunk = @buffer.slice!(0, length) unless @buffer.empty?
+        @bytes_read += chunk.bytesize if chunk
+        chunk
+      end
+    end
+
+    around do |&block|
+      Timeout.timeout(30) { super(&block) } # a deadlock would otherwise hang
+    end
+
+    def fiber_io(name, **options)
+      FiberIO.new(File.binread("test/fixtures/#{name}"), **options)
+    end
+
+    it "streams IO objects that can only be read from their own thread" do
+      result = ImageProcessing::Vips.resize_to_limit(400, 400).call(fiber_io("portrait.jpg"))
+      assert_dimensions [300, 400], result
+      assert_similar ImageProcessing::Vips.resize_to_limit(400, 400).call(@portrait), result
+    end
+
+    it "streams IO objects without resizing on load" do
+      result = ImageProcessing::Vips.invert.call(fiber_io("portrait.jpg"))
+      assert_similar ImageProcessing::Vips.invert.call(@portrait), result
+    end
+
+    it "accepts StringIO" do
+      result = ImageProcessing::Vips.resize_to_fill(200, 200).call(StringIO.new(File.binread(@portrait.path)))
+      assert_dimensions [200, 200], result
+    end
+
+    it "accepts IO objects with formats that require seeking" do
+      png  = ImageProcessing::Vips.convert("png").call(@portrait)
+      tiff = ImageProcessing::Vips.convert("tiff").call(@portrait)
+
+      assert_dimensions [300, 400], ImageProcessing::Vips.resize_to_limit(400, 400).call(StringIO.new(png.read))
+      assert_dimensions [300, 400], ImageProcessing::Vips.resize_to_limit(400, 400).call(StringIO.new(tiff.read))
+    end
+
+    it "accepts IO objects in #resize_to_cover" do
+      result = ImageProcessing::Vips.resize_to_cover(300, 100).call(fiber_io("portrait.jpg"))
+      assert_dimensions [300, 400], result
+    end
+
+    it "auto rotates IO objects" do
+      assert_dimensions [600, 800], ImageProcessing::Vips.call(fiber_io("rotated.jpg"))
+      assert_dimensions [300, 400], ImageProcessing::Vips.resize_to_limit(400, 400).call(fiber_io("rotated.jpg"))
+    end
+
+    it "saves IO objects to a destination" do
+      destination = Tempfile.new(["destination", ".png"])
+      ImageProcessing::Vips.resize_to_limit(400, 400).call(fiber_io("portrait.jpg"), destination: destination.path)
+      assert_dimensions [300, 400], destination
+      assert_type "PNG", destination
+    end
+
+    it "applies loader options to IO objects" do
+      assert_dimensions [300, 400], ImageProcessing::Vips.loader(shrink: 2).call(fiber_io("portrait.jpg"))
+    end
+
+    it "ignores loader options to IO objects that are not defined" do
+      png = ImageProcessing::Vips.convert("png").call(@portrait)
+      assert_dimensions [600, 800], ImageProcessing::Vips.loader(shrink: 2).call(StringIO.new(png.read))
+    end
+
+    it "accepts :loader for IO objects" do
+      error = assert_raises(Vips::Error) do
+        ImageProcessing::Vips.loader(loader: :tiff).call(fiber_io("portrait.jpg"))
+      end
+      assert_match "Not a TIFF", error.message
+    end
+
+    it "returns an image from IO objects that doesn't need the IO object" do
+      image = ImageProcessing::Vips.invert.call(fiber_io("portrait.jpg"), save: false)
+      assert_equal [600, 800], image.size
+      GC.start
+      assert_equal 600 * 800 * 3, image.write_to_memory.bytesize
+    end
+
+    it "returns a resized image from IO objects" do
+      image = ImageProcessing::Vips.resize_to_limit(400, 400).call(fiber_io("portrait.jpg"), save: false)
+      assert_equal [300, 400], image.size
+    end
+
+    it "raises the error from reading the IO object rather than saving a truncated image" do
+      io = fiber_io("portrait.jpg", fail_after: 32 * 1024)
+
+      error = assert_raises(IOError) { ImageProcessing::Vips.resize_to_limit(400, 400).call(io) }
+      assert_equal "connection reset", error.message
+    end
+
+    it "raises the error from reading the IO object without resizing on load" do
+      io = fiber_io("portrait.jpg", fail_after: 32 * 1024)
+
+      assert_raises(IOError) { ImageProcessing::Vips.invert.call(io) }
+    end
+
+    it "deletes the destination when reading the IO object fails" do
+      destination = Dir::Tmpname.create(["destination", ".jpg"]) {}
+      io = fiber_io("portrait.jpg", fail_after: 32 * 1024)
+
+      assert_raises(IOError) { ImageProcessing::Vips.invert.call(io, destination:) }
+      refute File.exist?(destination)
+    end
+
+    it "raises Vips::Error on invalid images" do
+      error = assert_raises(Vips::Error) { ImageProcessing::Vips.call(StringIO.new("not an image")) }
+      assert_includes error.message, "not in a known format"
+    end
+
+    it "stops reading the IO object when processing fails" do
+      io = FiberIO.new("not an image" * 1_000_000, chunk_size: 1024)
+
+      assert_raises(Vips::Error) { ImageProcessing::Vips.call(io) }
+      assert_operator io.bytes_read, :<, 1_000_000
+    end
   end
 
   describe ".valid_image?" do
