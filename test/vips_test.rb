@@ -455,6 +455,112 @@ describe "ImageProcessing::Vips" do
     end
   end
 
+  describe "#trim" do
+    # Creates an image filled with the background, with a rectangle drawn on it.
+    def image(background, rect: nil, rect_color: nil, size: [100, 100])
+      image = (Vips::Image.black(*size) + background).cast(:uchar)
+      image = image.copy(interpretation: :srgb) if background.size >= 3
+      image = image.draw_rect(rect_color, *rect, fill: true) if rect
+      image
+    end
+
+    def trim(image, *args, **options)
+      ImageProcessing::Vips.source(image).trim(*args, **options).call(save: false)
+    end
+
+    it "trims background matching the top-left pixel" do
+      white = image([255, 255, 255], rect: [20, 30, 10, 15], rect_color: [255, 0, 0])
+      black = image([0, 0, 0], rect: [20, 30, 10, 15], rect_color: [255, 0, 0])
+
+      assert_equal [10, 15], trim(white).size
+      assert_equal [10, 15], trim(black).size
+    end
+
+    it "trims the correct area" do
+      trimmed = trim image([255, 255, 255], rect: [20, 30, 10, 15], rect_color: [255, 0, 0])
+
+      assert_equal [255, 0, 0], trimmed.getpoint(0, 0)
+      assert_equal [255, 0, 0], trimmed.getpoint(9, 14)
+    end
+
+    it "trims grayscale images" do
+      assert_equal [10, 15], trim(image([0], rect: [20, 30, 10, 15], rect_color: [255])).size
+    end
+
+    it "trims transparent background" do
+      transparent = image([255, 255, 255, 0], rect: [20, 30, 10, 15], rect_color: [255, 0, 0, 255])
+
+      assert_equal [10, 15], trim(transparent).size
+    end
+
+    it "trims transparent background around content of the same color" do
+      transparent = image([0, 0, 0, 0], rect: [20, 30, 10, 15], rect_color: [0, 0, 0, 255])
+
+      assert_equal [10, 15], trim(transparent).size
+    end
+
+    it "trims around content that differs in either color or alpha" do
+      transparent = image([255, 255, 255, 0])
+        .draw_rect([255, 0, 0, 255], 10, 10, 5, 5, fill: true)     # differs in color
+        .draw_rect([255, 255, 255, 128], 50, 60, 5, 5, fill: true) # differs only in alpha
+
+      assert_equal [45, 55], trim(transparent).size
+    end
+
+    it "keeps the image when it's entirely background" do
+      assert_equal [100, 100], trim(image([255, 255, 255])).size
+      assert_equal [100, 100], trim(image([0, 0, 0, 0])).size
+    end
+
+    it "keeps the image when it's too small to trim" do
+      assert_equal [2, 100], trim(image([255, 255, 255], size: [2, 100])).size
+    end
+
+    it "accepts background color" do
+      black = image([0, 0, 0], rect: [20, 30, 10, 15], rect_color: [255, 255, 255])
+
+      assert_equal [100, 100], trim(black, background: [255, 255, 255]).size
+      assert_equal [10, 15], trim(black, background: [0, 0, 0]).size
+    end
+
+    it "accepts background color with alpha" do
+      transparent = image([0, 0, 0, 0], rect: [20, 30, 10, 15], rect_color: [0, 0, 0, 255])
+
+      assert_equal [100, 100], trim(transparent, background: [0, 0, 0, 255]).size
+      assert_equal [10, 15], trim(transparent, background: [0, 0, 0, 0]).size
+    end
+
+    it "accepts threshold" do
+      faint = image([255, 255, 255], rect: [20, 30, 10, 15], rect_color: [250, 250, 250])
+
+      assert_equal [100, 100], trim(faint).size
+      assert_equal [10, 15], trim(faint, threshold: 2).size
+    end
+
+    it "accepts additional find_trim options" do
+      skip "requires libvips 8.15+" unless Vips.at_least_libvips?(8, 15)
+
+      # a single pixel is removed by the median filter unless line_art is set
+      dot = image([255, 255, 255], rect: [20, 30, 1, 1], rect_color: [0, 0, 0])
+
+      assert_equal [100, 100], trim(dot).size
+      assert_equal [1, 1], trim(dot, line_art: true).size
+    end
+
+    it "works after resizing" do
+      white = image([255, 255, 255], rect: [20, 30, 10, 15], rect_color: [255, 0, 0])
+      trimmed = ImageProcessing::Vips.source(white).resize_to_fit(200, 200).trim.call(save: false)
+
+      # resampling blurs the edges by a pixel
+      assert_in_delta 20, trimmed.width, 1
+      assert_in_delta 30, trimmed.height, 1
+    end
+
+    it "works with files" do
+      assert_dimensions [600, 800], ImageProcessing::Vips.source(@portrait).trim.call
+    end
+  end
+
   describe "#rotate" do
     before do
       @pipeline = ImageProcessing::Vips.source(@portrait)

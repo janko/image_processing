@@ -17,6 +17,7 @@ The `ImageProcessing::Vips` module contains processing macros that use the
   * [`#resize_and_pad`](#resize_and_pad)
   * [`#resize_to_cover`](#resize_to_cover)
   * [`#crop`](#crop)
+  * [`#trim`](#trim)
   * [`#rotate`](#rotate)
   * [`#composite`](#composite)
   * [`#convert`](#convert)
@@ -290,6 +291,53 @@ ImageProcessing::Vips
 
 This calls `Vips::Image#crop` (an alias for `#extract_area`), so the area has
 to be fully contained within the image.
+
+#### `#trim`
+
+Removes edges that match the background color, which is useful for normalizing
+images such as product photos or logos that come with varying amounts of empty
+space around them.
+
+```rb
+ImageProcessing::Vips
+  .trim
+  .resize_and_pad(400, 400)
+  # ...
+```
+
+The background color defaults to the color of the top-left pixel, and can be
+specified with `:background`:
+
+```rb
+ImageProcessing::Vips
+  .trim(background: [255, 255, 255]) # trims white edges
+```
+
+Pixels are considered background when they differ from it by less than
+`:threshold` (default `10`). It's measured in pixel values (e.g. 0–255 for
+8-bit images), not in percentages like ImageMagick's `-fuzz`.
+
+```rb
+ImageProcessing::Vips
+  .trim(threshold: 30) # trims edges with more noise
+```
+
+Transparent edges are trimmed as well. When the image has an alpha channel,
+its background is taken from the top-left pixel, unless the given background
+includes it (e.g. `[255, 255, 255, 0]`). If the whole image matches the
+background, it's returned unchanged.
+
+Any additional options are forwarded to [`vips_find_trim()`], such as
+`:line_art` for disabling noise filtering on synthetic images (libvips 8.15+):
+
+```rb
+ImageProcessing::Vips
+  .trim(line_art: true)
+```
+
+Trimming reads the whole image, so it doesn't work with sequential access
+(`loader(access: :sequential)`). It's best applied before resizing, so that
+edges are found at full resolution.
 
 #### `#rotate`
 
@@ -595,6 +643,7 @@ ImageProcessing::Vips
 [`Vips::Image#gravity`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#gravity-instance_method
 [`Vips::Image#composite`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#composite-instance_method
 [`Vips::Image#similarity`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#similarity-instance_method
+[`vips_find_trim()`]: https://www.libvips.org/API/current/method.Image.find_trim.html
 [`vips_thumbnail()`]: https://www.libvips.org/API/current/ctor.Image.thumbnail.html
 [`vips_gravity()`]: https://www.libvips.org/API/current/method.Image.gravity.html
 [`vips_composite()`]: https://www.libvips.org/API/current/type_func.Image.composite.html

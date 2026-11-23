@@ -133,6 +133,34 @@ module ImageProcessing
         end
       end
 
+      # Removes edges that match the background color, which defaults to the
+      # color of the top-left pixel. Transparent edges are removed as well.
+      def trim(threshold: 10, background: nil, **options)
+        # find_trim's median filter needs at least 3x3 pixels
+        return image if image.width < 3 || image.height < 3
+
+        color, alpha = trim_background(background)
+
+        box = image.find_trim(threshold: threshold, background: color, **options)
+
+        if image.has_alpha?
+          # Flattening can make content indistinguishable from a transparent
+          # background (e.g. black content on transparent black), so search
+          # the alpha channel separately and combine the results.
+          alpha_box = image.extract_band(image.bands - 1)
+            .find_trim(threshold: threshold, background: [alpha], **options)
+
+          box = union_box(box, alpha_box)
+        end
+
+        left, top, width, height = box
+
+        # the whole image is background
+        return image if width.zero? || height.zero?
+
+        image.crop(left, top, width, height)
+      end
+
       # Overlays the specified image over the current one. Supports specifying
       # composite mode, direction or offset of the overlay image.
       def composite(overlay, _mode = nil, mode: "over", gravity: "north-west", offset: nil, **options)
@@ -189,6 +217,33 @@ module ImageProcessing
         end
 
         image
+      end
+
+      # Returns the background color and alpha for #trim. Defaults to the
+      # top-left pixel, and takes the alpha from it when the given background
+      # doesn't include it.
+      def trim_background(background)
+        pixel = image.getpoint(0, 0)
+        background = Array(background || pixel)
+
+        return [background, nil] unless image.has_alpha?
+
+        alpha = background.size == image.bands ? background.last : pixel.last
+
+        [background.first(image.bands - 1), alpha]
+      end
+
+      # Returns the smallest box containing both boxes, ignoring empty ones.
+      def union_box((left1, top1, width1, height1), (left2, top2, width2, height2))
+        return [left2, top2, width2, height2] if width1.zero? || height1.zero?
+        return [left1, top1, width1, height1] if width2.zero? || height2.zero?
+
+        left   = [left1, left2].min
+        top    = [top1, top2].min
+        right  = [left1 + width1, left2 + width2].max
+        bottom = [top1 + height1, top2 + height2].max
+
+        [left, top, right - left, bottom - top]
       end
 
       # Hack to allow omitting one dimension.
