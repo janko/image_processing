@@ -150,10 +150,12 @@ ImageProcessing::Vips.source(Down.open("https://example.com/image.jpg"))
 
 The IO object is read in the calling thread, while the image is processed in a
 separate thread, so a `#custom` block won't see thread-local or fiber-local
-state. Inside a `#custom` block, use libvips operations rather than methods
-that read pixels directly, such as `Vips::Image#to_a` or `#write_to_memory`:
-ruby-vips holds the GVL while running them, so they would deadlock waiting for
-data from the IO object. With `save: false`, the IO object is read into memory
+state. On ruby-vips 2.3.0 and older, use libvips operations inside a `#custom`
+block rather than methods that read pixels directly, such as
+`Vips::Image#to_a`, `#write_to_memory` or `#copy_memory`: those versions hold
+the GVL while running them, so they would deadlock waiting for data from the IO
+object. The same applies to `Vips::Region#fetch` on all ruby-vips versions so
+far. With `save: false`, the IO object is read into memory
 upfront, as libvips reads pixels only after the image is returned.
 
 When `#call` is called without options, the result of processing is a
