@@ -55,7 +55,7 @@ require "image_processing/vips"
 processed = ImageProcessing::Vips
   .source(image)
   .resize_to_limit(400, 400)
-  .saver(strip: true)
+  .saver(keep: :none) # strip metadata
   .call
 
 processed #=> #<Tempfile:/var/folders/.../image_processing20180316-18446-1j247h6.png>
@@ -472,6 +472,16 @@ ImageProcessing::Vips
   # ...
 ```
 
+By default libvips loads truncated and corrupt images, and fills in the missing
+parts. To raise an error instead, use the `:fail_on` loader option (libvips
+8.12+):
+
+```rb
+ImageProcessing::Vips
+  .loader(fail_on: :error) # or :truncated, :warning
+  # ...
+```
+
 If the `#loader` clause is specified multiple times, the options are merged.
 
 ```rb
@@ -534,6 +544,16 @@ Specifies options that will be forwarded to [`Vips::Image#write_to_file`].
 ```rb
 ImageProcessing::Vips
   .saver(quality: 100) # alias for :Q
+  # ...
+```
+
+To strip metadata, use the `:keep` saver option (libvips 8.15+), which can also
+keep selected metadata, or `strip: true` on older libvips versions:
+
+```rb
+ImageProcessing::Vips
+  .saver(keep: :none) # strip all metadata
+  .saver(keep: :icc)  # keep only the ICC profile
   # ...
 ```
 

@@ -210,7 +210,7 @@ block.
 ```rb
 pipeline = ImageProcessing::Vips.instrumenter do |**options, &processing|
   options[:source]     #=> #<File:...>
-  options[:loader]     #=> { fail: true }
+  options[:loader]     #=> { fail_on: :error }
   options[:saver]      #=> { quality: 85 }
   options[:format]     #=> "png"
   options[:operations] #=> [[:resize_to_limit, [500, 500]], [:flip, [:horizontal]]]
@@ -223,7 +223,7 @@ end
 
 pipeline
   .source(image)
-  .loader(fail: true)
+  .loader(fail_on: :error)
   .saver(quality: 85)
   .convert("png")
   .resize_to_limit(500, 500)

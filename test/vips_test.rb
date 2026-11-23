@@ -105,6 +105,21 @@ describe "ImageProcessing::Vips" do
     refute_includes Vips::Image.new_from_file(result.path).get_fields, "exif-data"
   end
 
+  it "strips metadata with :keep saver option" do
+    result = ImageProcessing::Vips.saver(keep: :icc).call(@portrait)
+    fields = Vips::Image.new_from_file(result.path).get_fields
+    refute_includes fields, "exif-data"
+    assert_includes fields, "icc-profile-data"
+  end if Vips.at_least_libvips?(8, 15)
+
+  it "fails on truncated images with :fail_on loader option" do
+    truncated = copy_to_tempfile(StringIO.new(@portrait.read(30_000)), ".jpg")
+    ImageProcessing::Vips.call(truncated) # loads by default
+
+    error = assert_raises(Vips::Error) { ImageProcessing::Vips.loader(fail_on: :error).call(truncated) }
+    assert_match "premature end", error.message
+  end if Vips.at_least_libvips?(8, 12)
+
   it "converts :quality saver option to :Q" do
     result1 = ImageProcessing::Vips.saver(quality: 50).call(@portrait)
     result2 = ImageProcessing::Vips.saver(quality: 100).call(@portrait)
