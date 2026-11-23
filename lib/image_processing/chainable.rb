@@ -8,7 +8,7 @@ module ImageProcessing
 
     # Specify the output format.
     def convert(format)
-      branch format: format
+      branch(format:)
     end
 
     # Specify processor options applied when loading the image.
@@ -56,12 +56,12 @@ module ImageProcessing
 
     # Call the defined processing and get the result. Allows specifying
     # the source file and destination.
-    def call(file = nil, destination: nil, **call_options)
+    def call(file = nil, destination: nil, **)
       options = {}
       options[:source] = file if file
       options[:destination] = destination if destination
 
-      branch(**options).call!(**call_options)
+      branch(**options).call!(**)
     end
 
     # Creates a new builder object, merging current options with new options.

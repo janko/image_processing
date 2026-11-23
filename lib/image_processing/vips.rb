@@ -81,34 +81,34 @@ module ImageProcessing
       end
 
       # Resizes the image to not be larger than the specified dimensions.
-      def resize_to_limit(width, height, **options)
+      def resize_to_limit(width, height, **)
         width, height = default_dimensions(width, height)
-        thumbnail(width, height, size: :down, **options)
+        thumbnail(width, height, size: :down, **)
       end
 
       # Resizes the image to fit within the specified dimensions.
-      def resize_to_fit(width, height, **options)
+      def resize_to_fit(width, height, **)
         width, height = default_dimensions(width, height)
-        thumbnail(width, height, **options)
+        thumbnail(width, height, **)
       end
 
       # Resizes the image to fill the specified dimensions, applying any
       # necessary cropping.
-      def resize_to_fill(width, height, **options)
-        thumbnail(width, height, crop: :centre, **options)
+      def resize_to_fill(width, height, **)
+        thumbnail(width, height, crop: :centre, **)
       end
 
       # Resizes the image to fit within the specified dimensions and fills
       # the remaining area with the specified background color.
-      def resize_and_pad(width, height, gravity: "centre", extend: nil, background: nil, alpha: nil, **options)
-        image = thumbnail(width, height, **options)
+      def resize_and_pad(width, height, gravity: "centre", extend: nil, background: nil, alpha: nil, **)
+        image = thumbnail(width, height, **)
         image = image.add_alpha if alpha && !image.has_alpha?
-        image.gravity(gravity, width, height, extend: extend, background: background)
+        image.gravity(gravity, width, height, extend:, background:)
       end
 
       # Resizes the image to cover the specified dimensions, without
       # cropping the excess.
-      def resize_to_cover(width, height, **options)
+      def resize_to_cover(width, height, **)
         image = self.image.is_a?(String) ? self.class.load_image(self.image) : self.image
 
         image_ratio = Rational(image.width, image.height)
@@ -120,7 +120,7 @@ module ImageProcessing
           height = ::Vips::MAX_COORD
         end
 
-        thumbnail(width, height, **options, crop: :none)
+        thumbnail(width, height, **, crop: :none)
       end
 
       # Rotates the image by an arbitrary angle.
@@ -135,20 +135,20 @@ module ImageProcessing
 
       # Removes edges that match the background color, which defaults to the
       # color of the top-left pixel. Transparent edges are removed as well.
-      def trim(threshold: 10, background: nil, **options)
+      def trim(threshold: 10, background: nil, **)
         # find_trim's median filter needs at least 3x3 pixels
         return image if image.width < 3 || image.height < 3
 
         color, alpha = trim_background(background)
 
-        box = image.find_trim(threshold: threshold, background: color, **options)
+        box = image.find_trim(threshold:, background: color, **)
 
         if image.has_alpha?
           # Flattening can make content indistinguishable from a transparent
           # background (e.g. black content on transparent black), so search
           # the alpha channel separately and combine the results.
           alpha_box = image.extract_band(image.bands - 1)
-            .find_trim(threshold: threshold, background: [alpha], **options)
+            .find_trim(threshold:, background: [alpha], **)
 
           box = union_box(box, alpha_box)
         end
@@ -163,13 +163,13 @@ module ImageProcessing
 
       # Overlays the specified image over the current one. Supports specifying
       # composite mode, direction or offset of the overlay image.
-      def composite(overlay, _mode = nil, mode: "over", gravity: "north-west", offset: nil, **options)
+      def composite(overlay, _mode = nil, mode: "over", gravity: "north-west", offset: nil, **)
         # if the mode argument is given, call the original Vips::Image#composite
         if _mode
           overlay = [overlay] unless overlay.is_a?(Array)
           overlay = overlay.map { |object| convert_to_image(object, "overlay") }
 
-          return image.composite(overlay, _mode, **options)
+          return image.composite(overlay, _mode, **)
         end
 
         overlay = convert_to_image(overlay, "overlay")
@@ -186,7 +186,7 @@ module ImageProcessing
         overlay = overlay.gravity(gravity, image.width, image.height)
 
         # apply the composition
-        image.composite(overlay, mode, **options)
+        image.composite(overlay, mode, **)
       end
 
       # make metadata setter methods chainable
@@ -202,13 +202,13 @@ module ImageProcessing
       def thumbnail(width, height, sharpen: nil, **options)
         if self.image.is_a?(String) # path
           # resize on load
-          image = ::Vips::Image.thumbnail(self.image, width, height: height, **options)
+          image = ::Vips::Image.thumbnail(self.image, width, height:, **options)
         else
           # we're already calling Image#autorot when loading the image
           no_rotate = ::Vips.at_least_libvips?(8, 8) ? { no_rotate: true } : { auto_rotate: false }
           options   = no_rotate.merge(options)
 
-          image = self.image.thumbnail_image(width, height: height, **options)
+          image = self.image.thumbnail_image(width, height:, **options)
         end
 
         if sharpen

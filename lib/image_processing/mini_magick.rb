@@ -17,7 +17,7 @@ module ImageProcessing
         raise LoadError, "The `inherit_fds` loader option requires mini_magick #{INHERIT_FDS_MINIMUM_VERSION} or newer, but mini_magick #{::MiniMagick.version} is loaded. Please upgrade the gem."
       end
 
-      options = inherit_fds ? { inherit_fds: inherit_fds } : {}
+      options = inherit_fds ? { inherit_fds: } : {}
 
       if ::MiniMagick.respond_to?(:convert)
         ::MiniMagick.convert(**options, &block)
@@ -50,14 +50,14 @@ module ImageProcessing
       # `/dev/fd/N` path. The source stays a path, so `loader`, `page` and
       # `geometry` still apply to it, which they would not if the caller passed
       # a pre-built MiniMagick::Tool carrying the descriptor.
-      def self.load_image(path_or_magick, loader: nil, page: nil, geometry: nil, auto_orient: true, inherit_fds: nil, **options)
+      def self.load_image(path_or_magick, loader: nil, page: nil, geometry: nil, auto_orient: true, inherit_fds: nil, **)
         if path_or_magick.is_a?(::MiniMagick::Tool)
           magick = path_or_magick
         else
           source_path = path_or_magick
-          magick = ::ImageProcessing::MiniMagick.convert_shim(inherit_fds: inherit_fds)
+          magick = ::ImageProcessing::MiniMagick.convert_shim(inherit_fds:)
 
-          Utils.apply_options(magick, **options)
+          Utils.apply_options(magick, **)
 
           input  = source_path
           input  = "#{loader}:#{input}" if loader
@@ -75,8 +75,8 @@ module ImageProcessing
       # the result to disk. Accepts additional options related to saving the
       # image (e.g. quality). `format` names the output format when given,
       # otherwise ImageMagick infers it from the path's extension.
-      def self.save_image(magick, destination_path, format = nil, allow_splitting: false, **options)
-        Utils.apply_options(magick, **options)
+      def self.save_image(magick, destination_path, format = nil, allow_splitting: false, **)
+        Utils.apply_options(magick, **)
 
         if format
           # ImageMagick reads everything before the first colon as the
@@ -94,19 +94,19 @@ module ImageProcessing
       end
 
       # Resizes the image to not be larger than the specified dimensions.
-      def resize_to_limit(width, height, **options)
-        thumbnail("#{width}x#{height}>", **options)
+      def resize_to_limit(width, height, **)
+        thumbnail("#{width}x#{height}>", **)
       end
 
       # Resizes the image to fit within the specified dimensions.
-      def resize_to_fit(width, height, **options)
-        thumbnail("#{width}x#{height}", **options)
+      def resize_to_fit(width, height, **)
+        thumbnail("#{width}x#{height}", **)
       end
 
       # Resizes the image to fill the specified dimensions, applying any
       # necessary cropping.
-      def resize_to_fill(width, height, gravity: "Center", **options)
-        thumbnail("#{width}x#{height}^", **options)
+      def resize_to_fill(width, height, gravity: "Center", **)
+        thumbnail("#{width}x#{height}^", **)
         magick.gravity gravity
         magick.background color(:transparent)
         magick.extent "#{width}x#{height}"
@@ -114,8 +114,8 @@ module ImageProcessing
 
       # Resizes the image to fit within the specified dimensions and fills
       # the remaining area with the specified background color.
-      def resize_and_pad(width, height, background: :transparent, gravity: "Center", **options)
-        thumbnail("#{width}x#{height}", **options)
+      def resize_and_pad(width, height, background: :transparent, gravity: "Center", **)
+        thumbnail("#{width}x#{height}", **)
         magick.background color(background)
         magick.gravity gravity
         magick.extent "#{width}x#{height}"
@@ -123,8 +123,8 @@ module ImageProcessing
 
       # Resizes the image to cover the specified dimensions, without
       # cropping the excess.
-      def resize_to_cover(width, height, **options)
-        thumbnail("#{width}x#{height}^", **options)
+      def resize_to_cover(width, height, **)
+        thumbnail("#{width}x#{height}^", **)
       end
 
       # Crops the image with the specified crop points.
@@ -159,7 +159,7 @@ module ImageProcessing
         magick << mask_path if mask_path
 
         magick.compose(mode) if mode
-        define(compose: { args: args }) if args
+        define(compose: { args: }) if args
 
         magick.gravity(gravity) if gravity
         magick.geometry(geometry) if geometry

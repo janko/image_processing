@@ -22,9 +22,9 @@ module ImageProcessing
       elsif destination
         handle_destination do
           if format && !determine_format(destination)
-            call_processor(destination: destination, format: format)
+            call_processor(destination:, format:)
           else
-            call_processor(destination: destination)
+            call_processor(destination:)
           end
         end
       else
@@ -50,14 +50,8 @@ module ImageProcessing
 
     private
 
-    def call_processor(**options)
-      processor.call(
-        source:     source,
-        loader:     loader,
-        operations: operations,
-        saver:      saver,
-        **options
-      )
+    def call_processor(**)
+      processor.call(source:, loader:, operations:, saver:, **)
     end
 
     # Creates a new tempfile for the destination file, yields it, and refreshes
