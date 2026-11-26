@@ -86,6 +86,19 @@ Resize-on-load is only possible when the source is a file path (not a
 `Vips::Image` object) and no `#loader` options were specified. Otherwise the
 image is loaded first and then resized with [`Vips::Image#thumbnail_image`].
 
+If your image isn't on disk, you can resize it on load yourself with
+[`Vips::Image.thumbnail_source`] and pass the result as the source:
+
+```rb
+source = Vips::Source.new_from_memory(image_data) # or any other Vips::Source
+image  = Vips::Image.thumbnail_source(source, 400, height: 400, size: :down)
+
+ImageProcessing::Vips
+  .source(image)
+  .colourspace(:grey16)
+  # ...
+```
+
 ### Untrusted loaders
 
 This gem automatically [blocks all untrusted operations][block
@@ -681,4 +694,5 @@ ImageProcessing::Vips
 [crop high low]: https://github.com/janko/image_processing/wiki/Resize-To-Fill
 [block untrusted]: https://www.rubydoc.info/gems/ruby-vips/Vips#block_untrusted-class_method
 [`Vips::Image.thumbnail`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail-class_method
+[`Vips::Image.thumbnail_source`]: https://www.rubydoc.info/gems/ruby-vips/Vips/Image#thumbnail_source-class_method
 [resize-on-load]: #resize-on-load
